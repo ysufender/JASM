@@ -14,10 +14,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDART_REQUIRED TRUE)
 
-add_subdirectory(src)
 add_subdirectory(lib)
+add_subdirectory(src)
 
-add_executable(JASM src/main.cpp)
+add_executable(JASM 
+    src/main.cpp 
+    src/assemblycontext.cpp
+)
 
 configure_file(
     ${CMAKE_SOURCE_DIR}/include/JASMConfig.hpp.in

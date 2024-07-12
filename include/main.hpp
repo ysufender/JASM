@@ -1,4 +1,4 @@
 #pragma once
 
-void printHeader();
-void printHelp();
+void PrintHeader();
+void PrintHelp();
