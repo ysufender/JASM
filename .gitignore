@@ -3,3 +3,8 @@ build/
 .clangd
 .editorconfig
 .cache/
+
+*.jef
+*.stc
+*.shd
+*.jasm

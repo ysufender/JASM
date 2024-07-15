@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-struct AssemblyContext 
+class AssemblyContext 
 {
     private:
         bool singleAssembly;
@@ -16,10 +16,10 @@ struct AssemblyContext
     public:
         AssemblyContext(
             bool single, 
-            std::string out, 
-            std::string libT, 
-            std::vector<std::string> in,
-            std::vector<std::string> libs
+            const std::string& out, 
+            const std::string& libT, 
+            const std::vector<std::string>& in,
+            const std::vector<std::string>& libs
         );
 
         const bool& IsSingle() const;

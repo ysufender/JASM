@@ -8,10 +8,10 @@
 
 AssemblyContext::AssemblyContext(
         bool single, 
-        std::string out, 
-        std::string libT, 
-        std::vector<std::string> in,
-        std::vector<std::string> libs
+        const std::string& out, 
+        const std::string& libT, 
+        const std::vector<std::string>& in,
+        const std::vector<std::string>& libs
     )
 {
     if (in.size() == 0)
@@ -30,9 +30,13 @@ AssemblyContext::AssemblyContext(
 
     // Input file extensions are '.jasm' for files
     if (out.empty())
-        ss << inputFiles[0].erase(inputFiles[0].size()-5, 5);
+    {
+        std::string copy { inputFiles.at(0) };
+        ss << copy.erase(copy.size()-5, 5);
+    }
     else
-     ss << out;
+        ss << out;
+
     ss << "." << (isLib ? libType : "jef");
     outFile = ss.str();
 }

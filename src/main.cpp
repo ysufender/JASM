@@ -1,5 +1,12 @@
+#include "assemblycontext.hpp"
 #include <exception>
+#include <ios>
 #include <iostream>
+#include <string>
+
+#ifndef NDEBUG
+#include <fstream>
+#endif
 
 #include "main.hpp"
 #include "CLIParser.hpp"
@@ -36,6 +43,10 @@ int main(int argc, char** args)
 
             Assembler assembler { assemblyContext };
             assembler.Assemble();
+
+#ifndef NDEBUG
+            Finalize(assemblyContext);
+#endif
         }
     }
     catch (const std::exception& exception)
@@ -43,10 +54,28 @@ int main(int argc, char** args)
         std::cerr << "An error occured during process."
                   << "\n\tProvided information: " << exception.what() << std::endl;
     }
-
-
-    return 1;
 }
+
+#ifndef NDEBUG
+void Finalize(const AssemblyContext& context)
+{
+    std::cout << "\n\nFinalizing...";
+   
+    if (!context.IsSingle())
+        return;
+
+    for (const auto& file : context.InputFiles())
+    {
+        std::string outPath { file };
+        outPath.append(".stc");
+        std::ifstream out { outPath, std::ios::binary };
+        AssemblyInfo info;
+
+        info.Deserialize(out);
+        info.PrintAssemblyInfo();
+    }
+}
+#endif
 
 void PrintHeader()
 {
@@ -69,5 +98,8 @@ void PrintHelp()
 
     -in <..input..>: Files to assemble and (optionally) link. The first entry is treated as main file containing entry point.
     -libs <..libraries..>: Libraries used and to be linked.
+
+    WARNING:
+        In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `-libType` flag.
     )";
 }
