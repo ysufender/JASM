@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 
 #include "assembler/assembler.hpp"
 #include "assemblycontext.hpp"
@@ -9,19 +10,27 @@
 //
 // Assembler Implementation
 //
-Assembler::asminf_t Assembler::Assemble()
+std::vector<AssemblyInfo> Assembler::Assemble()
 {
-    context.PrintContext();
+    context.PrintContext(std::cout);
 
-    Assembler::asminf_t outputVector { };
+    std::vector<AssemblyInfo> outputVector { };
 
     // TODO: Loop through all input files and call specified assembler function. 
+    const std::vector<std::string>& inFiles { context.InputFiles() };
+    size_t i { 0 };
 
     if (!context.IsLib() && !context.IsSingle())
-        outputVector.push_back(AssembleExecutable(context.InputFiles()[0]));
+    {
+        outputVector.push_back(AssembleExecutable(inFiles[0]));
+        i = 1;
+    }
 
-    for (const auto& inputFile : context.InputFiles())
+    for (; i < inFiles.size(); i++)
+    {
+        const std::string& inputFile { inFiles[i] };
         outputVector.push_back(AssembleLibrary(inputFile));
+    }
 
     std::cout << "\nDone.\n";
     return std::move(outputVector);
@@ -31,10 +40,12 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
 {
     std::string outPath { file };
     outPath.append(".jef");
+    char outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
 
-    AssemblyInfo assemblyInfo;
-    
-    std::cout << "\n\tDone.";
+    AssemblyInfo assemblyInfo {
+        outPath,
+        outFlags
+    };
     return std::move(assemblyInfo);
 }
 
@@ -42,18 +53,30 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
 {
     std::string outPath { file };
     outPath.append(".stc");
+    char outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo };
 
     if (std::filesystem::exists(outPath))
         std::filesystem::remove(outPath);
+    
+    std::string directories { outPath.substr(0, outPath.find_last_of('/') + 1) };
 
-    AssemblyInfo assemblyInfo;
-    assemblyInfo.path = outPath;
-    assemblyInfo.flags = AssemblyFlags::Static | AssemblyFlags::SymbolInfo;
+    if (!directories.empty())
+        std::filesystem::create_directories(directories);
+
+#ifndef NDEBUG
+    outFlags |= AssemblyFlags::StoreName;
+#endif
+
+    AssemblyInfo assemblyInfo {
+        outPath,
+        outFlags
+    };
 
     if (context.IsSingle())
     {
         std::ofstream out { outPath, std::ios::binary };
         assemblyInfo.Serialize(out);
+        out.close();
     }
     
     return std::move(assemblyInfo);
@@ -62,43 +85,59 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
 //
 // AssemblyInfo Implementation 
 //
+AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : path(path), flags(flags)
+{
+}
+
 void AssemblyInfo::Serialize(std::ofstream& outFile)
 {
+    if (outFile.fail())
+        throw std::runtime_error{"Couldn't open file while serializing assembly info"};
+
     // Write the assembly flags
     outFile.write(&flags, sizeof(flags));
 
-    // Write the path size and path
-    size_t size { path.size() };
-    outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
-    outFile.write(path.data(), size);
+    // Store File Name if Flag is Set
+    if (flags & AssemblyFlags::StoreName)
+    {
+        size_t size { path.size() };
+        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+        outFile.write(path.data(), size);
+    }
+    
+    if (!(flags & AssemblyFlags::SymbolInfo))
+    {
+        outFile.close();
+        return;
+    }
 
     // Write function symbol count
-    size = functionSymbols.size();
-    outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+    symaddr_t sizeSym = static_cast<symaddr_t>(functionSymbols.size());
+    outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Iterate through symbols and write both size and path and address
-    for(size_t i = 0; i < size; i++)
+    for(symaddr_t i = 0; i < sizeSym; i++)
     {
         auto& [name, address] { functionSymbols.at(i) };
-        size_t nameSize { name.size() };
+        maxnamesize_t nameSize { static_cast<maxnamesize_t>(name.size()) };
         outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
         outFile.write(name.data(), nameSize);
         outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
     }
 
     // Write Variable Symbol Count
-    size = variableSymbols.size();
-    outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+    sizeSym = static_cast<symaddr_t>(variableSymbols.size());
+    outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Iterate through symbols and write both size and path and address
-    for (size_t i = 0; i < size; i++)
+    for (symaddr_t i = 0; i < sizeSym; i++)
     {
         auto& [name, info] { variableSymbols.at(i) };
-        size_t nameSize { name.size() };
+        maxnamesize_t nameSize { static_cast<maxnamesize_t>(name.size()) };
         outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
         outFile.write(name.data(), nameSize);
-        int t { info.first };
+        char t { info.first };
         symaddr_t a { info.second };
-        outFile.write(reinterpret_cast<char*>(&t), sizeof(info.first));
-        outFile.write(reinterpret_cast<char*>(&a), sizeof(info.second));
+        outFile.write(&t, sizeof(t));
+        outFile.write(reinterpret_cast<char*>(&a), sizeof(a));
     }
 
 
@@ -107,24 +146,36 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
 
 void AssemblyInfo::Deserialize(std::ifstream& inFile)
 {
+    if (inFile.fail())
+        throw std::runtime_error{"Couldn't open file while deserializing assembly info"};
+
     // Read the assembly flags
     inFile.read(&flags, sizeof(flags));
+    
+    // Read the File Name if Flag is Set
+    if (flags & AssemblyFlags::StoreName)
+    {
+        size_t size;
+        inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+        path.resize(size);
+        inFile.read(path.data(), size);
+    }
 
-    // Read the path
-    size_t size;
-    inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-    path.clear();
-    path.resize(size);
-    inFile.read(path.data(), size);
+    if (!(flags & AssemblyFlags::SymbolInfo))
+    {
+        inFile.close();
+        return;
+    }
 
     // Read function symbol count
-    inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+    symaddr_t sizeSym;
+    inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Read symbols
-    functionSymbols.resize(size);
+    functionSymbols.resize(sizeSym);
     functionSymbols.clear();
-    while (size > 0)
+    while (sizeSym > 0)
     {
-        size_t nameSize;
+        maxnamesize_t nameSize;
         symname_t name;
         inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
         name.resize(nameSize);
@@ -133,18 +184,18 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
         inFile.read(reinterpret_cast<char*>(&address), sizeof(address));
         functionSymbols.push_back({std::move(name), address});
 
-        size--;
+        sizeSym--;
     }
 
 
     // Read variable symbol count
-    inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+    inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Read Symbols
-    variableSymbols.resize(size);
+    variableSymbols.resize(sizeSym);
     variableSymbols.clear();
-    while (size > 0)
+    while (sizeSym > 0)
     {
-        size_t nameSize;
+        maxnamesize_t nameSize;
         symname_t  name;
         inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
         name.resize(nameSize);
@@ -156,9 +207,8 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
         inFile.read(reinterpret_cast<char*>(&address), sizeof(address));
         variableSymbols.push_back({name, {varType, address}});
 
-        size--;
+        sizeSym--;
     }
-
 
 
     inFile.close();
@@ -183,7 +233,7 @@ void AssemblyInfo::PrintAssemblyInfo() const
         }
     };
 
-    std::cout << "\n\nInfo \"" << path << "\"" 
+    std::cout << "\n\nInfo " << (path.empty() ? "Unknown" : path) 
               << "\nFlags: " << static_cast<int>(flags)
               << "\nFunction Symbols [ordered](" << functionSymbols.size() << "):";
 

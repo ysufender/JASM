@@ -13,6 +13,14 @@ CREATE THE FUCKING ASSEMBLY LANGUAGE FIRST IDIOT
 
 ## On Assembly
 
+- A symbol name can be maximum uint16_t in size.
+- Assembly is designed to be 32-bit so the max integer and the max memory is calculated by uint32_t
+
+> NOTE: 
+>   The reason I chose uint16_t and uint32_t is that because the files are getting too big.
+>   A library has to contain the assembly info containing its symbols' names and addresses.
+>   If I use size_t while writing name sizes, well, that's a bit too much. So 16 bits. Yeah.
+
 ### Registers
 
 | Name | Size   | Accesibility | Description               |
