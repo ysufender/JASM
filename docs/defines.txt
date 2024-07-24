@@ -1,22 +1,22 @@
-i32 ->  signed 32-bit integer   \
-u32 ->  unsigned 32-bit integer \
-u64 -> unsigned 64-bit integer. Only for edge cases.    \
-u16 -> unsigned 16-bit integer. \
-byte -> signed 8-bit integer    \
-ubyte -> unsigned 8-bit integer \
-float -> single-precision 32-bit floating point number  \
-    \
-(   \
-    <typename>, \
-    <typename>,     -> For repeating patterned data \
-    ... \
-)   \
-<typename>[] -> array of given type \
-??? -> unknown varying sized data   \
-_<typename> -> conditional data \
-% <message> -> description about something. not included in data    \
-    \
-.jef extension -> bytecode assembled to be executed \
-.stc extension -> bytecode assembled to be linked statically    \
-.sth extension -> bytecode assembled to be linked at runtime    \
-.jasm extension -> symbolic assemmbly language for bytecode \
+i32 ->  signed 32-bit integer   
+u32 ->  unsigned 32-bit integer 
+u64 -> unsigned 64-bit integer. Only for edge cases.    
+u16 -> unsigned 16-bit integer. 
+byte -> signed 8-bit integer    
+ubyte -> unsigned 8-bit integer 
+float -> single-precision 32-bit floating point number  
+    
+(   
+    <typename>, 
+    <typename>,     -> For repeating patterned data 
+    ... 
+)   
+<typename>[] -> array of given type 
+??? -> unknown varying sized data   
+_<typename> -> conditional data 
+% <message> -> description about something. not included in data    
+    
+.jef extension -> bytecode assembled to be executed 
+.stc extension -> bytecode assembled to be linked statically    
+.sth extension -> bytecode assembled to be linked at runtime    
+.jasm extension -> symbolic assemmbly language for bytecode 

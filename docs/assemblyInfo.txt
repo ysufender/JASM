@@ -1,17 +1,17 @@
-byte;           flags;          0x1 shared, 0x2 static, 0x4 executable, 0x8 symbol info, 0x10 store name    \
-_u64;           name length;    for debugging purposes, generally turned off, decided by store name flag    \
-_byte[???];     name;           full file path of the assembly  \
-_u32;           symbol count;   decided by symbol info flag. Count of defined symbols in the assembly   \
-(   \
-    % Known symbol data \
-    _u16;       name length;    length of the symbol name   \
-    _???;       name;           name of the symbol. maximum u16 characters long \
-    _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecode   \
-)   \
-_u32;           symbol count;   decided by symbol info flag. Count of unknown symbols in the assembly   \
-(   \
-    % Unknown symbol data   \
-    _u16;       name length;    length of the symbol name   \
-    _???;       name;           name of the symbol. maximum u16 characters long \
-    _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecodee  \
-)   \
+byte;           flags;          0x1 shared, 0x2 static, 0x4 executable, 0x8 symbol info, 0x10 store name    
+_u64;           name length;    for debugging purposes, generally turned off, decided by store name flag    
+_byte[???];     name;           full file path of the assembly  
+_u32;           symbol count;   decided by symbol info flag. Count of defined symbols in the assembly   
+(   
+    % Known symbol data 
+    _u16;       name length;    length of the symbol name   
+    _???;       name;           name of the symbol. maximum u16 characters long 
+    _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecode   
+)   
+_u32;           symbol count;   decided by symbol info flag. Count of unknown symbols in the assembly   
+(   
+    % Unknown symbol data   
+    _u16;       name length;    length of the symbol name   
+    _???;       name;           name of the symbol. maximum u16 characters long 
+    _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecodee  
+)   
