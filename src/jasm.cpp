@@ -1,14 +1,17 @@
 #include "assemblycontext.hpp"
+#include "utilities/system.hpp"
+#include <cstdlib>
 #include <exception>
 #include <ios>
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 
 #ifndef NDEBUG
 #include <fstream>
 #endif
 
-#include "main.hpp"
+#include "jasm.hpp"
 #include "CLIParser.hpp"
 #include "JASMConfig.hpp"
 #include "assembler/assembler.hpp"
@@ -52,11 +55,13 @@ int main(int argc, char** args)
                 flags.GetStringList("libs")
             };
 
-            Assembler assembler { assemblyContext };
-            assembler.Assemble();
+            System::Setup(assemblyContext);
+
+            Assembler assembler;
+            auto collection = assembler.Assemble();
 
 #ifndef NDEBUG
-            Finalize(assemblyContext);
+            Finalize(collection);
 #endif
         }
     }
@@ -64,26 +69,41 @@ int main(int argc, char** args)
     {
         std::cerr << "An error occured during process."
                   << "\n\tProvided information: " << exception.what() << std::endl;
+
+        return 1;
     }
+
+    return 0;
 }
 
 #ifndef NDEBUG
-void Finalize(const AssemblyContext& context)
+void Finalize(const Assembler::AssemblyInfoCollection& collection)
 {
     std::cout << "\n\nFinalizing...";
-   
-    if (!context.IsSingle())
-        return;
 
-    for (const auto& file : context.InputFiles())
+    for (const auto& entry : collection)
     {
-        std::string outPath { file };
-        outPath.append(".stc");
-        std::ifstream out { outPath, std::ios::binary };
         AssemblyInfo info;
+        std::ifstream inputFile { entry.path, std::ios::binary };
 
-        info.Deserialize(out);
+        if (entry.flags & AssemblyFlags::Executable)
+        {
+            systembit_t entry;
+            systembit_t stack;
+            systembit_t heap;
+
+            inputFile.read(reinterpret_cast<char*>(&entry), sizeof(entry));
+            inputFile.read(reinterpret_cast<char*>(&stack), sizeof(stack));
+            inputFile.read(reinterpret_cast<char*>(&heap), sizeof(heap));
+
+            std::cout << "\nProgram Entry Point:      " << entry
+                << "\nProgram Stack Size:       " << stack
+                << "\nProgram Max Heap Size:    " << heap;
+        }
+
+        info.Deserialize(inputFile);
         info.PrintAssemblyInfo();
+        inputFile.close();
     }
 }
 #endif
@@ -108,7 +128,7 @@ void PrintHelp()
     -out, -o: Place the output file to specified path if flag `-single` is not set.
     -libType <lib_type>: If desired output is a library, specify the type. (either shared 'shd' or static 'stc')
 
-    -in <..input..>, -I <..input..>: Files to assemble and (optionally) link. The first entry is treated as main file containing entry point.
+    -in <..input..>, -I <..input..>: Files to assemble and (optionally) link. The first entry is treated as jasm file containing entry point.
     -libs <..libs..>, -L <..libs..>: Libraries used and to be linked.
 
     WARNING:

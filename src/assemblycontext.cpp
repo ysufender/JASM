@@ -49,38 +49,40 @@ const std::string& AssemblyContext::LibType() const { return libType; }
 const std::vector<std::string>& AssemblyContext::InputFiles() const { return inputFiles; }
 const std::vector<std::string>& AssemblyContext::Libraries() const { return libraries; }
 
-void AssemblyContext::PrintContext(std::ostream& out) const 
+void AssemblyContext::PrintContext() const 
 {
     if (silentMode)
         return;
 
-    out << "JASM Version " << JASM_VERSION << " Assembly Context";
-    out << "\n\tSingle Mode: " << (singleAssembly ? "Enabled" : "Disabled");
-    if (!singleAssembly) { out << "\n\tOutput File: " << outFile; }
-    if (isLib) { out << "\n\tLibrary Type: " << (libType == "shd" ? "Shared" : "Static" ); }
+    std::cout << "JASM Version " << JASM_VERSION << " Assembly Context";
+    std::cout << "\n\tSingle Mode: " << (singleAssembly ? "Enabled" : "Disabled");
+    if (!singleAssembly) { std::cout << "\n\tOutput File: " << outFile; }
+    if (isLib) { std::cout << "\n\tLibrary Type: " << (libType == "shd" ? "Shared" : "Static" ); }
 
-    out << "\n\tInput Files: " << inputFiles.size() << " total {";
+    std::cout << "\n\tInput Files: " << inputFiles.size() << " total {";
     for (const std::string& file : inputFiles)
     {
-        out << "\n\t\t\"" << file << '\"';
+        std::cout << "\n\t\t\"" << file << '\"';
         
         if (inputFiles.back() != file)
-            out << ',';
+            std::cout << ',';
     }
-    out << "\n\t}";
+    std::cout << "\n\t}";
     
     if(libraries.size() != 0)
     {
-        out << "\n\tLibraries: " << libraries.size() << " total {";
+        std::cout << "\n\tLibraries: " << libraries.size() << " total {";
         for (const std::string& lib : libraries) 
         {
-            out << "\n\t\t\"" << lib << '\"';
+            std::cout << "\n\t\t\"" << lib << '\"';
         
             if (libraries.back() != lib)
-                out << ',';
+                std::cout << ',';
         }
-        out << "\n\t}";
+        std::cout << "\n\t}";
     }
     else
-        out << "\n\tLibraries: No Library Provided";
+        std::cout << "\n\tLibraries: No Library Provided";
+
+    std::cout << '\n';
 }

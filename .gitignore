@@ -3,6 +3,7 @@ build/
 .clangd
 .editorconfig
 .cache/
+test/
 
 *.jef
 *.stc

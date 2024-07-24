@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <ostream>
 
 class AssemblyContext 
 {
@@ -25,6 +24,7 @@ class AssemblyContext
             const std::vector<std::string>& libs
         );
 
+
         const bool& IsSilent() const;
         const bool& IsSingle() const;
         const bool& IsLib() const;
@@ -33,5 +33,14 @@ class AssemblyContext
         const std::vector<std::string>& InputFiles() const;
         const std::vector<std::string>& Libraries() const;
 
-        void PrintContext(std::ostream& out) const;
+        void PrintContext() const;
+};
+
+static AssemblyContext DefaultContext { 
+    /*.silentMode =*/ false, 
+    /*.singleAssembly =*/ false, 
+    /*.outFile =*/ "", 
+    /*.libType =*/ "", 
+    /*.inputFiles =*/ { "none.jasm" }, 
+    /*.libraries =*/ { }
 };

@@ -1,8 +1,15 @@
+#include <cctype>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <stdio.h>
+#include <string>
 
+#include "JASMConfig.hpp"
+#include "utilities/system.hpp"
+#include "utilities/stringextensions.hpp"
+#include "utilities/streamextensions.hpp"
 #include "assembler/assembler.hpp"
 #include "assemblycontext.hpp"
 
@@ -12,15 +19,15 @@
 //
 std::vector<AssemblyInfo> Assembler::Assemble()
 {
-    context.PrintContext(std::cout);
+    System::Context.PrintContext();
 
     std::vector<AssemblyInfo> outputVector { };
 
-    // TODO: Loop through all input files and call specified assembler function. 
-    const std::vector<std::string>& inFiles { context.InputFiles() };
+    // TODO: Loop through all input files and call specified assembler . 
+    const std::vector<std::string>& inFiles { System::Context.InputFiles() };
     size_t i { 0 };
 
-    if (!context.IsLib() && !context.IsSingle())
+    if (!System::Context.IsLib() && !System::Context.IsSingle())
     {
         outputVector.push_back(AssembleExecutable(inFiles[0]));
         i = 1;
@@ -32,20 +39,107 @@ std::vector<AssemblyInfo> Assembler::Assemble()
         outputVector.push_back(AssembleLibrary(inputFile));
     }
 
-    std::cout << "\nDone.\n";
     return std::move(outputVector);
+}
+
+AssemblyInfo Assembler::AssembleCommon(AssemblyInfo& assemblyInfo)
+{
+    return {};
 }
 
 AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
 {
+    // Setup
     std::string outPath { file };
     outPath.append(".jef");
     char outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
+
+    if (std::filesystem::exists(outPath))
+        std::filesystem::remove(outPath);
+    
+    std::string directories { outPath.substr(0, outPath.find_last_of('/') + 1) };
+
+    if (!directories.empty())
+        std::filesystem::create_directories(directories);
+
+#ifndef NDEBUG
+    outFlags |= AssemblyFlags::StoreName;
+#endif
 
     AssemblyInfo assemblyInfo {
         outPath,
         outFlags
     };
+
+    // Executable byte-code format:
+    // First 32 bytes = Entry Point
+    // Second 32 bytes = Stack Size
+    // Third 32 bytes = Max Heap Size
+    // Serialized AssemblyInfo
+    // Byte code
+
+
+    // Process
+    // TODO: Read the first section of assembly containing max heap size, stack size and entry point.
+    // TODO: The rest is the same as assembling a library.
+    std::ifstream sourceFile { file };
+    std::ofstream outFile { outPath, std::ios_base::binary };
+    
+    char prep { 0 };
+    while (prep < 3)
+    {
+        std::string token { Extensions::Stream::Tokenize(sourceFile) };
+
+        if (sourceFile.bad())
+        {
+            sourceFile.close();
+            LOGE("An Error Occured While Reading the Source File", System::LogLevel::High);
+        }
+
+        if (token == "org")
+        {
+            std::string entryName { Extensions::Stream::Tokenize(sourceFile) };
+            systembit_t address { 0 }; 
+
+            outFile.seekp(0, std::ios_base::beg);
+            outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
+            assemblyInfo.unknownSymbols.push_back( {entryName, 0} );
+            prep++;
+        }
+        else if (token == "sts")
+        {
+            std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+            systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
+
+            outFile.seekp(4, std::ios_base::beg);
+            outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+            prep++;
+        }
+        else if (token == "sth")
+        {
+            std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+            systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
+
+            outFile.seekp(8, std::ios_base::beg);
+            outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+            prep++;
+        }
+        else
+            LOGE(
+                Extensions::String::Concat({
+                        "Unexpected token '", token, "' before '", Extensions::Stream::Tokenize(sourceFile), "'"
+                    }
+                ), 
+                System::LogLevel::High
+            );
+    }
+
+#ifndef NDEBUG
+    assemblyInfo.Serialize(outFile);
+#endif
+
+    sourceFile.close();
+    outFile.close();
     return std::move(assemblyInfo);
 }
 
@@ -72,13 +166,16 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
         outFlags
     };
 
-    if (context.IsSingle())
-    {
-        std::ofstream out { outPath, std::ios::binary };
-        assemblyInfo.Serialize(out);
-        out.close();
-    }
+    // Process
+    std::ifstream sourceFile { file };
+    std::ofstream outFile { outPath, std::ios_base::binary };
+
+#ifndef NDEBUG
+        assemblyInfo.Serialize(outFile);
+#endif
     
+    sourceFile.close();
+    outFile.close();
     return std::move(assemblyInfo);
 }
 
@@ -91,7 +188,7 @@ AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : path(path), fl
 
 void AssemblyInfo::Serialize(std::ofstream& outFile)
 {
-    if (outFile.fail())
+    if (outFile.fail() || outFile.bad())
         throw std::runtime_error{"Couldn't open file while serializing assembly info"};
 
     // Write the assembly flags
@@ -111,37 +208,31 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
         return;
     }
 
-    // Write function symbol count
-    symaddr_t sizeSym = static_cast<symaddr_t>(functionSymbols.size());
+    // Write symbol count
+    systembit_t sizeSym = static_cast<systembit_t>(definedSymbols.size());
     outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Iterate through symbols and write both size and path and address
-    for(symaddr_t i = 0; i < sizeSym; i++)
+    // Iterate through symbols and write both size and path and info.Address
+    for(systembit_t i = 0; i < sizeSym; i++)
     {
-        auto& [name, address] { functionSymbols.at(i) };
-        maxnamesize_t nameSize { static_cast<maxnamesize_t>(name.size()) };
+        SymbolInfo& info { definedSymbols.at(i) };
+        uint16_t nameSize { static_cast<uint16_t>(info.SymbolName.size()) };
         outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        outFile.write(name.data(), nameSize);
-        outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
+        outFile.write(info.SymbolName.data(), nameSize);
+        outFile.write(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
     }
 
-    // Write Variable Symbol Count
-    sizeSym = static_cast<symaddr_t>(variableSymbols.size());
+    // Write unknown symbol count
+    sizeSym = static_cast<systembit_t>(unknownSymbols.size());
     outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Iterate through symbols and write both size and path and address
-    for (symaddr_t i = 0; i < sizeSym; i++)
+    // Iterate through symbols and write both size and path and info.Address
+    for (systembit_t i = 0; i < sizeSym; i++)
     {
-        auto& [name, info] { variableSymbols.at(i) };
-        maxnamesize_t nameSize { static_cast<maxnamesize_t>(name.size()) };
+        SymbolInfo& info { unknownSymbols.at(i) };
+        uint16_t nameSize { static_cast<uint16_t>(info.SymbolName.size()) };
         outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        outFile.write(name.data(), nameSize);
-        char t { info.first };
-        symaddr_t a { info.second };
-        outFile.write(&t, sizeof(t));
-        outFile.write(reinterpret_cast<char*>(&a), sizeof(a));
+        outFile.write(info.SymbolName.data(), nameSize);
+        outFile.write(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
     }
-
-
-    outFile.close();
 }
 
 void AssemblyInfo::Deserialize(std::ifstream& inFile)
@@ -167,81 +258,66 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
         return;
     }
 
-    // Read function symbol count
-    symaddr_t sizeSym;
+    // Read symbol count
+    systembit_t sizeSym;
     inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Read symbols
-    functionSymbols.resize(sizeSym);
-    functionSymbols.clear();
+    definedSymbols.resize(sizeSym);
+    definedSymbols.clear();
     while (sizeSym > 0)
     {
-        maxnamesize_t nameSize;
-        symname_t name;
+        SymbolInfo info;
+
+        // Read the SymbolName
+        uint16_t nameSize;
         inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        name.resize(nameSize);
-        inFile.read(name.data(), nameSize);
-        symaddr_t address;
-        inFile.read(reinterpret_cast<char*>(&address), sizeof(address));
-        functionSymbols.push_back({std::move(name), address});
+        info.SymbolName.resize(nameSize);
+        inFile.read(info.SymbolName.data(), nameSize);
+
+        // Read the Address
+        inFile.read(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
+
+        definedSymbols.push_back(std::move(info));
 
         sizeSym--;
     }
 
 
-    // Read variable symbol count
+    // Read unknown symbol count
     inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
     // Read Symbols
-    variableSymbols.resize(sizeSym);
-    variableSymbols.clear();
+    unknownSymbols.resize(sizeSym);
+    unknownSymbols.clear();
     while (sizeSym > 0)
     {
-        maxnamesize_t nameSize;
-        symname_t  name;
+        SymbolInfo info;
+        
+        // Read the SymbolName
+        uint16_t nameSize;
         inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        name.resize(nameSize);
-        inFile.read(name.data(), nameSize);
-       
-        int varType;
-        inFile.read(reinterpret_cast<char*>(&varType), sizeof(varType));
-        symaddr_t address;
-        inFile.read(reinterpret_cast<char*>(&address), sizeof(address));
-        variableSymbols.push_back({name, {varType, address}});
+        info.SymbolName.resize(nameSize);
+        inFile.read(info.SymbolName.data(), nameSize);
+
+        // Read the Address
+        inFile.read(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
+
+        unknownSymbols.push_back(std::move(info));
 
         sizeSym--;
     }
-
-
-    inFile.close();
 }
 
 void AssemblyInfo::PrintAssemblyInfo() const
 {
-    const auto varTypeToString = [](const int& varType) {
-        switch (static_cast<int>(varType)) {
-            case 0:
-                return "Int";
-            case 1:
-                return "UInt";
-            case 2:
-                return "Byte";
-            case 3:
-                return "UByte";
-            case 4:
-                return "Array";
-            default:
-                return "Unknown";
-        }
-    };
-
     std::cout << "\n\nInfo " << (path.empty() ? "Unknown" : path) 
               << "\nFlags: " << static_cast<int>(flags)
-              << "\nFunction Symbols [ordered](" << functionSymbols.size() << "):";
+              << "\nDefined Symbols [ordered](" << definedSymbols.size() << "):";
 
-    for (const auto& [name, address] : functionSymbols)
-        std::cout << "\n\t" << name << " at address " << address;
+    for (const auto& info : definedSymbols)
+        std::cout << "\n\t" << info.SymbolName << " at address " << info.Address;
 
-    std::cout << "\nVariable Symbols [ordered](" << variableSymbols.size() << "):";
+    std::cout << "\nUnknown Symbols [ordered](" << unknownSymbols.size() << "):";
 
-    for (const auto& [name, varInf] : variableSymbols)
-        std::cout << "\n\t" << name << " [" << varTypeToString(varInf.first) << "] at address " << varInf.second;
+    for (const auto& info : unknownSymbols)
+        std::cout << "\n\t" << info.SymbolName << " at address " << info.Address;
 }
