@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 
 #include "assemblycontext.hpp"
@@ -39,7 +40,11 @@ struct AssemblyInfo
     SymbolCollection definedSymbols;
     SymbolCollection unknownSymbols;
 
+#ifndef NDEBUG
     AssemblyInfo() = default;
+#else
+    AssemblyInfo() = delete;
+#endif
     AssemblyInfo(const std::string& path, char flags);
     void Serialize(std::ofstream& outFile);
     void Deserialize(std::ifstream& inFile);
@@ -57,5 +62,5 @@ class Assembler
     private:
         AssemblyInfo AssembleLibrary(const std::string& file);
         AssemblyInfo AssembleExecutable(const std::string& file);
-        AssemblyInfo AssembleCommon(AssemblyInfo& assemblyInfo);
+        AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstream& sourceFile, std::ofstream& outFile);
 };

@@ -11,6 +11,12 @@
 
 CREATE THE FUCKING ASSEMBLY LANGUAGE FIRST IDIOT
 
+# IMPORTANT TODO!!!
+
+I have to write my own serialization functions for primitive types because the endianness
+will cause problems with the future VM for libraries and executables assembled on a machine
+with different endianness.
+
 ## On Assembly
 
 - A symbol name can be maximum uint16_t in size.

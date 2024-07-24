@@ -42,9 +42,9 @@ std::vector<AssemblyInfo> Assembler::Assemble()
     return std::move(outputVector);
 }
 
-AssemblyInfo Assembler::AssembleCommon(AssemblyInfo& assemblyInfo)
+AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstream& sourceFile, std::ofstream& outFile)
 {
-    return {};
+    return assemblyInfo;
 }
 
 AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
@@ -62,81 +62,79 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     if (!directories.empty())
         std::filesystem::create_directories(directories);
 
-#ifndef NDEBUG
-    outFlags |= AssemblyFlags::StoreName;
-#endif
-
     AssemblyInfo assemblyInfo {
         outPath,
         outFlags
     };
 
     // Executable byte-code format:
-    // First 32 bytes = Entry Point
-    // Second 32 bytes = Stack Size
-    // Third 32 bytes = Max Heap Size
+    // First byte    = Endianness flag
+    // Next 32 bytes = Entry Point
+    // Next 32 bytes = Stack Size
+    // Next 32 bytes = Max Heap Size
     // Serialized AssemblyInfo
     // Byte code
-
 
     // Process
     // TODO: Read the first section of assembly containing max heap size, stack size and entry point.
     // TODO: The rest is the same as assembling a library.
     std::ifstream sourceFile { file };
     std::ofstream outFile { outPath, std::ios_base::binary };
-    
-    char prep { 0 };
-    while (prep < 3)
+
+    if (sourceFile.bad())
     {
-        std::string token { Extensions::Stream::Tokenize(sourceFile) };
-
-        if (sourceFile.bad())
-        {
-            sourceFile.close();
-            LOGE("An Error Occured While Reading the Source File", System::LogLevel::High);
-        }
-
-        if (token == "org")
-        {
-            std::string entryName { Extensions::Stream::Tokenize(sourceFile) };
-            systembit_t address { 0 }; 
-
-            outFile.seekp(0, std::ios_base::beg);
-            outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
-            assemblyInfo.unknownSymbols.push_back( {entryName, 0} );
-            prep++;
-        }
-        else if (token == "sts")
-        {
-            std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
-            systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-
-            outFile.seekp(4, std::ios_base::beg);
-            outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
-            prep++;
-        }
-        else if (token == "sth")
-        {
-            std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
-            systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-
-            outFile.seekp(8, std::ios_base::beg);
-            outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
-            prep++;
-        }
-        else
-            LOGE(
-                Extensions::String::Concat({
-                        "Unexpected token '", token, "' before '", Extensions::Stream::Tokenize(sourceFile), "'"
-                    }
-                ), 
-                System::LogLevel::High
-            );
+        sourceFile.close();
+        LOGE("An Error Occured While Reading the Source File", System::LogLevel::High);
     }
 
-#ifndef NDEBUG
-    assemblyInfo.Serialize(outFile);
-#endif
+    while (Extensions::Stream::Tokenize(sourceFile) != ".prep") {}
+
+    // 
+    // Set the origin point
+    //
+    std::string token { Extensions::Stream::Tokenize(sourceFile) };
+    if (token != "org")
+        LOGE("Expected org after .prep", System::LogLevel::High);
+    // origin set block. Not a part of the if block
+    { 
+        std::string entryName { Extensions::Stream::Tokenize(sourceFile) };
+        systembit_t address { 0 }; 
+        outFile.seekp(0, std::ios_base::beg);
+        outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
+        assemblyInfo.unknownSymbols.push_back( {entryName, 0} );
+    }
+    
+    //
+    // Set the stack size
+    //
+    token = Extensions::Stream::Tokenize(sourceFile);
+    if (token != "sts")
+        LOGE("Expected sts after org", System::LogLevel::High);
+    // Stack size set block. Not a part of the if block
+    {
+        std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+        systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
+
+        outFile.seekp(4, std::ios_base::beg);
+        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+    }
+
+    //
+    // Set max heap size
+    //
+    token = Extensions::Stream::Tokenize(sourceFile);
+    if (token != "sth")
+        LOGE("Expected sth after sts", System::LogLevel::High);
+    // Heap size set block. Not a part of the if block
+    {
+        std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+        systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
+
+        outFile.seekp(8, std::ios_base::beg);
+        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+    }
+
+    AssembleCommon(assemblyInfo, sourceFile, outFile);
 
     sourceFile.close();
     outFile.close();
@@ -167,14 +165,14 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
     };
 
     // Process
-    std::ifstream sourceFile { file };
+    //std::ifstream sourceFile { file };
     std::ofstream outFile { outPath, std::ios_base::binary };
 
 #ifndef NDEBUG
         assemblyInfo.Serialize(outFile);
 #endif
     
-    sourceFile.close();
+    //sourceFile.close();
     outFile.close();
     return std::move(assemblyInfo);
 }

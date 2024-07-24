@@ -1,0 +1,6 @@
+byte;   endianness;     0x1 for little-endian 0x2 for big-endian
+u32;    entry point;    entry point of the program decided by the org instruction
+u32;    stack size;     stack size of the program decided by the sts instruction
+u32;    max heap size;  maximum heap size of the  program decided by the sth instruction
+???;    AssemblyInfo;   serialized assembly info. It's size can vary from 1 byte to a couple hundred
+???;    bytecode;       compiled bytecode. It's size can be maximum of which u32 can hold
