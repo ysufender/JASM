@@ -102,9 +102,7 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     // origin set block. Not a part of the if block
     { 
         std::string entryName { Stream::Tokenize(sourceFile) };
-        systembit_t address { 0 }; 
-        outFile.seekp(0, std::ios_base::beg);
-        outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
+        Serialization::SerializeInteger(0, outFile);
         assemblyInfo.unknownSymbols.push_back( {entryName, 0} );
     }
     
@@ -118,9 +116,7 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     {
         std::string sizeStr { Stream::Tokenize(sourceFile) };
         systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-
-        outFile.seekp(4, std::ios_base::beg);
-        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+        Serialization::SerializeInteger(size, outFile);
     }
 
     //
@@ -133,9 +129,7 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     {
         std::string sizeStr { Stream::Tokenize(sourceFile) };
         systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-
-        outFile.seekp(8, std::ios_base::beg);
-        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
+        Serialization::SerializeInteger(size, outFile);
     }
 
     AssembleCommon(assemblyInfo, sourceFile, outFile);
