@@ -1,4 +1,8 @@
-add_library(assembler STATIC assembler.cpp)
+add_library(assembler 
+    STATIC 
+        assembler.cpp
+        instructions.cpp
+)
 
 target_include_directories(assembler 
     PRIVATE 

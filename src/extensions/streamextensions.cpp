@@ -1,7 +1,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "utilities/streamextensions.hpp"
+#include "extensions/streamextensions.hpp"
 
 namespace Extensions::Stream
 {

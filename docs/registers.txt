@@ -1,0 +1,2 @@
+eax;    uint32;     stores return values and returned pointers
+ebx;    uint32;     general purpose. main purpose is storing addresses

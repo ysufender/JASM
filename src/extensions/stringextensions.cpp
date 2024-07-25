@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "utilities/stringextensions.hpp"
+#include "extensions/stringextensions.hpp"
 
 namespace Extensions::String
 {

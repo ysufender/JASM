@@ -1,8 +1,12 @@
 #pragma once
 
+#include "extensions/system.hpp"
+#include <bit>
 #include <cmath>
 #include <fstream>
 #include <functional>
+#include <ios>
+#include <iterator>
 #include <string>
 #include <type_traits>
 
@@ -19,11 +23,7 @@ namespace Extensions::Serialization
         *std::begin(t);
     };
 
-    //
-    // TODO:
-    //      Add compile-time check for push_back function on Container (de)serialization
-    //
-    
+
     //
     // Serialization
     //
@@ -35,6 +35,11 @@ namespace Extensions::Serialization
             char byte { static_cast<char>(data >> 8*i) };
             stream.write(&byte, sizeof(byte));
         }
+    }
+
+    void constexpr SerializeFloat(const float& data, std::ofstream& stream)
+    {
+        stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
     }
 
     template<iterable ContT, integer SizeT, typename ElemT>
@@ -57,20 +62,36 @@ namespace Extensions::Serialization
     template<integer T>
     void DeserializeInteger(T& data, std::ifstream& stream)
     {
-        T temp { 0 };
+        using uchar = std::make_unsigned_t<char>;
+        using UT = std::make_unsigned_t<T>;
+
+        UT temp { 0 };
         for (char i = 0; i < sizeof(T); i++)
         {
             temp <<= 8;
-            char byte;
-            stream.read(&byte, sizeof(byte));
+            uchar byte;
+            stream.read(reinterpret_cast<char*>(&byte), sizeof(byte));
             temp |= byte;
         }
 
         for (char i = 0; i < sizeof(T); i++)
         {
-            char swapData { static_cast<char>(temp >> i*8) };
+            uchar swapData { static_cast<uchar>(temp >> i*8) };
             data <<= 8;
-            data |= static_cast<std::make_unsigned<char>::type>(swapData);
+            data |= swapData;
+        }
+    }
+
+    void constexpr DeserializeFlaot(float& data, std::ifstream& stream)
+    {
+        float flTemp; 
+        stream.read(reinterpret_cast<char*>(&flTemp), sizeof(flTemp));
+
+        if (std::endian::native == std::endian::little)
+            data = flTemp;
+        else
+        {
+
         }
     }
 

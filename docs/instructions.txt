@@ -1,0 +1,19 @@
+[x] nop;    0x00;   no operation
+
+[x] sti;    0x01;   store integer constant on stack
+[ ] stf;    0x02;   store float constant on stack
+[ ] stb;    0x03;   store byte constant on stack
+[ ] stui;   0x04;   store uint constant on stack
+[ ] stub;   0x05;   store ubyte constant on stack
+
+[ ] ldi;    0x06;   store integer from stack on heap and set &eax to address 
+[ ] ldf;    0x07;   store float from stack on heap and set &eax to address 
+[ ] ldb;    0x08;   store byte from stack on heap and set &eax to address 
+[ ] ldui;   0x09;   store uint from stack on heap and set &eax to address 
+[ ] ldub;   0x0A;   store ubyte from stack on heap and set &eax to address 
+
+[ ] rdi;    0x0B;   read an integer from heap on address &ebx and store it on stack
+[ ] rdf;    0x0C;   read a float from heap on address &ebx and store it on stack
+[ ] rdb;    0x0D;   read a byte from heap on address &ebx and store it on stack
+[ ] rdui;   0x0E;   read a uint from heap on address &ebx and store it on stack
+[ ] rdub;   0x0F;   read a ubyte from heap on address &ebx and store it on stack

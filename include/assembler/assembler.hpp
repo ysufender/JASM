@@ -2,10 +2,9 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
-#include "assemblycontext.hpp"
 #include "JASMConfig.hpp"
-#include "assembler/instructions.hpp"
 
 /*
 * I could've made all of this without object orientation 

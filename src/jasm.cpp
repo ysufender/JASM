@@ -1,17 +1,12 @@
 #include "assemblycontext.hpp"
-#include "utilities/serialization.hpp"
-#include "utilities/system.hpp"
+#include "extensions/system.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <exception>
-#include <ios>
 #include <iostream>
+#include <stdexcept>
 #include <stdlib.h>
 #include <string>
-
-#ifndef NDEBUG
-#include <fstream>
-#endif
 
 #include "jasm.hpp"
 #include "CLIParser.hpp"
@@ -20,6 +15,9 @@
 
 int main(int argc, char** args)
 {
+
+    return 0;
+
     try
     {
         CLIParser parser{args, argc};
@@ -71,7 +69,6 @@ int main(int argc, char** args)
     {
         std::cerr << "An error occured during process."
                   << "\n\tProvided information: " << exception.what() << std::endl;
-
         return 1;
     }
 
@@ -82,27 +79,6 @@ int main(int argc, char** args)
 void Finalize(const Assembler::AssemblyInfoCollection& collection)
 {
     std::cout << "\nFinalizing...\n";
-
-    //for (const auto& entry : collection)
-    //{
-    //    AssemblyInfo info;
-    //    std::ifstream inputFile { entry.path, std::ios::binary };
-    //    if (entry.flags & AssemblyFlags::Executable)
-    //    {
-    //        systembit_t entry;
-    //        systembit_t stack;
-    //        systembit_t heap;
-    //        inputFile.read(reinterpret_cast<char*>(&entry), sizeof(entry));
-    //        inputFile.read(reinterpret_cast<char*>(&stack), sizeof(stack));
-    //        inputFile.read(reinterpret_cast<char*>(&heap), sizeof(heap));
-    //        std::cout << "\nProgram Entry Point:      " << entry
-    //            << "\nProgram Stack Size:       " << stack
-    //            << "\nProgram Max Heap Size:    " << heap;
-    //    }
-    //    info.Deserialize(inputFile);
-    //    info.PrintAssemblyInfo();
-    //    inputFile.close();
-    //}
 
     for (const auto& entry : collection)
         entry.PrintAssemblyInfo();

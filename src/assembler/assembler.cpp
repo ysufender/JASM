@@ -1,21 +1,18 @@
-#include <cctype>
-#include <cstdint>
 #include <filesystem>
-#include <iostream>
 #include <fstream>
-#include <stdexcept>
-#include <stdio.h>
-#include <string>
-#include <unordered_map>
+#include <iostream>
 
 #include "JASMConfig.hpp"
-#include "utilities/system.hpp"
-#include "utilities/stringextensions.hpp"
-#include "utilities/serialization.hpp"
-#include "utilities/streamextensions.hpp"
+#include "extensions/system.hpp"
+#include "extensions/serialization.hpp"
+#include "extensions/streamextensions.hpp"
 #include "assembler/assembler.hpp"
+#include "assembler/instructions.hpp"
 #include "assemblycontext.hpp"
 
+//
+// Usings
+//
 using namespace Extensions;
 
 //
@@ -23,9 +20,15 @@ using namespace Extensions;
 // It's better than a bunch of if-else statements
 // I think
 //
-static const std::unordered_map<std::string, std::function<void(AssemblyInfo&, std::ifstream&, std::ofstream&)>> instructionMap {
-
+static const std::unordered_map<std::string, void (*)(AssemblyInfo&, std::ifstream&, std::ofstream&)> instructionMap {
+    {"nop", &Instructions::Nop},
+    {"sti", &Instructions::StoreInt},
+    {"stf", &Instructions::StoreFloat},
+    {"stb", &Instructions::StoreByte},
+    {"stui", &Instructions::StoreUInt},
+    {"stub", &Instructions::StoreUByte},
 };
+
 
 //
 // Assembler Implementation
@@ -59,7 +62,7 @@ AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstrea
 {
     std::string token { Stream::Tokenize(sourceFile) };
 
-    while (token != ".text")
+    while (token != ".body")
     {
         // The prep instructions here
         if (token == "imp")
@@ -76,9 +79,7 @@ AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstrea
         token = Stream::Tokenize(sourceFile);
     }
 
-    systembit_t startAddress { static_cast<systembit_t>(outFile.tellp()) };
-
-    // token is now ".text". So we get the next one.
+    // token is now ".body". So we get the next one.
     token = Stream::Tokenize(sourceFile);
 
     while (token != ".end")
@@ -86,14 +87,12 @@ AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstrea
         if (token.back() == ':')
         {
             token.pop_back();
-            systembit_t index { static_cast<systembit_t>(outFile.tellp()) - startAddress }; 
+            systembit_t index { static_cast<systembit_t>(outFile.tellp()) }; 
 
             assemblyInfo.definedSymbols.push_back({token, index});
         }
         else if (instructionMap.contains(token))
-        {
-
-        }
+            instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
         else
             LOGE(System::LogLevel::High, "Couldn't find '", token, "' on inscturcion map.");
 

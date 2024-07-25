@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "utilities/stringextensions.hpp"
+#include "extensions/stringextensions.hpp"
 #include "assemblycontext.hpp"
 
 #ifndef NDEBUG
