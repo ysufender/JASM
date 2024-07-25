@@ -19,7 +19,7 @@ void System::Log(const std::string& message, const std::string& file, int line)
         return;
 
     size_t idx { file.find_first_of("JASM") };
-    std::cout << "\n[JASM::System::Log](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
+    std::cout << "[JASM::System::Log](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
 }
 
 void System::LogWarning(const std::string& message, const std::string& file, int line)
@@ -28,13 +28,12 @@ void System::LogWarning(const std::string& message, const std::string& file, int
         return;
 
     size_t idx { file.find_first_of("JASM") };
-    std::cout << "\n[JASM::Warning](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
+    std::cout << "[JASM::Warning](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
 }
 
 void System::LogError(const std::string& message, LogLevel level, const std::string& file, int line)
 {
     size_t idx { file.find_first_of("JASM") };
-    std::cout << '\n';
 
     switch (level)
     {

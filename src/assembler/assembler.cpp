@@ -1,4 +1,5 @@
 #include <cctype>
+#include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
@@ -9,9 +10,12 @@
 #include "JASMConfig.hpp"
 #include "utilities/system.hpp"
 #include "utilities/stringextensions.hpp"
+#include "utilities/serialization.hpp"
 #include "utilities/streamextensions.hpp"
 #include "assembler/assembler.hpp"
 #include "assemblycontext.hpp"
+
+using namespace Extensions;
 
 
 //
@@ -87,17 +91,17 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
         LOGE("An Error Occured While Reading the Source File", System::LogLevel::High);
     }
 
-    while (Extensions::Stream::Tokenize(sourceFile) != ".prep") {}
+    while (Stream::Tokenize(sourceFile) != ".prep") {}
 
     // 
     // Set the origin point
     //
-    std::string token { Extensions::Stream::Tokenize(sourceFile) };
+    std::string token { Stream::Tokenize(sourceFile) };
     if (token != "org")
         LOGE("Expected org after .prep", System::LogLevel::High);
     // origin set block. Not a part of the if block
     { 
-        std::string entryName { Extensions::Stream::Tokenize(sourceFile) };
+        std::string entryName { Stream::Tokenize(sourceFile) };
         systembit_t address { 0 }; 
         outFile.seekp(0, std::ios_base::beg);
         outFile.write(reinterpret_cast<char*>(&address), sizeof(address));
@@ -107,12 +111,12 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     //
     // Set the stack size
     //
-    token = Extensions::Stream::Tokenize(sourceFile);
+    token = Stream::Tokenize(sourceFile);
     if (token != "sts")
         LOGE("Expected sts after org", System::LogLevel::High);
     // Stack size set block. Not a part of the if block
     {
-        std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+        std::string sizeStr { Stream::Tokenize(sourceFile) };
         systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
 
         outFile.seekp(4, std::ios_base::beg);
@@ -122,12 +126,12 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     //
     // Set max heap size
     //
-    token = Extensions::Stream::Tokenize(sourceFile);
+    token = Stream::Tokenize(sourceFile);
     if (token != "sth")
         LOGE("Expected sth after sts", System::LogLevel::High);
     // Heap size set block. Not a part of the if block
     {
-        std::string sizeStr { Extensions::Stream::Tokenize(sourceFile) };
+        std::string sizeStr { Stream::Tokenize(sourceFile) };
         systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
 
         outFile.seekp(8, std::ios_base::beg);
@@ -187,122 +191,96 @@ AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : path(path), fl
 void AssemblyInfo::Serialize(std::ofstream& outFile)
 {
     if (outFile.fail() || outFile.bad())
-        throw std::runtime_error{"Couldn't open file while serializing assembly info"};
+        LOGE("Couldn't open file while serializing assembly info", System::LogLevel::High);
 
-    // Write the assembly flags
-    outFile.write(&flags, sizeof(flags));
+    // Flags
+    Serialization::SerializeInteger(flags, outFile);
 
-    // Store File Name if Flag is Set
     if (flags & AssemblyFlags::StoreName)
-    {
-        size_t size { path.size() };
-        outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
-        outFile.write(path.data(), size);
-    }
-    
+        Serialization::SerializeContainer<std::string, size_t, char>(
+                path, 
+                &Serialization::SerializeInteger<char>, 
+                outFile
+        );
+
     if (!(flags & AssemblyFlags::SymbolInfo))
-    {
-        outFile.close();
         return;
-    }
+    
+    // Known Symbols
+    Serialization::SerializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
+            definedSymbols, 
+            [](const SymbolInfo& symInfo, std::ofstream& out){
+                Serialization::SerializeContainer<std::string, uint16_t, char>(
+                        symInfo.SymbolName, 
+                        &Serialization::SerializeInteger<char>, 
+                        out
+                ); 
+                Serialization::SerializeInteger(symInfo.Address, out);
+            },
+            outFile
+    );
 
-    // Write symbol count
-    systembit_t sizeSym = static_cast<systembit_t>(definedSymbols.size());
-    outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Iterate through symbols and write both size and path and info.Address
-    for(systembit_t i = 0; i < sizeSym; i++)
-    {
-        SymbolInfo& info { definedSymbols.at(i) };
-        uint16_t nameSize { static_cast<uint16_t>(info.SymbolName.size()) };
-        outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        outFile.write(info.SymbolName.data(), nameSize);
-        outFile.write(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
-    }
-
-    // Write unknown symbol count
-    sizeSym = static_cast<systembit_t>(unknownSymbols.size());
-    outFile.write(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Iterate through symbols and write both size and path and info.Address
-    for (systembit_t i = 0; i < sizeSym; i++)
-    {
-        SymbolInfo& info { unknownSymbols.at(i) };
-        uint16_t nameSize { static_cast<uint16_t>(info.SymbolName.size()) };
-        outFile.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        outFile.write(info.SymbolName.data(), nameSize);
-        outFile.write(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
-    }
+    // Unknown Symbols
+    Serialization::SerializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
+            unknownSymbols, 
+            [](const SymbolInfo& symInfo, std::ofstream& out){
+                Serialization::SerializeContainer<std::string, uint16_t, char>(
+                        symInfo.SymbolName, 
+                        &Serialization::SerializeInteger<char>, 
+                        out
+                ); 
+                Serialization::SerializeInteger(symInfo.Address, out);
+            },
+            outFile
+    );
 }
 
 void AssemblyInfo::Deserialize(std::ifstream& inFile)
 {
-    if (inFile.fail())
-        throw std::runtime_error{"Couldn't open file while deserializing assembly info"};
+    if (inFile.fail() || inFile.bad())
+        LOGE("Couldn't open file while deserializing assembly info", System::LogLevel::High);
 
-    // Read the assembly flags
-    inFile.read(&flags, sizeof(flags));
-    
-    // Read the File Name if Flag is Set
+    Serialization::DeserializeInteger(flags, inFile);
+
     if (flags & AssemblyFlags::StoreName)
-    {
-        size_t size;
-        inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-        path.resize(size);
-        inFile.read(path.data(), size);
-    }
+        Serialization::DeserializeContainer<std::string, size_t, char>(
+                path, 
+                Serialization::DeserializeInteger<char>, 
+                inFile
+        );
 
     if (!(flags & AssemblyFlags::SymbolInfo))
-    {
-        inFile.close();
         return;
-    }
 
-    // Read symbol count
-    systembit_t sizeSym;
-    inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Read symbols
-    definedSymbols.resize(sizeSym);
-    definedSymbols.clear();
-    while (sizeSym > 0)
-    {
-        SymbolInfo info;
+    // Defined Symbols
+    Serialization::DeserializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
+            definedSymbols, 
+            [](SymbolInfo& info, std::ifstream& in) {
+                Serialization::DeserializeContainer<std::string, uint16_t, char>(
+                    info.SymbolName, 
+                    Serialization::DeserializeInteger<char>, 
+                    in
+                );
 
-        // Read the SymbolName
-        uint16_t nameSize;
-        inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        info.SymbolName.resize(nameSize);
-        inFile.read(info.SymbolName.data(), nameSize);
+                Serialization::DeserializeInteger(info.Address, in);
+            }, 
+            inFile
+    );
 
-        // Read the Address
-        inFile.read(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
+    // Unknown Symbols
+    Serialization::DeserializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
+            unknownSymbols, 
+            [](SymbolInfo& info, std::ifstream& in) {
+                Serialization::DeserializeContainer<std::string, uint16_t, char>(
+                    info.SymbolName, 
+                    Serialization::DeserializeInteger<char>, 
+                    in
+                );
 
-        definedSymbols.push_back(std::move(info));
-
-        sizeSym--;
-    }
-
-
-    // Read unknown symbol count
-    inFile.read(reinterpret_cast<char*>(&sizeSym), sizeof(sizeSym));
-    // Read Symbols
-    unknownSymbols.resize(sizeSym);
-    unknownSymbols.clear();
-    while (sizeSym > 0)
-    {
-        SymbolInfo info;
-        
-        // Read the SymbolName
-        uint16_t nameSize;
-        inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        info.SymbolName.resize(nameSize);
-        inFile.read(info.SymbolName.data(), nameSize);
-
-        // Read the Address
-        inFile.read(reinterpret_cast<char*>(&info.Address), sizeof(info.Address));
-
-        unknownSymbols.push_back(std::move(info));
-
-        sizeSym--;
-    }
+                Serialization::DeserializeInteger(info.Address, in);
+            }, 
+            inFile
+    );
 }
 
 void AssemblyInfo::PrintAssemblyInfo() const

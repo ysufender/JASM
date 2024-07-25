@@ -1,5 +1,7 @@
 #include "assemblycontext.hpp"
+#include "utilities/serialization.hpp"
 #include "utilities/system.hpp"
+#include <cassert>
 #include <cstdlib>
 #include <exception>
 #include <ios>
@@ -79,7 +81,7 @@ int main(int argc, char** args)
 #ifndef NDEBUG
 void Finalize(const Assembler::AssemblyInfoCollection& collection)
 {
-    std::cout << "\n\nFinalizing...";
+    std::cout << "\n\nFinalizing...\n";
 
     for (const auto& entry : collection)
     {

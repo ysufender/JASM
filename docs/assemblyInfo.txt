@@ -4,14 +4,14 @@ _byte[???];     name;           full file path of the assembly
 _u32;           symbol count;   decided by symbol info flag. Count of defined symbols in the assembly   
 (   
     % Known symbol data 
-    _u16;       name length;    length of the symbol name   
-    _???;       name;           name of the symbol. maximum u16 characters long 
+    _i16;       name length;    length of the symbol name   
+    _???;       name;           name of the symbol. maximum i16 characters long 
     _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecode   
 )   
 _u32;           symbol count;   decided by symbol info flag. Count of unknown symbols in the assembly   
 (   
     % Unknown symbol data   
-    _u16;       name length;    length of the symbol name   
-    _???;       name;           name of the symbol. maximum u16 characters long 
+    _i16;       name length;    length of the symbol name   
+    _???;       name;           name of the symbol. maximum i16 characters long 
     _u32;       address;        address of the symbol in current bytecod    _u32;       address;        address of the symbol in current bytecodee  
 )   

@@ -1,7 +1,7 @@
 i32 ->  signed 32-bit integer   
 u32 ->  unsigned 32-bit integer 
 u64 -> unsigned 64-bit integer. Only for edge cases.    
-u16 -> unsigned 16-bit integer. 
+i16 -> unsigned 16-bit integer. 
 byte -> signed 8-bit integer    
 ubyte -> unsigned 8-bit integer 
 float -> single-precision 32-bit floating point number  

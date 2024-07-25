@@ -3,6 +3,11 @@
 #include "assemblycontext.hpp"
 #include <string>
 
+#ifndef NDEBUG
+    #define LOGD(message) LOG(message)
+#else
+    #define LOGD(message)
+#endif
 #define LOG(message) System::Log(message, __FILE__, __LINE__)
 #define LOGW(message) System::LogWarning(message, __FILE__, __LINE__)
 #define LOGE(message, level) System::LogError(message, level, __FILE__, __LINE__)
