@@ -10,6 +10,9 @@ namespace Extensions::String
     {
         std::stringstream ss;
         std::vector<std::string> vec;
+
+        if (string.find_first_of(delimiter) == std::string::npos)
+            return { string };
   
         for (size_t i = 0; i < string.size(); i++)
         {
@@ -34,6 +37,11 @@ namespace Extensions::String
 
     std::string Concat(const std::vector<std::string>& strings)
     {
+        if (strings.size() == 1)
+            return strings[0];
+        if (strings.size() == 0)
+            return "";
+
         std::stringstream ss;
         for (const auto& str : strings)
             ss << str;
@@ -42,6 +50,11 @@ namespace Extensions::String
 
     std::string Join(const std::vector<std::string>& strings, char delimiter)
     {
+        if (strings.size() == 1)
+            return strings[0];
+        if (strings.size() == 0)
+            return "";
+
         std::stringstream ss;
         for (const auto& str : strings)
             ss << str << delimiter;

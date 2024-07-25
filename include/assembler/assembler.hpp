@@ -5,9 +5,10 @@
 
 #include "assemblycontext.hpp"
 #include "JASMConfig.hpp"
+#include "assembler/instructions.hpp"
 
 /*
-* I coul've made all of this without object orientation 
+* I could've made all of this without object orientation 
 * but with the existence of a shared state (AssemblyContext 
 * and AssemblyInfo) I thought it would be easier to design
 * the program with it. So here it is.
@@ -15,7 +16,7 @@
 
 
 // Because of serialization ease, I didn't want to 
-// create enums so just plain namespaces and constexprs
+// create enums so just plain ol' namespaces and constexprs
 namespace AssemblyFlags
 {
     constexpr char Shared       = 1;
@@ -34,11 +35,13 @@ struct SymbolInfo
 struct AssemblyInfo
 {
     using SymbolCollection = std::vector<SymbolInfo>;
+    using ImportCollection = std::vector<std::string>;
 
     std::string path;
     char flags;
     SymbolCollection definedSymbols;
     SymbolCollection unknownSymbols;
+    ImportCollection runtimeImports;
 
 #ifndef NDEBUG
     AssemblyInfo() = default;

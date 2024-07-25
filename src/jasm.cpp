@@ -81,32 +81,31 @@ int main(int argc, char** args)
 #ifndef NDEBUG
 void Finalize(const Assembler::AssemblyInfoCollection& collection)
 {
-    std::cout << "\n\nFinalizing...\n";
+    std::cout << "\nFinalizing...\n";
+
+    //for (const auto& entry : collection)
+    //{
+    //    AssemblyInfo info;
+    //    std::ifstream inputFile { entry.path, std::ios::binary };
+    //    if (entry.flags & AssemblyFlags::Executable)
+    //    {
+    //        systembit_t entry;
+    //        systembit_t stack;
+    //        systembit_t heap;
+    //        inputFile.read(reinterpret_cast<char*>(&entry), sizeof(entry));
+    //        inputFile.read(reinterpret_cast<char*>(&stack), sizeof(stack));
+    //        inputFile.read(reinterpret_cast<char*>(&heap), sizeof(heap));
+    //        std::cout << "\nProgram Entry Point:      " << entry
+    //            << "\nProgram Stack Size:       " << stack
+    //            << "\nProgram Max Heap Size:    " << heap;
+    //    }
+    //    info.Deserialize(inputFile);
+    //    info.PrintAssemblyInfo();
+    //    inputFile.close();
+    //}
 
     for (const auto& entry : collection)
-    {
-        AssemblyInfo info;
-        std::ifstream inputFile { entry.path, std::ios::binary };
-
-        if (entry.flags & AssemblyFlags::Executable)
-        {
-            systembit_t entry;
-            systembit_t stack;
-            systembit_t heap;
-
-            inputFile.read(reinterpret_cast<char*>(&entry), sizeof(entry));
-            inputFile.read(reinterpret_cast<char*>(&stack), sizeof(stack));
-            inputFile.read(reinterpret_cast<char*>(&heap), sizeof(heap));
-
-            std::cout << "\nProgram Entry Point:      " << entry
-                << "\nProgram Stack Size:       " << stack
-                << "\nProgram Max Heap Size:    " << heap;
-        }
-
-        info.Deserialize(inputFile);
-        info.PrintAssemblyInfo();
-        inputFile.close();
-    }
+        entry.PrintAssemblyInfo();
 }
 #endif
 

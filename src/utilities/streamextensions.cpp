@@ -21,8 +21,6 @@ namespace Extensions::Stream
             {
                 if (ch == '#')
                 {
-                    std::cout << "its hashtag time\n";
-
                     if (!ss.str().empty())
                         break;
 

@@ -1,16 +1,18 @@
 #pragma once
 
-#include "assemblycontext.hpp"
 #include <string>
 
+#include "utilities/stringextensions.hpp"
+#include "assemblycontext.hpp"
+
 #ifndef NDEBUG
-    #define LOGD(message) LOG(message)
+    #define LOGD(...) LOG(Extensions::String::Concat({__VA_ARGS__}))
 #else
     #define LOGD(message)
 #endif
-#define LOG(message) System::Log(message, __FILE__, __LINE__)
-#define LOGW(message) System::LogWarning(message, __FILE__, __LINE__)
-#define LOGE(message, level) System::LogError(message, level, __FILE__, __LINE__)
+#define LOG(...) System::Log(Extensions::String::Concat({__VA_ARGS__}), __FILE__, __LINE__)
+#define LOGW(...) System::LogWarning(Extensions::String::Concat({__VA_ARGS__}), __FILE__, __LINE__)
+#define LOGE(level, ...) System::LogError(Extensions::String::Concat({__VA_ARGS__}), level, __FILE__, __LINE__)
 
 struct System
 {
