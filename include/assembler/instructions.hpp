@@ -11,6 +11,7 @@ namespace Instructions
         inline constexpr char nop = 0x00;
         inline constexpr char sti = 0x01;
         inline constexpr char stf = 0x02;
+        inline constexpr char stb = 0x03;
     }
 
     void Nop(AssemblyInfo& info, std::ifstream& in, std::ofstream& out);

@@ -28,18 +28,14 @@ namespace Extensions::Serialization
     // Serialization
     //
     template<integer T>
-    void SerializeInteger(const T& data, std::ofstream& stream)
+    void inline SerializeInteger(const T& data, std::ofstream& stream)
     {
-        for (char i = 0; i < sizeof(data); i++)
-        {
-            char byte { static_cast<char>(data >> 8*i) };
-            stream.write(&byte, sizeof(byte));
-        }
+        stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
     }
 
-    void constexpr SerializeFloat(const float& data, std::ofstream& stream)
+    void inline SerializeFloat(const float& data, std::ofstream& stream)
     {
-        stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+        stream.write(reinterpret_cast<const char*>(&data), sizeof(float));
     }
 
     template<iterable ContT, integer SizeT, typename ElemT>
@@ -65,35 +61,24 @@ namespace Extensions::Serialization
         using uchar = std::make_unsigned_t<char>;
         using UT = std::make_unsigned_t<T>;
 
-        UT temp { 0 };
-        for (char i = 0; i < sizeof(T); i++)
-        {
-            temp <<= 8;
-            uchar byte;
-            stream.read(reinterpret_cast<char*>(&byte), sizeof(byte));
-            temp |= byte;
-        }
-
-        for (char i = 0; i < sizeof(T); i++)
-        {
-            uchar swapData { static_cast<uchar>(temp >> i*8) };
-            data <<= 8;
-            data |= swapData;
-        }
-    }
-
-    void constexpr DeserializeFlaot(float& data, std::ifstream& stream)
-    {
-        float flTemp; 
-        stream.read(reinterpret_cast<char*>(&flTemp), sizeof(flTemp));
+        UT temp;
+        stream.read(reinterpret_cast<char*>(&temp), sizeof(UT));
 
         if (std::endian::native == std::endian::little)
-            data = flTemp;
+            data = temp;
         else
         {
-
+            for (char i = 0; i < sizeof(UT); i++)
+            {
+                uchar swapData { static_cast<uchar>(temp >> i*8) };
+                data <<= 8;
+                data |= swapData;
+            }
         }
     }
+
+    void DeserializeFloat(float& data, std::ifstream& stream);
+    
 
     template<iterable ContT, integer SizeT, typename ElemT>
     void DeserializeContainer(

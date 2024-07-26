@@ -39,13 +39,15 @@ namespace Instructions
         // stf <float>
         float floatVal { std::stof(Stream::Tokenize(in)) };
         Serialization::SerializeInteger(OpCodes::stf, out);
-
-        // TODO: Float Serialization
+        Serialization::SerializeFloat(floatVal, out);
     }
 
     void StoreByte(AssemblyInfo& info, std::ifstream& in, std::ofstream& out)
     {
         // stb <byte>
+        char byte { static_cast<char>(std::stoi(Stream::Tokenize(in))) };
+        Serialization::SerializeInteger(OpCodes::stb, out);
+        Serialization::SerializeInteger(byte, out);
     }
 
     void StoreUInt(AssemblyInfo& info, std::ifstream& in, std::ofstream& out)

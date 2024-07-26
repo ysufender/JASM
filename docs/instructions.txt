@@ -1,8 +1,8 @@
 [x] nop;    0x00;   no operation
 
 [x] sti;    0x01;   store integer constant on stack
-[ ] stf;    0x02;   store float constant on stack
-[ ] stb;    0x03;   store byte constant on stack
+[x] stf;    0x02;   store float constant on stack
+[x] stb;    0x03;   store byte constant on stack
 [ ] stui;   0x04;   store uint constant on stack
 [ ] stub;   0x05;   store ubyte constant on stack
 

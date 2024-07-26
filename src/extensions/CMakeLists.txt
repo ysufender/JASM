@@ -3,6 +3,7 @@ add_library(extensions
         stringextensions.cpp
         streamextensions.cpp
         system.cpp
+        serialization.cpp
 )
 
 target_include_directories(extensions

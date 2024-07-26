@@ -1,8 +1,10 @@
 #include "assemblycontext.hpp"
+#include "extensions/serialization.hpp"
 #include "extensions/system.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <stdlib.h>
@@ -15,9 +17,6 @@
 
 int main(int argc, char** args)
 {
-
-    return 0;
-
     try
     {
         CLIParser parser{args, argc};
