@@ -28,15 +28,29 @@ namespace Extensions::Serialization
     // Serialization
     //
     template<integer T>
-    void inline SerializeInteger(const T& data, std::ofstream& stream)
+    void SerializeInteger(const T& data, std::ofstream& stream)
     {
-        stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
+        using uchar = std::make_unsigned_t<char>;
+        using UT = std::make_unsigned_t<T>;
+
+        if (std::endian::native == std::endian::little)
+            stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
+        else
+        {
+            UT temp;
+
+            for (char i = 0; i < sizeof(UT); i++)
+            {
+                uchar swapData { static_cast<uchar>(data >> i*8) };
+                temp <<= 8;
+                temp |= swapData;
+            }
+
+            stream.write(reinterpret_cast<char*>(&temp), sizeof(temp));
+        }
     }
 
-    void inline SerializeFloat(const float& data, std::ofstream& stream)
-    {
-        stream.write(reinterpret_cast<const char*>(&data), sizeof(float));
-    }
+    
 
     template<iterable ContT, integer SizeT, typename ElemT>
     void SerializeContainer(
@@ -51,6 +65,8 @@ namespace Extensions::Serialization
         for (const ElemT& element : container)
            serializer(element, stream); 
     }
+
+    void SerializeFloat(const float& data, std::ofstream& stream);
 
     //
     // Deserialization

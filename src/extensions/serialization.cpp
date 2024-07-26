@@ -20,4 +20,23 @@ namespace Extensions::Serialization
             returnFloat[3] = floatToConvert[0];
         }
     }
+
+    void SerializeFloat(const float& data, std::ofstream& stream)
+    {
+        if (std::endian::native == std::endian::little)
+            stream.write(reinterpret_cast<const char*>(&data), sizeof(float));
+        else
+        {
+            float temp;
+            char* floatToConvert = (char*)&data;
+            char* returnFloat = (char*)&temp;
+
+            returnFloat[0] = floatToConvert[3];
+            returnFloat[1] = floatToConvert[2];
+            returnFloat[2] = floatToConvert[1];
+            returnFloat[3] = floatToConvert[0];
+
+            stream.write(reinterpret_cast<char*>(&temp), sizeof(data));
+        }
+    }
 }
