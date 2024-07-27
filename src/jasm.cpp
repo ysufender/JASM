@@ -81,26 +81,26 @@ void Finalize(const Assembler::AssemblyInfoCollection& collection)
 
     //for (const auto& entry : collection)
         //entry.PrintAssemblyInfo();
-    for (const auto& entry : collection)
-    {
-        std::ifstream in { entry.path, std::ios::binary };
+    //for (const auto& entry : collection)
+    //{
+        //std::ifstream in { entry.path, std::ios::binary };
         
-        if (!System::Context.IsSingle() && entry.path == collection.at(0).path)
-        {
-            systembit_t org, ssz, hsz;  
-            Extensions::Serialization::DeserializeInteger(org, in);
-            Extensions::Serialization::DeserializeInteger(ssz, in);
-            Extensions::Serialization::DeserializeInteger(hsz, in);
+        //if (!System::Context.IsSingle() && entry.path == collection.at(0).path)
+        //{
+            //systembit_t org, ssz, hsz;  
+            //Extensions::Serialization::DeserializeInteger(org, in);
+            //Extensions::Serialization::DeserializeInteger(ssz, in);
+            //Extensions::Serialization::DeserializeInteger(hsz, in);
 
-            std::cout << "\norg: " << org
-                      << "\nsts: " << ssz
-                      << "\nsth: " << hsz << '\n';
-        }
+            //std::cout << "\norg: " << org
+                      //<< "\nsts: " << ssz
+                      //<< "\nsth: " << hsz << '\n';
+        //}
 
-        AssemblyInfo info {entry.path, 0x00};
-        info.Deserialize(in);
-        info.PrintAssemblyInfo();
-    }
+        //AssemblyInfo info {entry.path, 0x00};
+        //info.Deserialize(in);
+        //info.PrintAssemblyInfo();
+    //}
 }
 #endif
 

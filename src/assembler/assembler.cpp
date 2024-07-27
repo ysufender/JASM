@@ -186,8 +186,8 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     }
 
     //AssembleCommon(assemblyInfo, sourceFile, outFile);
-
-    assemblyInfo.Serialize(outFile);
+    LOGW("Assemble Common is not called for ", file);
+    //assemblyInfo.Serialize(outFile);
 
     sourceFile.close();
     outFile.close();
@@ -219,9 +219,9 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
 
     while (Stream::Tokenize(sourceFile) != ".prep") {}
 
-    //AssembleCommon(assemblyInfo, sourceFile, outFile);
+    AssembleCommon(assemblyInfo, sourceFile, outFile);
 
-    assemblyInfo.Serialize(outFile);
+    //assemblyInfo.Serialize(outFile);
     
     //sourceFile.close();
     outFile.close();

@@ -17,17 +17,19 @@ namespace ModeFlags
 
     namespace RegisterModeFlags
     {
+        // 32-bit
         inline constexpr char eax       = 0x08;
         inline constexpr char ebx       = 0x09;
         inline constexpr char ecx       = 0x0A;
         inline constexpr char edx       = 0x0B;
 
+        // 8-bit
         inline constexpr char al        = 0x0C;
         inline constexpr char bl        = 0x0D;
         inline constexpr char cl        = 0x0E;
         inline constexpr char dl        = 0x0F;
     }
 
-    char GetModeFlag(const std::string& identifier); 
-    char GetRegisterModeFlag(const std::string& identifier);
+    char GetModeFlag(const std::string& identifier, bool throws = false); 
+    char GetRegisterModeFlag(const std::string& identifier, bool throws = false);
 }

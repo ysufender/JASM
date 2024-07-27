@@ -6,21 +6,25 @@ Note: words inside paranthesis "()" are optional
 [x] sti;    0x01;   store (u)int constant on stack
 [x] stf;    0x02;   store float constant on stack
 [x] stb;    0x03;   store (u)byte constant on stack
-[ ] stis;   ----;   store the (u)int at given symbol
-[ ] stif;   ----;   store the float at given symbol
-[ ] stib;   ----;   store the (u)byte at given symbol
+[x] stis;   0x04;   store the (u)int at given symbol on stack
+[x] stfs;   0x05;   store the float at given symbol on stack
+[x] stbs;   0x06;   store the (u)byte at given symbol on stack
 
 [x] ldc;    ----;   
-[x] ldi;    0x04;   load (u)int from stack on heap and set &eax to address 
-[x] ldf;    0x05;   load float from stack on heap and set &eax to address 
-[x] ldb;    0x06;   load (u)byte from stack on heap and set &eax to address 
+[x] ldi;    0x07;   load (u)int from stack on heap and set &eax to address 
+[x] ldf;    0x08;   load float from stack on heap and set &eax to address 
+[x] ldb;    0x09;   load (u)byte from stack on heap and set &eax to address 
 
 [x] rda;    ----;   
-[x] rdi;    0x07;   read (u)int from heap on address &<given_stack> and store it on stack
-[x] rdf;    0x08;   read float from heap on address &<given_stack> and store it on stack
-[x] rdb;    0x09;   read (u)byte from heap on address &<given_stack> and store it on stack
-[x] rdr;    0x0A;   read the &<given_register> and store it on stack
+[x] rdi;    0x0A;   read (u)int from heap on address &<given_stack> and store it on stack
+[x] rdf;    0x0B;   read float from heap on address &<given_stack> and store it on stack
+[x] rdb;    0x0C;   read (u)byte from heap on address &<given_stack> and store it on stack
+[x] rdr;    0x0D;   read the &<given_register> and store it on stack
 
-[x] mov;    ----;   
-[ ] movs;   ----;
-[x] movr;   0x0E;   set register to given register
+[x] mov;    ----;
+[x] movc;   0x0E;   set register to given constant value
+[x] movs;   0x0F;   set register to given value of symbol
+[x] movr;   0x10;   set register to given register
+[x] movi;   0x11;   set register to the (u)int at top of the stack
+[x] movf;   0x12;   set register to the float at top of the stack
+[x] movb;   0x13;   set register to the (u)byte at top of the stack
