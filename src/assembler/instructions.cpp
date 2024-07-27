@@ -1,11 +1,10 @@
 #include <array>
 #include <cassert>
+#include <cctype>
 #include <concepts>
-#include <ios>
 #include <ostream>
 #include <string>
 #include <iostream>
-#include <type_traits>
 
 #include "assembler/instructions.hpp"
 #include "assembler/modeflags.hpp"
@@ -73,6 +72,7 @@ namespace Instructions
     void StoreConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // stc <mode> <value>
+        // stc <mode> <symbol>
         // stc <float>
 
         std::string next { Stream::Tokenize(in) };
@@ -80,32 +80,18 @@ namespace Instructions
 
         if (modeFlag != ModeFlags::NoMode)
         {
-            const std::string numToken = Stream::Tokenize(in);
-
-            static const auto intCallback   = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(numToken), out);};
-            static const auto floatCallback = [&numToken, &out](){Serialization::SerializeFloat(std::stof(numToken), out);};
-            static const auto byteCallback  = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<char>(numToken), out);};
-            
-            _BoringNumSwitch(modeFlag, out, {OpCodes::sti, OpCodes::stf, OpCodes::stb}, {
-                [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(numToken), out);},
-                [&numToken, &out](){Serialization::SerializeFloat(std::stof(numToken), out);},
-                [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<char>(numToken), out);},
-            });
+            // TODO: store constant
+            // TODO: store symbol
         }
         else
         {
-            if (next.find_first_of('.') == std::string::npos)
-                LOGE(System::LogLevel::High, "Expected mode flag after '", Stream::Tokenize(in, true), "'");
-
-            Serialization::SerializeInteger(OpCodes::stf, out);
-            Serialization::SerializeFloat(std::stof(next), out);
+            // TODO: store constant float
         }
     }
 
     void LoadConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // ldc <mode> <value>
-        // ldc <float>
+        // ldc <mode>
 
         const std::string next { Stream::Tokenize(in) };
         const char modeFlag { ModeFlags::GetModeFlag(next) };
@@ -114,24 +100,10 @@ namespace Instructions
         {
             const std::string numToken = Stream::Tokenize(in);
 
-            static const auto intCallback   = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(numToken), out);};
-            static const auto floatCallback = [&numToken, &out](){Serialization::SerializeFloat(std::stof(numToken), out);};
-            static const auto byteCallback  = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<char>(numToken), out);};
-
-            _BoringNumSwitch(modeFlag, out, {OpCodes::ldi, OpCodes::ldf, OpCodes::ldb}, {
-                intCallback,
-                floatCallback,
-                byteCallback
-            });
+            _BoringNumSwitch(modeFlag, out, {OpCodes::ldi, OpCodes::ldf, OpCodes::ldb}, { });
         }
         else
-        {
-            if (next.find_first_of('.') == std::string::npos)
-                LOGE(System::LogLevel::High, "Expected mode flag after '", Stream::Tokenize(in, true), "'");
-
-            Serialization::SerializeInteger(OpCodes::ldf, out);
-            Serialization::SerializeFloat(std::stof(next), out);
-        }
+            LOGE(System::LogLevel::High, "Expected mode flag after '", Stream::Tokenize(in, true), "'");
     }
 
     void ReadAddress(AssemblyInfo& info, std::istream& in, std::ostream& out)
@@ -161,8 +133,8 @@ namespace Instructions
     void Move(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // mov <register> <register>
-        // mov <mode> <value> <register>
         // mov <value> <register>
+        // mov <mode> <symbol> register
 
         const std::string next { Stream::Tokenize(in) };
 
@@ -179,29 +151,11 @@ namespace Instructions
         }
         else if (next.starts_with('%'))
         {
-            const char numMode { ModeFlags::GetModeFlag(next) };
-            const std::string numToken { Stream::Tokenize(in) };
-            const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in)) }; 
-            
-            static const auto intCallback   = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(numToken), out);};
-            static const auto floatCallback = [&numToken, &out](){Serialization::SerializeFloat(std::stof(numToken), out);};
-            static const auto byteCallback  = [&numToken, &out](){Serialization::SerializeInteger(_TokenToInt<char>(numToken), out);};
-
-            _BoringNumSwitch(numMode, out, {OpCodes::movi, OpCodes::movf, OpCodes::movb}, {
-                intCallback,
-                floatCallback,
-                byteCallback
-            });
-
-            Serialization::SerializeInteger(regMode, out);
+            // TODO: move symbol to register
         }
         else
         {
-            if (next.find_first_of('.') == std::string::npos)
-                LOGE(System::LogLevel::High, "Expected mode flag after '", Stream::Tokenize(in, true), "'");
-
-            Serialization::SerializeInteger(OpCodes::movf, out);
-            Serialization::SerializeFloat(std::stof(next), out);
+            // TODO: move value to register
         }
     }
 }

@@ -13,9 +13,12 @@ namespace Instructions
         inline constexpr char nop   = 0x00;
 
         // stc
-        inline constexpr char sti   = 0x01;
-        inline constexpr char stf   = 0x02;
-        inline constexpr char stb   = 0x03;
+        inline constexpr char sti    = 0x01;
+        inline constexpr char stf    = 0x02;
+        inline constexpr char stb    = 0x03;
+        inline constexpr char stis   = 0x03;
+        inline constexpr char stif   = 0x03;
+        inline constexpr char stib   = 0x03;
 
         // ldc
         inline constexpr char ldi   = 0x04;

@@ -1,11 +1,9 @@
 #pragma once
 
-#include "extensions/system.hpp"
 #include <bit>
 #include <cmath>
 #include <fstream>
 #include <functional>
-#include <ios>
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -55,8 +53,8 @@ namespace Extensions::Serialization
     template<iterable ContT, integer SizeT, typename ElemT>
     void SerializeContainer(
             const ContT& container, 
-            std::function<void(const ElemT&, std::ostream&)> serializer, 
-            std::ostream& stream
+            std::ostream& stream,
+            std::function<void(const ElemT&, std::ostream&)> serializer
     )
     {
         SizeT size { static_cast<SizeT>(container.size()) };
@@ -99,8 +97,8 @@ namespace Extensions::Serialization
     template<iterable ContT, integer SizeT, typename ElemT>
     void DeserializeContainer(
             ContT& container,
-            std::function<void(ElemT&, std::istream&)> deserializer,
-            std::istream& stream
+            std::istream& stream,
+            std::function<void(ElemT&, std::istream&)> deserializer
     )
     {
         SizeT size;
@@ -108,7 +106,7 @@ namespace Extensions::Serialization
         
         for (; size > 0; size--)
         {
-            ElemT element { };
+            ElemT element;
             deserializer(element, stream);
             container.push_back(std::move(element));
         }

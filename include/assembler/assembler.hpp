@@ -1,10 +1,14 @@
 #pragma once
 
-#include <fstream>
+#include <functional>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
+#include <unordered_map>
 
 #include "JASMConfig.hpp"
+#include "extensions/system.hpp"
 
 /*
 * I could've made all of this without object orientation 
@@ -25,7 +29,7 @@ namespace AssemblyFlags
     constexpr char StoreName    = 16; // For possible future debugging
 };
 
-struct SymbolInfo
+struct SymbolInfo 
 {
     std::string SymbolName;
     systembit_t Address;
@@ -33,24 +37,30 @@ struct SymbolInfo
 
 struct AssemblyInfo
 {
-    using SymbolCollection = std::vector<SymbolInfo>;
+public:
+    //using SymbolCollection = std::vector<SymbolInfo>;
     using ImportCollection = std::vector<std::string>;
+    using KeyReference = std::unique_ptr<const std::string>;
+    using DefinedSymbolCollection = std::vector<KeyReference>;
+    using UnknownSymbolCollection = std::vector<SymbolInfo>;
+    using SymbolMap = std::unordered_map<std::string, systembit_t>;
 
     std::string path;
     char flags;
-    SymbolCollection definedSymbols;
-    SymbolCollection unknownSymbols;
+    DefinedSymbolCollection definedSymbols;
+    UnknownSymbolCollection unknownSymbols;
     ImportCollection runtimeImports;
+    SymbolMap symbolMap;
 
-#ifndef NDEBUG
-    AssemblyInfo() = default;
-#else
+public:
     AssemblyInfo() = delete;
-#endif
     AssemblyInfo(const std::string& path, char flags);
     void Serialize(std::ostream& outFile);
     void Deserialize(std::istream& inFile);
     void PrintAssemblyInfo() const;
+
+    void AddSymbol(std::string symbolName, systembit_t address);
+    void AddUnknownSymbol(std::string symbolName, systembit_t address);
 };
 
 class Assembler
