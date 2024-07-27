@@ -5,5 +5,5 @@
 
 namespace Extensions::Stream
 {
-    std::string Tokenize(std::ifstream& inputStream, bool backwards = false);
+    std::string Tokenize(std::istream& inputStream, bool backwards = false);
 }

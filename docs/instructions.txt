@@ -1,19 +1,27 @@
+Note: words inside paranthesis "()" are optional
+
 [x] nop;    0x00;   no operation
 
-[x] sti;    0x01;   store integer constant on stack
+[x] stc;    ----;   
+[x] sti;    0x01;   store (u)int constant on stack
 [x] stf;    0x02;   store float constant on stack
-[x] stb;    0x03;   store byte constant on stack
-[ ] stui;   0x04;   store uint constant on stack
-[ ] stub;   0x05;   store ubyte constant on stack
+[x] stb;    0x03;   store (u)byte constant on stack
 
-[ ] ldi;    0x06;   store integer from stack on heap and set &eax to address 
-[ ] ldf;    0x07;   store float from stack on heap and set &eax to address 
-[ ] ldb;    0x08;   store byte from stack on heap and set &eax to address 
-[ ] ldui;   0x09;   store uint from stack on heap and set &eax to address 
-[ ] ldub;   0x0A;   store ubyte from stack on heap and set &eax to address 
+[x] ldc;    ----;   
+[x] ldi;    0x04;   load (u)int from stack on heap and set &eax to address 
+[x] ldf;    0x05;   load float from stack on heap and set &eax to address 
+[x] ldb;    0x06;   load (u)byte from stack on heap and set &eax to address 
 
-[ ] rdi;    0x0B;   read an integer from heap on address &ebx and store it on stack
-[ ] rdf;    0x0C;   read a float from heap on address &ebx and store it on stack
-[ ] rdb;    0x0D;   read a byte from heap on address &ebx and store it on stack
-[ ] rdui;   0x0E;   read a uint from heap on address &ebx and store it on stack
-[ ] rdub;   0x0F;   read a ubyte from heap on address &ebx and store it on stack
+[x] rda;    ----;   
+[x] rdi;    0x07;   read (u)int from heap on address &<given_stack> and store it on stack
+[x] rdf;    0x08;   read float from heap on address &<given_stack> and store it on stack
+[x] rdb;    0x09;   read (u)byte from heap on address &<given_stack> and store it on stack
+[x] rdr;    0x0A;   read the &<given_register>
+
+[x] mov;    ----;   
+[x] movi;   0x0B;   set register to given int
+[x] movf;   0x0C;   set register to given float 
+[x] movb;   0x0D;   set register to given byte 
+[x] movr;   0x0E;   set register to value at given register
+
+[ ] add;    ----;   

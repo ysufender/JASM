@@ -2,7 +2,7 @@
 
 namespace Extensions::Serialization
 {
-    void DeserializeFloat(float& data, std::ifstream& stream)
+    void DeserializeFloat(float& data, std::istream& stream)
     {
         float temp;
         stream.read(reinterpret_cast<char*>(&temp), sizeof(float));
@@ -21,7 +21,7 @@ namespace Extensions::Serialization
         }
     }
 
-    void SerializeFloat(const float& data, std::ofstream& stream)
+    void SerializeFloat(const float& data, std::ostream& stream)
     {
         if (std::endian::native == std::endian::little)
             stream.write(reinterpret_cast<const char*>(&data), sizeof(float));

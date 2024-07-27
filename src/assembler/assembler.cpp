@@ -20,13 +20,12 @@ using namespace Extensions;
 // It's better than a bunch of if-else statements
 // I think
 //
-static const std::unordered_map<std::string, void (*)(AssemblyInfo&, std::ifstream&, std::ofstream&)> instructionMap {
+static const std::unordered_map<std::string, std::function<void(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
     {"nop", &Instructions::Nop},
-    {"sti", &Instructions::StoreInt},
-    {"stf", &Instructions::StoreFloat},
-    {"stb", &Instructions::StoreByte},
-    {"stui", &Instructions::StoreUInt},
-    {"stub", &Instructions::StoreUByte},
+    {"stc", &Instructions::StoreConstant},
+    {"ldc", &Instructions::LoadConstant}, 
+    {"rda", &Instructions::ReadAddress},
+    {"mov", &Instructions::Move },
 };
 
 
@@ -58,7 +57,7 @@ std::vector<AssemblyInfo> Assembler::Assemble()
     return std::move(outputVector);
 }
 
-AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstream& sourceFile, std::ofstream& outFile)
+AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile)
 {
     std::string token { Stream::Tokenize(sourceFile) };
 
@@ -204,10 +203,6 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
     if (!directories.empty())
         std::filesystem::create_directories(directories);
 
-#ifndef NDEBUG
-    outFlags |= AssemblyFlags::StoreName;
-#endif
-
     AssemblyInfo assemblyInfo {
         outPath,
         outFlags
@@ -233,7 +228,7 @@ AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : path(path), fl
 {
 }
 
-void AssemblyInfo::Serialize(std::ofstream& outFile)
+void AssemblyInfo::Serialize(std::ostream& outFile)
 {
     if (outFile.fail() || outFile.bad())
         LOGE(System::LogLevel::High, "Couldn't open file while serializing assembly info");
@@ -263,7 +258,7 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
     // Imports
     Serialization::SerializeContainer<AssemblyInfo::ImportCollection, systembit_t, std::string>(
         runtimeImports,
-        [](const std::string& data, std::ofstream& stream){
+        [](const std::string& data, std::ostream& stream){
             Serialization::SerializeContainer<std::string, uint16_t, char>(
                 data,
                 &Serialization::SerializeInteger<char>,
@@ -280,7 +275,7 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
     // Known Symbols
     Serialization::SerializeContainer<AssemblyInfo::SymbolCollection, systembit_t, SymbolInfo>(
         definedSymbols, 
-        [](const SymbolInfo& symInfo, std::ofstream& out){
+        [](const SymbolInfo& symInfo, std::ostream& out){
             Serialization::SerializeContainer<std::string, uint16_t, char>(
                 symInfo.SymbolName, 
                 &Serialization::SerializeInteger<char>, 
@@ -294,7 +289,7 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
     // Unknown Symbols
     Serialization::SerializeContainer<AssemblyInfo::SymbolCollection, systembit_t, SymbolInfo>(
         unknownSymbols, 
-        [](const SymbolInfo& symInfo, std::ofstream& out){
+        [](const SymbolInfo& symInfo, std::ostream& out){
             Serialization::SerializeContainer<std::string, uint16_t, char>(
                 symInfo.SymbolName, 
                 &Serialization::SerializeInteger<char>, 
@@ -306,7 +301,7 @@ void AssemblyInfo::Serialize(std::ofstream& outFile)
     );
 }
 
-void AssemblyInfo::Deserialize(std::ifstream& inFile)
+void AssemblyInfo::Deserialize(std::istream& inFile)
 {
     if (inFile.fail() || inFile.bad())
         LOGE(System::LogLevel::High, "Couldn't open file while deserializing assembly info");
@@ -325,7 +320,7 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
     // Imports
     Serialization::DeserializeContainer<AssemblyInfo::ImportCollection, systembit_t, std::string>(
         runtimeImports, 
-        [](std::string& data, std::ifstream& stream){
+        [](std::string& data, std::istream& stream){
             Serialization::DeserializeContainer<std::string, uint16_t, char>(
                 data, 
                 &Serialization::DeserializeInteger<char>, 
@@ -342,7 +337,7 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
     // Defined Symbols
     Serialization::DeserializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
         definedSymbols, 
-        [](SymbolInfo& info, std::ifstream& in) {
+        [](SymbolInfo& info, std::istream& in) {
             Serialization::DeserializeContainer<std::string, uint16_t, char>(
                 info.SymbolName, 
                 Serialization::DeserializeInteger<char>, 
@@ -357,7 +352,7 @@ void AssemblyInfo::Deserialize(std::ifstream& inFile)
     // Unknown Symbols
     Serialization::DeserializeContainer<std::vector<SymbolInfo>, systembit_t, SymbolInfo>(
         unknownSymbols, 
-        [](SymbolInfo& info, std::ifstream& in) {
+        [](SymbolInfo& info, std::istream& in) {
             Serialization::DeserializeContainer<std::string, uint16_t, char>(
                 info.SymbolName, 
                 Serialization::DeserializeInteger<char>, 

@@ -1,3 +1,5 @@
+#include <cctype>
+#include <istream>
 #include <sstream>
 #include <iostream>
 
@@ -5,7 +7,7 @@
 
 namespace Extensions::Stream
 {
-    std::string Tokenize(std::ifstream& inputStream, bool backwards)
+    std::string ForwardTokenize(std::istream& inputStream)
     {
         char ch;
         std::stringstream ss;
@@ -40,5 +42,23 @@ namespace Extensions::Stream
         }
 
         return std::move(ss.str());
+    }
+
+    std::string BackwardTokenize(std::istream& inputStream)
+    {
+        char ch { 'g' };
+
+        while (!isspace(ch))
+        {
+            inputStream.seekg(-2, std::ios::cur);
+            inputStream.read(&ch, sizeof(ch));
+        }
+
+        return ForwardTokenize(inputStream);
+    }
+
+    std::string Tokenize(std::istream& inputStream, bool backwards)
+    {
+        return backwards ? BackwardTokenize(inputStream) : ForwardTokenize(inputStream);
     }
 }

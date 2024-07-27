@@ -48,8 +48,8 @@ struct AssemblyInfo
     AssemblyInfo() = delete;
 #endif
     AssemblyInfo(const std::string& path, char flags);
-    void Serialize(std::ofstream& outFile);
-    void Deserialize(std::ifstream& inFile);
+    void Serialize(std::ostream& outFile);
+    void Deserialize(std::istream& inFile);
     void PrintAssemblyInfo() const;
 };
 
@@ -64,5 +64,5 @@ class Assembler
     private:
         AssemblyInfo AssembleLibrary(const std::string& file);
         AssemblyInfo AssembleExecutable(const std::string& file);
-        AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::ifstream& sourceFile, std::ofstream& outFile);
+        AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile);
 };

@@ -28,7 +28,7 @@ namespace Extensions::Serialization
     // Serialization
     //
     template<integer T>
-    void SerializeInteger(const T& data, std::ofstream& stream)
+    void SerializeInteger(const T& data, std::ostream& stream)
     {
         using uchar = std::make_unsigned_t<char>;
         using UT = std::make_unsigned_t<T>;
@@ -55,8 +55,8 @@ namespace Extensions::Serialization
     template<iterable ContT, integer SizeT, typename ElemT>
     void SerializeContainer(
             const ContT& container, 
-            std::function<void(const ElemT&, std::ofstream&)> serializer, 
-            std::ofstream& stream
+            std::function<void(const ElemT&, std::ostream&)> serializer, 
+            std::ostream& stream
     )
     {
         SizeT size { static_cast<SizeT>(container.size()) };
@@ -66,13 +66,13 @@ namespace Extensions::Serialization
            serializer(element, stream); 
     }
 
-    void SerializeFloat(const float& data, std::ofstream& stream);
+    void SerializeFloat(const float& data, std::ostream& stream);
 
     //
     // Deserialization
     //
     template<integer T>
-    void DeserializeInteger(T& data, std::ifstream& stream)
+    void DeserializeInteger(T& data, std::istream& stream)
     {
         using uchar = std::make_unsigned_t<char>;
         using UT = std::make_unsigned_t<T>;
@@ -93,14 +93,14 @@ namespace Extensions::Serialization
         }
     }
 
-    void DeserializeFloat(float& data, std::ifstream& stream);
+    void DeserializeFloat(float& data, std::istream& stream);
     
 
     template<iterable ContT, integer SizeT, typename ElemT>
     void DeserializeContainer(
             ContT& container,
-            std::function<void(ElemT&, std::ifstream&)> deserializer,
-            std::ifstream& stream
+            std::function<void(ElemT&, std::istream&)> deserializer,
+            std::istream& stream
     )
     {
         SizeT size;
