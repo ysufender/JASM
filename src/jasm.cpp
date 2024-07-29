@@ -19,15 +19,15 @@ int main(int argc, char** args)
 {
     try
     {
-        CLIParser parser{args, argc};
-        parser.AddFlag("help", FlagType::Bool);
-        parser.AddFlag("version", FlagType::Bool);
-        parser.AddFlag("silent", FlagType::Bool);
-        parser.AddFlag("single", FlagType::Bool);       // Assemble files but do NOT link
-        parser.AddFlag("out", FlagType::String);        // Place the output file to specified path if flag `single` is not set
-        parser.AddFlag("libType", FlagType::String);    // If desired output is a library, specify the type. (either shared or static)
-        parser.AddFlag("in", FlagType::StringList);     // Files to assemble and (optionally) link
-        parser.AddFlag("libs", FlagType::StringList);   // Both static and shared libraries to link
+        CLIParser::Parser parser{args, argc, "--", "-"};
+        parser.AddFlag("help", CLIParser::FlagType::Bool);
+        parser.AddFlag("version", CLIParser::FlagType::Bool);
+        parser.AddFlag("silent", CLIParser::FlagType::Bool);
+        parser.AddFlag("single", CLIParser::FlagType::Bool);       // Assemble files but do NOT link
+        parser.AddFlag("out", CLIParser::FlagType::String);        // Place the output file to specified path if flag `single` is not set
+        parser.AddFlag("libType", CLIParser::FlagType::String);    // If desired output is a library, specify the type. (either shared or static)
+        parser.AddFlag("in", CLIParser::FlagType::StringList);     // Files to assemble and (optionally) link
+        parser.AddFlag("libs", CLIParser::FlagType::StringList);   // Both static and shared libraries to link
 
         parser.BindFlag("h", "help");
         parser.BindFlag("v", "version");
@@ -37,7 +37,7 @@ int main(int argc, char** args)
         parser.BindFlag("I", "in");
         parser.BindFlag("L", "libs");
 
-        Flags flags = parser.Parse();
+        CLIParser::Flags flags = parser.Parse();
 
         if (argc == 1 || flags.GetBool("help"))
             PrintHelp();
@@ -79,8 +79,9 @@ void Finalize(const Assembler::AssemblyInfoCollection& collection)
 {
     std::cout << "\nFinalizing...\n";
 
-    //for (const auto& entry : collection)
-        //entry.PrintAssemblyInfo();
+    for (const auto& entry : collection)
+        entry.PrintAssemblyInfo();
+
     //for (const auto& entry : collection)
     //{
         //std::ifstream in { entry.path, std::ios::binary };

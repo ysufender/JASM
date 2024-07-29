@@ -13,6 +13,6 @@ if (-not $gen) {
     cmake --build build
 }
 
-if (Test-Path "build/bin/jasm.exe"){
+if (Test-Path "build/bin/jasm.exe" -and -not $gen){
     cp  "build/bin/jasm.exe" "test/jasm.exe"
 }
