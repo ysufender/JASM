@@ -8,10 +8,9 @@
 
 #ifdef JASM_TEST_MODE
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN 
-#else
+#include "doctest.h"
 #endif
 
-#include "doctest.h"
 
 #include "jasm.hpp"
 #include "CLIParser.hpp"
@@ -20,6 +19,14 @@
 
 int main(int argc, char** args)
 {
+#if JASM_TEST_MODE
+    std::cout << "Testing\n";
+#else
+    std::cout << "Not Testing\n";
+#endif
+
+    return 0;
+
     try
     {
         CLIParser::Parser parser{args, argc, "--", "-"};

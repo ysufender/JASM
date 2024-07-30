@@ -1,15 +1,18 @@
 {
-    "version": 1,
-    "cmakeMinimumRequired": {
+    "version": 2,
+    "cmakeMinimumRequired": 
+    {
         "major": 3,
         "minor": 30,
         "patch": 0
     },
-    "configurePresets": {
+    "configurePresets": [
         {
             "name": "DebugBuild",
             "binaryDir": "${sourceDir}/build/Debug",
-            "cacheVariables": {
+            "generator": "Ninja",
+            "cacheVariables": 
+            {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_COMPILER": "g++"
             }
@@ -17,21 +20,51 @@
         {
             "name": "TestBuild",
             "binaryDir": "${sourceDir}/build/Test",
-            "cacheVariables" : {
-                "JASM_TEST_MODE": true,
+            "generator": "Ninja",
+            "cacheVariables" : 
+            {
+                "JASM_TEST_MODE": {
+                    "type": "BOOL",
+                    "value": "ON" 
+                },
                 "CMAKE_BUILD_TYPE": "Test",
                 "CMAKE_CXX_COMPILER": "g++"
             }
+        },
+        {
+            "name": "ReleaseBuild",
+            "binaryDir": "${sourceDir}/build/Release",
+            "generator": "Ninja",
+            "cacheVariables": 
+            {
+                "USE_PIPELINES_OPT": {
+                    "type": "BOOL",
+                    "value":  "OFF"
+                },
+
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
         }
-    },
-    "buildPresets": {
+    ],
+    "buildPresets": [
         {
             "name": "DebugBuild",
-            "configurePreset": "DebugBuild"
+            "configurePreset": "DebugBuild",
+            "verbose": true,
+            "targets": ["jasm"]
         },
         {
             "name": "TestBuild",
-            "configurePreset": "TestBuild"
+            "configurePreset": "TestBuild",
+            "verbose": true,
+            "targets": ["jasm"]
+        },
+        {
+            "name": "ReleaseBuild",
+            "configurePreset": "ReleaseBuild",
+            "verbose": true,
+            "targets": ["jasm"]
         }
-    }
+    ]
 }

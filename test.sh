@@ -33,12 +33,3 @@ if [ $generate == true ]; then
 fi
 
 cmake --build build
-
-if [[ -f "build/bin/jasm" && $generate == false ]]; then
-    if [ ! -d test ]; then
-        mkdir test
-    fi
-
-    cp -rf "build/bin/jasm" "test/jasm"
-    echo "[BUILD_SCRIPT] test/jasm has been copied"
-fi
