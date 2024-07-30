@@ -21,11 +21,11 @@ while test $# -gt 0; do
 done
 
 if [[ $refresh == true && -d build ]]; then
-    echo "[BUILD_SCRIPT] Cleaning the build directory..."
+    echo "[TEST_SCRIPT] Cleaning the build directory..."
     rm -rf build
 fi
 
-cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug -DJASM_TEST_MODE:BOOL=TRUE
 
 if [ $generate == true ]; then
     echo "[BUILD_SCRIPT] Generate-only mode"

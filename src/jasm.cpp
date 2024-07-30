@@ -1,14 +1,17 @@
 #include "assemblycontext.hpp"
-#include "extensions/serialization.hpp"
 #include "extensions/system.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <exception>
-#include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <stdlib.h>
-#include <string>
+
+#ifdef JASM_TEST_MODE
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN 
+#else
+#endif
+
+#include "doctest.h"
 
 #include "jasm.hpp"
 #include "CLIParser.hpp"
@@ -107,9 +110,12 @@ void Finalize(const Assembler::AssemblyInfoCollection& collection)
 
 void PrintHeader()
 {
-    std::cout << "\nJust an Assembler (JASM)\n";
-    std::cout << "\tDescription: " << JASM_DESCRIPTION << '\n';
-    std::cout << "\tVersion: " << JASM_VERSION << '\n';
+    std::cout << "\nJust an Assembler (JASM)"
+              << "\n\tDescription: " << JASM_DESCRIPTION
+              << "\n\tVersion: " << JASM_VERSION
+              //<< "\n\tPipelines: " << std::boolalpha << JASM_USE_PIPELINES_OPT
+              //<< "\n\tEmbedded: " << JASM_TOOLCHAIN_MODE << std::noboolalpha << '\n';
+              ;
 }
 
 void PrintHelp()
@@ -117,18 +123,18 @@ void PrintHelp()
     PrintHeader();
 
     std::cout << '\n' << R"(Available Flags:
-    -help, -h: Print help.
-    -version, -v: Print version.
+    --help, -h: Print help.
+    --version, -v: Print version.
 
-    -silent, -s : Disables SOME outputs. So it's less painful to look at the screen.
-    -single, -S: Assemble each file provided by `-in` but do NOT link.
-    -out, -o: Place the output file to specified path if flag `-single` is not set.
-    -libType <lib_type>: If desired output is a library, specify the type. (either shared 'shd' or static 'stc')
+    --silent, -s : Disables SOME outputs. So it's less painful to look at the screen.
+    --single, -S: Assemble each file provided by `-in` but do NOT link.
+    --out, -o: Place the output file to specified path if flag `-single` is not set.
+    --libType <lib_type>: If desired output is a library, specify the type. (either shared 'shd' or static 'stc')
 
-    -in <..input..>, -I <..input..>: Files to assemble and (optionally) link. The first entry is treated as jasm file containing entry point.
-    -libs <..libs..>, -L <..libs..>: Libraries used and to be linked.
+    --in <..input..>, -I <..input..>: Files to assemble and (optionally) link. The first entry is treated as jasm file containing entry point.
+    --libs <..libs..>, -L <..libs..>: Libraries used and to be linked.
 
     WARNING:
-        In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `-libType` flag.
+        In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.
     )";
 }

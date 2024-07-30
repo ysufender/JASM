@@ -1,0 +1,14 @@
+#pragma once
+
+#include <cstdint>
+
+#define JASM_VERSION "@jasm_VERSION@"
+#define JASM_VERSION_MAJOR @jasm_VERSION_MAJOR@
+#define JASM_VERSION_MINOR @jasm_VERSION_MINOR@
+#define JASM_VERSION_PATCH @jasm_VERSION_PATCH@
+#define JASM_DESCRIPTION "@jasm_DESCRIPTION@"
+#define JASM_USE_PIPELINES_OPT @jasm_USE_PIPELINES_OPT@
+#define JASM_TOOLCHAIN_MODE @jasm_TOOLCHAIN_MODE@
+
+using systembit_t = uint32_t;
+using sybmolsize_t = uint16_t;

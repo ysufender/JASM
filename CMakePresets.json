@@ -1,0 +1,37 @@
+{
+    "version": 1,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 30,
+        "patch": 0
+    },
+    "configurePresets": {
+        {
+            "name": "DebugBuild",
+            "binaryDir": "${sourceDir}/build/Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "TestBuild",
+            "binaryDir": "${sourceDir}/build/Test",
+            "cacheVariables" : {
+                "JASM_TEST_MODE": true,
+                "CMAKE_BUILD_TYPE": "Test",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        }
+    },
+    "buildPresets": {
+        {
+            "name": "DebugBuild",
+            "configurePreset": "DebugBuild"
+        },
+        {
+            "name": "TestBuild",
+            "configurePreset": "TestBuild"
+        }
+    }
+}

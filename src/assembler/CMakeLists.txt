@@ -4,9 +4,3 @@ add_library(assembler
         instructions.cpp
         modeflags.cpp
 )
-
-target_include_directories(assembler 
-    PRIVATE 
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_BINARY_DIR}/include
-)

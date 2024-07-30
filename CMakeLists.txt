@@ -14,18 +14,37 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDART_REQUIRED TRUE)
 
+#
+# CLI Arguments 
+# 
+set(USE_PIPELINES_OPT FALSE CACHE BOOL "Enable pipelines")
+set(TOOLCHAIN_MODE FALSE CACHE BOOL "Enable toolchain mode")
+set(JASM_TEST_MODE FALSE CACHE BOOL "Activate the unit tests")
+
+# This is before the include call to prevent it including 
+# project headers. Might cause problems.
 add_subdirectory(lib)
-add_subdirectory(src)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/JASMConfig.hpp.in
+    ${CMAKE_BINARY_DIR}/include/JASMConfig.hpp
+)
 
 add_executable(${CMAKE_PROJECT_NAME} 
     src/jasm.cpp 
     src/assemblycontext.cpp
 )
 
-configure_file(
-    ${CMAKE_SOURCE_DIR}/include/JASMConfig.hpp.in
-    ${CMAKE_BINARY_DIR}/include/JASMConfig.hpp
+include_directories(${CMAKE_PROJECT_NAME} 
+    PRIVATE 
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/lib/header_only
+        ${CMAKE_BINARY_DIR}/include
 )
+
+# After the include call so everything includes those above
+add_subdirectory(src)
+
 
 set_target_properties(${CMAKE_PROJECT_NAME}
     PROPERTIES
@@ -34,10 +53,6 @@ set_target_properties(${CMAKE_PROJECT_NAME}
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-target_include_directories(${CMAKE_PROJECT_NAME} 
-    PRIVATE 
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_BINARY_DIR}/include
-)
+
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE core libs)
