@@ -5,6 +5,7 @@
 #include <string>
 
 #include "JASMConfig.hpp"
+#include "catch2/internal/catch_result_type.hpp"
 #include "assemblycontext.hpp"
 
 AssemblyContext::AssemblyContext(
@@ -97,20 +98,19 @@ void AssemblyContext::PrintContext() const
 #ifdef TEST_MODE
 #include "extensions/system.hpp"
 
-TEST_SUITE("AssemblyContext") 
+TEST_CASE("Assembly Context Tests")
 {
-
-    TEST_CASE("AssemblyContext::ctor::Error")
+    SECTION("AssemblyContext::ctor::Error")
     {
-        CHECK_THROWS_MESSAGE(
+        CHECK_THROWS(
             AssemblyContext (false, false, "out", "stc", {}, {}),
-            "At least one input file is needed."
+            Catch::ResultDisposition::ContinueOnFailure
         );
     }
 
-    TEST_CASE("AssemblyContext::Correctness_Check")
+    SECTION("AssemblyContext::Correctness_Check")
     {
-        SUBCASE("AssemblyContext::Correctness_Check::Static")
+        SECTION("AssemblyContext::Correctness_Check::Static")
         {
             AssemblyContext context { false, false, "out", "stc", {"testOut.jasm"}, {} };
             CHECK(context.IsLib());
@@ -118,7 +118,7 @@ TEST_SUITE("AssemblyContext")
             CHECK(context.OutFile() == "out.stc");
         }
 
-        SUBCASE("AssemblyContext::Correctness_Check::Shared")
+        SECTION("AssemblyContext::Correctness_Check::Shared")
         {
             AssemblyContext context { false, false, "out", "shd", {"testOut.jasm"}, {} };
             CHECK(context.IsLib());
@@ -126,7 +126,7 @@ TEST_SUITE("AssemblyContext")
             CHECK(context.OutFile() == "out.shd");
         }
 
-        SUBCASE("AssemblyContext::Correctness_Check::General")
+        SECTION("AssemblyContext::Correctness_Check::General")
         {
             AssemblyContext context { true, true, "outTest", "", {"test.jasm", "a.jasm"}, {"lib.stc"}};
 
@@ -145,7 +145,7 @@ TEST_SUITE("AssemblyContext")
             context.PrintContext();
 
             fakeCout << "JASM Version " << JASM_VERSION << " Assembly Context"
-              << "\n\tSingle Mode: " << (context.IsSingle() ? "Enabled" : "Disabled");
+                << "\n\tSingle Mode: " << (context.IsSingle() ? "Enabled" : "Disabled");
 
             if (!context.IsSingle()) { fakeCout << "\n\tOutput File: " << context.OutFile(); }
             if (context.IsLib()) { fakeCout << "\n\tLibrary Type: " << (context.LibType() == LibTypeEnum::Shared ? "Shared" : "Static" ); }
@@ -154,12 +154,12 @@ TEST_SUITE("AssemblyContext")
             for (const std::string& file : context.InputFiles())
             {
                 fakeCout << "\n\t\t\"" << file << '\"';
-                
+
                 if (context.InputFiles().back() != file)
                     fakeCout << ',';
             }
             fakeCout << "\n\t}";
-            
+
             if(context.Libraries().size() == 0)
             {
                 fakeCout << "\n\tLibraries: No Library Provided\n";

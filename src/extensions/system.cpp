@@ -88,7 +88,7 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
 #include <sstream>
 #include <functional>
 
-TEST_SUITE("System Test Suite")
+TEST_CASE("System Test Suite")
 {
     std::stringstream ss {};
 
@@ -106,7 +106,7 @@ TEST_SUITE("System Test Suite")
         return val;
     };
 
-    TEST_CASE("System::Setup")
+    SECTION("System::Setup")
     {
         System::Setup(DefaultContext, ss, ss);
 
@@ -114,7 +114,7 @@ TEST_SUITE("System Test Suite")
         CHECK(std::cerr.rdbuf() == ss.rdbuf());
     }
 
-    TEST_CASE("System::LogTest (Info & Warning)")
+    SECTION("System::LogTest (Info & Warning)")
     {
         LOG("Testing Testing...");
         CHECK(ss.str() == "Testing Testing...\n");

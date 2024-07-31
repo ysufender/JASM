@@ -39,7 +39,6 @@ add_executable(${CMAKE_PROJECT_NAME}
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
-        #${CMAKE_SOURCE_DIR}/lib/header_only
         ${CMAKE_BINARY_DIR}/include
 )
 

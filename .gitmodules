@@ -1,3 +1,6 @@
 [submodule "lib/CLIParser"]
 	path = lib/CLIParser
 	url = https://github.com/The2ndSlimShady/CLIParser.git
+[submodule "lib/Catch2"]
+	path = lib/Catch2
+	url = https://github.com/catchorg/Catch2.git
