@@ -1,13 +1,4 @@
 #pragma oncejasm
 
-#include <cstdint>
-
-
-void PrintHeader();
-void PrintHelp();
-
-#ifndef NDEBUG
-#include "assembler/assembler.hpp"
-
-void Finalize(const Assembler::AssemblyInfoCollection& context);
-#endif
+void PrintHeader() noexcept;
+void PrintHelp() noexcept;

@@ -61,3 +61,9 @@ namespace Extensions::String
         return std::move(ss.str());
     }
 }
+
+//
+// Tests
+//
+#ifdef TEST_MODE
+#endif

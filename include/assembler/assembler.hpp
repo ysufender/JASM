@@ -1,14 +1,11 @@
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 #include <unordered_map>
 
 #include "JASMConfig.hpp"
-#include "extensions/system.hpp"
 
 /*
 * I could've made all of this without object orientation 

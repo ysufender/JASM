@@ -25,11 +25,11 @@ if [[ $refresh == true && -d build ]]; then
     rm -rf build
 fi
 
+cmake --preset Debug
+
 if [ $generate == true ]; then
     echo "[BUILD_SCRIPT] Generate-only mode"
     exit
 fi
 
-mkdir -p "build/Debug"
-cmake -S . -B build
-cmake --build --preset DebugBuild
+cmake --build build --preset Debug

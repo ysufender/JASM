@@ -17,9 +17,10 @@ set(CMAKE_CXX_STANDART_REQUIRED TRUE)
 #
 # CLI Arguments 
 # 
-set(USE_PIPELINES_OPT FALSE CACHE BOOL "Enable pipelines")
-set(TOOLCHAIN_MODE FALSE CACHE BOOL "Enable toolchain mode")
-set(JASM_TEST_MODE FALSE CACHE BOOL "Activate the unit tests")
+option(TOOLCHAIN_MODE "Enable toolchain mode" OFF)
+option(TEST_MODE "Activate the unit tests" OFF)
+option(USE_PIPELINES_OPT "Pipeline support" OFF)
+set(OUTPUT_PATH "" CACHE STRING "")
 
 # This is before the include call to prevent it including 
 # project headers. Might cause problems.
@@ -28,6 +29,7 @@ add_subdirectory(lib)
 configure_file(
     ${CMAKE_SOURCE_DIR}/JASMConfig.hpp.in
     ${CMAKE_BINARY_DIR}/include/JASMConfig.hpp
+    @ONLY
 )
 
 add_executable(${CMAKE_PROJECT_NAME} 
@@ -35,24 +37,20 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/assemblycontext.cpp
 )
 
-include_directories(${CMAKE_PROJECT_NAME} 
-    PRIVATE 
+include_directories(
         ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}/lib/header_only
+        #${CMAKE_SOURCE_DIR}/lib/header_only
         ${CMAKE_BINARY_DIR}/include
 )
 
 # After the include call so everything includes those above
 add_subdirectory(src)
 
-
 set_target_properties(${CMAKE_PROJECT_NAME}
     PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
 )
-
-
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE core libs)

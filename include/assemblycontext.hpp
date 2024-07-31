@@ -3,6 +3,13 @@
 #include <string>
 #include <vector>
 
+enum class LibTypeEnum 
+{
+    Static,
+    Shared,
+    Executable
+};
+
 class AssemblyContext 
 {
     private:
@@ -10,7 +17,7 @@ class AssemblyContext
         bool singleAssembly;
         bool isLib;
         std::string outFile;
-        std::string libType;
+        LibTypeEnum libType;
         std::vector<std::string> inputFiles;
         std::vector<std::string> libraries;
 
@@ -29,7 +36,7 @@ class AssemblyContext
         const bool& IsSingle() const;
         const bool& IsLib() const;
         const std::string& OutFile() const;
-        const std::string& LibType() const;
+        LibTypeEnum LibType() const;
         const std::vector<std::string>& InputFiles() const;
         const std::vector<std::string>& Libraries() const;
 

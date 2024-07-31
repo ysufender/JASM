@@ -1,51 +1,50 @@
-#include "assemblycontext.hpp"
-#include "extensions/system.hpp"
 #include <cassert>
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 #include <stdlib.h>
-
-#ifdef JASM_TEST_MODE
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN 
-#include "doctest.h"
-#endif
-
 
 #include "jasm.hpp"
 #include "CLIParser.hpp"
 #include "JASMConfig.hpp"
+
+#ifdef TEST_MODE
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN 
+#endif
+
+#include "test/test.hpp"
+
+#ifndef TEST_MODE
+#include <exception>
+
+#include "extensions/system.hpp"
 #include "assembler/assembler.hpp"
+#include "assemblycontext.hpp"
 
 int main(int argc, char** args)
 {
-#if JASM_TEST_MODE
-    std::cout << "Testing\n";
-#else
-    std::cout << "Not Testing\n";
-#endif
-
-    return 0;
+    using namespace CLIParser;
 
     try
     {
-        CLIParser::Parser parser{args, argc, "--", "-"};
-        parser.AddFlag("help", CLIParser::FlagType::Bool);
-        parser.AddFlag("version", CLIParser::FlagType::Bool);
-        parser.AddFlag("silent", CLIParser::FlagType::Bool);
-        parser.AddFlag("single", CLIParser::FlagType::Bool);       // Assemble files but do NOT link
-        parser.AddFlag("out", CLIParser::FlagType::String);        // Place the output file to specified path if flag `single` is not set
-        parser.AddFlag("libType", CLIParser::FlagType::String);    // If desired output is a library, specify the type. (either shared or static)
-        parser.AddFlag("in", CLIParser::FlagType::StringList);     // Files to assemble and (optionally) link
-        parser.AddFlag("libs", CLIParser::FlagType::StringList);   // Both static and shared libraries to link
+        Parser parser{args, argc, "--", "-"};
+        parser.AddFlag("help", FlagType::Bool);
+        parser.AddFlag("version", FlagType::Bool);
+        parser.AddFlag("silent", FlagType::Bool);
+        parser.AddFlag("single", FlagType::Bool);       // Assemble files but do NOT link
+        parser.AddFlag("out", FlagType::String);        // Place the output file to specified path if flag `single` is not set
+        parser.AddFlag("libType", FlagType::String);    // If desired output is a library, specify the type. (either shared or static)
+        parser.AddFlag("in", FlagType::StringList);     // Files to assemble and (optionally) link
+        parser.AddFlag("libs", FlagType::StringList);   // Both static and shared libraries to link
+        parser.AddFlag("pipelines", FlagType::Bool);
 
+        parser.BindFlag("p", "pipelines");
         parser.BindFlag("h", "help");
         parser.BindFlag("v", "version");
         parser.BindFlag("s", "silent");
         parser.BindFlag("S", "single");
         parser.BindFlag("o", "out");
-        parser.BindFlag("I", "in");
-        parser.BindFlag("L", "libs");
+        parser.BindFlag("i", "in");
+        parser.BindFlag("l", "libs");
 
         CLIParser::Flags flags = parser.Parse();
 
@@ -68,10 +67,6 @@ int main(int argc, char** args)
 
             Assembler assembler;
             auto collection = assembler.Assemble();
-
-#ifndef NDEBUG
-            Finalize(collection);
-#endif
         }
     }
     catch (const std::exception& exception)
@@ -83,49 +78,29 @@ int main(int argc, char** args)
 
     return 0;
 }
-
-#ifndef NDEBUG
-void Finalize(const Assembler::AssemblyInfoCollection& collection)
-{
-    std::cout << "\nFinalizing...\n";
-
-    for (const auto& entry : collection)
-        entry.PrintAssemblyInfo();
-
-    //for (const auto& entry : collection)
-    //{
-        //std::ifstream in { entry.path, std::ios::binary };
-        
-        //if (!System::Context.IsSingle() && entry.path == collection.at(0).path)
-        //{
-            //systembit_t org, ssz, hsz;  
-            //Extensions::Serialization::DeserializeInteger(org, in);
-            //Extensions::Serialization::DeserializeInteger(ssz, in);
-            //Extensions::Serialization::DeserializeInteger(hsz, in);
-
-            //std::cout << "\norg: " << org
-                      //<< "\nsts: " << ssz
-                      //<< "\nsth: " << hsz << '\n';
-        //}
-
-        //AssemblyInfo info {entry.path, 0x00};
-        //info.Deserialize(in);
-        //info.PrintAssemblyInfo();
-    //}
-}
 #endif
 
-void PrintHeader()
+void PrintHeader() noexcept
 {
     std::cout << "\nJust an Assembler (JASM)"
               << "\n\tDescription: " << JASM_DESCRIPTION
               << "\n\tVersion: " << JASM_VERSION
-              //<< "\n\tPipelines: " << std::boolalpha << JASM_USE_PIPELINES_OPT
-              //<< "\n\tEmbedded: " << JASM_TOOLCHAIN_MODE << std::noboolalpha << '\n';
-              ;
+              << "\n\tUse Pipelines: "
+#ifdef USE_PIPELINES_OPT
+              << "Available"
+#else
+              << "Unavailable"
+#endif
+              << "\n\tBuild Mode: "
+#ifdef TOOLCHAIN_MODE
+              << "Toolchain"
+#else
+              << "CLI"
+#endif
+              << '\n';
 }
 
-void PrintHelp()
+void PrintHelp() noexcept
 {
     PrintHeader();
 

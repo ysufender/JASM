@@ -1,70 +1,54 @@
 {
-    "version": 2,
-    "cmakeMinimumRequired": 
-    {
+    "version": 6,
+    "cmakeMinimumRequired": {
         "major": 3,
         "minor": 30,
         "patch": 0
     },
     "configurePresets": [
         {
-            "name": "DebugBuild",
-            "binaryDir": "${sourceDir}/build/Debug",
+            "name": "default",
+            "hidden": true,
             "generator": "Ninja",
-            "cacheVariables": 
-            {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "g++"
-            }
-        },
-        {
-            "name": "TestBuild",
-            "binaryDir": "${sourceDir}/build/Test",
-            "generator": "Ninja",
-            "cacheVariables" : 
-            {
-                "JASM_TEST_MODE": {
-                    "type": "BOOL",
-                    "value": "ON" 
-                },
-                "CMAKE_BUILD_TYPE": "Test",
-                "CMAKE_CXX_COMPILER": "g++"
-            }
-        },
-        {
-            "name": "ReleaseBuild",
-            "binaryDir": "${sourceDir}/build/Release",
-            "generator": "Ninja",
-            "cacheVariables": 
-            {
-                "USE_PIPELINES_OPT": {
-                    "type": "BOOL",
-                    "value":  "OFF"
-                },
+            "binaryDir": "build",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CMAKE_CXX_STANDART": "20",
+                "CMAKE_CXX_STANDART_REQUIRED": true,
 
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CXX_COMPILER": "g++"
+                "TOOLCHAIN_MODE": "OFF",
+                "TEST_MODE": "OFF",
+                "USE_PIPELINES_OPT": "OFF",
+                "OUTPUT_PATH": ""
+            }
+        },
+        {
+            "name": "Debug",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "OUTPUT_PATH": "Debug"
+            }
+        },
+        {
+            "name": "Test",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "OUTPUT_PATH": "Test",
+                "TEST_MODE": "ON"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "DebugBuild",
-            "configurePreset": "DebugBuild",
-            "verbose": true,
-            "targets": ["jasm"]
+            "name": "Debug",
+            "configurePreset": "Debug"
         },
         {
-            "name": "TestBuild",
-            "configurePreset": "TestBuild",
-            "verbose": true,
-            "targets": ["jasm"]
-        },
-        {
-            "name": "ReleaseBuild",
-            "configurePreset": "ReleaseBuild",
-            "verbose": true,
-            "targets": ["jasm"]
+            "name": "Test",
+            "configurePreset": "Test"
         }
     ]
 }
