@@ -14,10 +14,22 @@ like "What am I going to do with a bytecode when I can't execute it?"
 
 ### Installation
 
-You can either grab the compiled binaries from the release section, or you can buld JASM from source.
+You can either grab the compiled binaries from the release section, or build JASM from source.
 
-Also a link to the docs here.
+#### Building From The Source
+
+--Link To Build.md--
+
+### Basic Usage
+
+### JASM Introduction
+
+--Link To Docs--
 
 ## Contributing
 
-Contributing standarts here.
+Since I don't really have **any** kind of experience in open source and development in general, I'll probably be satisfied
+with the state of JASM and move on. That doesn't mean I won't maintain it but new features might not be implemented quickly
+as the time passes. So every inch of help is much greatly appreciated, just don't forget to add your name to CONTRIBUTORS.md
+and also don't forget to update necessary documents in the repository when you add/remove a dependency/feature/bug. If you
+are new around here like me, take a look at --Contributing.md link here--!

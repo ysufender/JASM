@@ -5,7 +5,6 @@
 #include <string>
 
 #include "JASMConfig.hpp"
-#include "catch2/internal/catch_result_type.hpp"
 #include "assemblycontext.hpp"
 
 AssemblyContext::AssemblyContext(
@@ -102,9 +101,9 @@ TEST_CASE("Assembly Context Tests")
 {
     SECTION("AssemblyContext::ctor::Error")
     {
-        CHECK_THROWS(
+        CHECK_THROWS_WITH(
             AssemblyContext (false, false, "out", "stc", {}, {}),
-            Catch::ResultDisposition::ContinueOnFailure
+            "At least one input file is needed."
         );
     }
 
@@ -128,20 +127,20 @@ TEST_CASE("Assembly Context Tests")
 
         SECTION("AssemblyContext::Correctness_Check::General")
         {
-            AssemblyContext context { true, true, "outTest", "", {"test.jasm", "a.jasm"}, {"lib.stc"}};
+            AssemblyContext context { false, true, "outTest", "", {"test.jasm", "a.jasm"}, {"lib.stc"}};
 
             CHECK(context.LibType() == LibTypeEnum::Executable);
             CHECK(context.OutFile() == "outTest.jef");
             CHECK_FALSE(context.IsLib());
-            CHECK(context.IsSilent());
+            CHECK_FALSE(context.IsSilent());
             CHECK(context.IsSingle());
             CHECK(context.Libraries().size() == 1);
             CHECK(context.InputFiles().size() == 2);
 
-            std::stringstream ss;
+            std::stringstream ss { };
             std::stringstream fakeCout;
 
-            System::Setup(DefaultContext, ss, ss);
+            System::Setup(context, ss, ss);
             context.PrintContext();
 
             fakeCout << "JASM Version " << JASM_VERSION << " Assembly Context"
@@ -177,8 +176,6 @@ TEST_CASE("Assembly Context Tests")
             fakeCout << "\n\t}\n";
 
             CHECK(ss.str() == fakeCout.str());
-
-            System::Setup(DefaultContext, std::cout, std::cerr);
         }
     }
 }

@@ -1,12 +1,12 @@
-#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <ostream>
+#include <string>
 #include <string_view>
 
 #include "extensions/system.hpp"
 #include "assemblycontext.hpp"
-
+#include "extensions/stringextensions.hpp"
 
 using systembit_t = uint32_t;
 
@@ -90,21 +90,8 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
 
 TEST_CASE("System Test Suite")
 {
+    using namespace Extensions::String;
     std::stringstream ss {};
-
-    const auto Test = [](const std::string& signature, std::function<void(std::string_view, std::string_view, int)> logCallback) -> bool 
-    {
-
-        logCallback("Testing Testing...", __FILE__, __LINE__);
-        bool val = ss.str() == Extensions::String::Concat({
-            "[JASM::",
-            signature,
-            "](JASM/src/extensions/system.cpp:92) >>> Testing Testing...\n"
-        });
-
-        ss.str("");
-        return val;
-    };
 
     SECTION("System::Setup")
     {
@@ -114,34 +101,56 @@ TEST_CASE("System Test Suite")
         CHECK(std::cerr.rdbuf() == ss.rdbuf());
     }
 
-    SECTION("System::LogTest (Info & Warning)")
+    SECTION("System::LogTest")
     {
-        LOG("Testing Testing...");
-        CHECK(ss.str() == "Testing Testing...\n");
-        ss.str("");
+        SECTION("System::LogTest::Log")
+        {
+            LOG("Testing Testing...");
+            CHECK(ss.str() == "Testing Testing...\n");
+        }
 
-        CHECK(Test("Log", System::LogInternal));
+        SECTION("System::LogTest::LogInternal")
+        {
+            LOGD("Testing Testing...");
+            CHECK(ss.str() == Concat({"[JASM::Log](JASM/src/extensions/system.cpp:", std::to_string(__LINE__-1), ") >>> Testing Testing...\n"}));
+        }
 
-        CHECK(Test("Warning", System::LogWarning));
+        SECTION("System::LogTest::LogWarning")
+        {
+            LOGW("Testing Testing...");
+            CHECK(ss.str() == Concat({"[JASM::Warning](JASM/src/extensions/system.cpp:", std::to_string(__LINE__-1), ") >>> Testing Testing...\n"}));
+        }
 
-        LOGE(System::LogLevel::Normal, "Testing Testing...");
-        CHECK(ss.str() == "[JASM::Error](JASM/src/extensions/system.cpp:135) >>> Testing Testing...\n");
-        ss.str("");
+        SECTION("System::LogTest::LogError")
+        {
+            SECTION("System::LogTest::LogError::Normal")
+            {
+                LOGE(System::LogLevel::Normal, "Testing Testing...");
+                CHECK(ss.str() == Concat({"[JASM::Error](JASM/src/extensions/system.cpp:", std::to_string(__LINE__-1), ") >>> Testing Testing...\n"}));
+            }
 
-        LOGE(System::LogLevel::Low, "Testing Testing...");
-        CHECK(ss.str() == "ERROR [JASM::Error](JASM/src/extensions/system.cpp:135) >>> Testing Testing...\n");
-        ss.str("");
+            SECTION("System::LogTest::LogError::Low")
+            {
+                LOGE(System::LogLevel::Low, "Testing Testing...");
+                CHECK(ss.str() == Concat({"ERROR [JASM::Error](JASM/src/extensions/system.cpp:", std::to_string(__LINE__-1), ") >>> Testing Testing...\n"}));
+            }
 
-        LOGE(System::LogLevel::Medium, "Testing Testing...");
-        CHECK(ss.str() == "IMPORTANT ERROR [JASM::Error](JASM/src/extensions/system.cpp:135) >>> Testing Testing...\n");
-        ss.str("");
+            SECTION("System::LogTest::LogError::Medium")
+            {
+                LOGE(System::LogLevel::Medium, "Testing Testing...");
+                CHECK(ss.str() == Concat({"IMPORTANT ERROR [JASM::Error](JASM/src/extensions/system.cpp:", std::to_string(__LINE__-1), ") >>> Testing Testing...\n"}));
+            }
 
-        CHECK_THROWS_MESSAGE(
-            LOGE(System::LogLevel::Normal, "Testing Testing..."),
-            "Testing Testing..."
-        );
+            SECTION("System::LogTest::LogError::High")
+            {
+                CHECK_THROWS_WITH(
+                    LOGE(System::LogLevel::High, "Testing Testing..."),
+                    "Testing Testing..."
+                );
 
-        System::Setup(DefaultContext, std::cout, std::cerr);
+                CHECK(ss.str() == Concat({"ALERT JASM/src/extensions/system.cpp:", std::to_string(__LINE__-4), "\n"}));
+            }
+        }
     }
 }
 #endif

@@ -1,21 +1,16 @@
 # First Steps
 
-~~Create the base CLI tool:~~ 
-~~- [x] Print Helper~~ 
-~~- [x] Assembler Options Context~~ 
-~~- [x] Proper Base Structure~~ 
-~~- [ ] Some Utility Functions That Are Probably Will Be Needed~~ 
+Create the base CLI tool: 
+- [x] Print Helper 
+- [x] Assembler Options Context 
+- [x] Proper Base Structure 
+- [x] Some Utility Functions That Are Probably Will Be Needed 
 
-~~Create the Assembler:~~ 
-~~- [ ] Set up the AssemblerOutput class~~.
+Create the Assembler: 
+- [x] Set up the AssemblyInfo class.
+- [x] Serialization
 
 CREATE THE FUCKING ASSEMBLY LANGUAGE FIRST IDIOT
-
-# IMPORTANT TODO!!!
-
-I have to write my own serialization functions for primitive types because the endianness
-will cause problems with the future VM for libraries and executables assembled on a machine
-with different endianness.
 
 ## On Assembly
 
@@ -26,6 +21,12 @@ with different endianness.
 >   The reason I chose uint16_t and uint32_t is that because the files are getting too big.
 >   A library has to contain the assembly info containing its symbols' names and addresses.
 >   If I use size_t while writing name sizes, well, that's a bit too much. So 16 bits. Yeah.
+
+> !!! TODO !!!
+> (Plans on symbols)
+>   I'm planning to not use raw string in AssemblyInfo. I'll create a hash function and hash the
+>   symbol names with it, then use their integer hashes as keys in places. This way both the memory
+>   fottprint and the file size problem will be solved.
 
 ### Registers
 
@@ -39,7 +40,7 @@ with different endianness.
 ### Supported Data Types
 
 ```
-array   ([u]byte, [u]int, float)      ;; Always stored in heap |type_flag (char)|size (uint)|<values>|
+array   ([u]byte, [u]int, float) #Basically raw data#
 int     (32-bit, signed)
 uint    (32-bit, unsigned)
 float   (32-bit, signed)
@@ -49,18 +50,4 @@ ubyte   (8-bit, unsigned)
 
 ### Instructions
 
-```
-sti <constant>      ;; push int constant to stack
-stf <constant>      ;; push float constant to stack
-stb <constant>      ;; push byte constant to stack
-stui <constant>     ;; push uint constant to stack
-stub <constant>     ;; push ubyte constant to stack
-
-ldi <constant>      ;; load constant int to heap and push address to stack 
-ldf <constant>      ;; load constant float to heap and push address to stack 
-ldb <constant>      ;; load constant byte to heap and push address to stack 
-ldui <constant>     ;; load constant uint to heap and push address to stack 
-ldui <constant>     ;; load constant ubyte to heap and push address to stack 
-
-mov <from_addr> <to_addr>   ;; copy the value of from_addr to to_addr. from_addr remains as is.
-```
+Refer to (instructions.txt)[docs/instructions.txt]

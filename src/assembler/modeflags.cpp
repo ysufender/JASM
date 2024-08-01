@@ -61,7 +61,7 @@ namespace ModeFlags
         for (const auto& [reg, regFlag] : ModeFlags::regModeMap)
             CHECK_FALSE(ModeFlags::GetRegisterModeFlag(reg) == regFlag);
 
-        CHECK_THROWS_MESSAGE(ModeFlags::GetRegisterModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
+        CHECK_THROWS(ModeFlags::GetRegisterModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
         CHECK(ModeFlags::GetRegisterModeFlag("unknown") == ModeFlags::NoMode);
     }
 
@@ -70,7 +70,7 @@ namespace ModeFlags
         for (const auto& [nu, flag] : ModeFlags::nuModeMap)
             CHECK(ModeFlags::GetModeFlag(nu) == flag);
 
-        CHECK_THROWS_MESSAGE(ModeFlags::GetModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
+        CHECK_THROWS_WITH(ModeFlags::GetModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
         CHECK(ModeFlags::GetModeFlag("unknown") == ModeFlags::NoMode);
     }
 #endif

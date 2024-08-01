@@ -1,4 +1,5 @@
 #include <cctype>
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -6,7 +7,7 @@
 
 namespace Extensions::String
 {
-    std::vector<std::string> Split(const std::string& string, char delimiter)
+    std::vector<std::string> Split(const std::string& string, char delimiter, bool removeTrailing)
     {
         std::stringstream ss;
         std::vector<std::string> vec;
@@ -25,7 +26,7 @@ namespace Extensions::String
                 continue;
             }
 
-            if (character == ' ' && i != string.size()-1 && string.at(i) == ' ')
+            if (removeTrailing && character == ' ' && i != string.size()-1 && string.at(i+1) == ' ')
                 continue;
 
             ss << character;
@@ -57,7 +58,12 @@ namespace Extensions::String
 
         std::stringstream ss;
         for (const auto& str : strings)
-            ss << str << delimiter;
+        {
+            ss << str;
+            if (str != strings.back())
+                ss << delimiter;
+        }
+
         return std::move(ss.str());
     }
 }
@@ -65,5 +71,47 @@ namespace Extensions::String
 //
 // Tests
 //
+#include "JASMConfig.hpp"
+
 #ifdef TEST_MODE
+#include "test/test.hpp"
+
+TEST_CASE("String Extension Tests")
+{
+    using namespace Extensions::String;
+
+    SECTION("StringExtensions::Split")
+    {
+        std::string testStr { "String;; Will be split by; colons" };
+        std::vector<std::string> desiredOut { "String", "", " Will be split by", " colons" };
+
+        CHECK(Split(testStr, ';') == desiredOut);
+    }
+
+    SECTION("StringExtensions::Concat")
+    {
+        std::vector<std::string> input { "Nice", " and", " concatenated." };
+        std::string desiredOut { "Nice and concatenated." };
+
+        CHECK(Concat(input) == desiredOut);
+    }
+
+    SECTION("StringExtensions::Join")
+    {
+        std::vector<std::string> input { "This","is","without","spaces" };
+        std::string desiredOut { "This is without spaces" };
+
+        CHECK(Join(input, ' ') == desiredOut);
+    }
+
+    SECTION("StringExtensions::HexToInt")
+    {
+        std::string hex { "0x0FF05" };
+        std::string signedHex { "0xFFFFFFF1" };
+
+        CHECK(HexToInt<int>(hex) == 0x0FF05);
+        CHECK(HexToInt<uint32_t>(signedHex) == 0xFFFFFFF1);
+        //CHECK_THROWS(HexToInt<float>(hex));
+    }
+}
 #endif

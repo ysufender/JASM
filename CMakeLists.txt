@@ -22,10 +22,6 @@ option(TEST_MODE "Activate the unit tests" OFF)
 option(USE_PIPELINES_OPT "Pipeline support" OFF)
 set(OUTPUT_PATH "" CACHE STRING "")
 
-# This is before the include call to prevent it including 
-# project headers. Might cause problems.
-add_subdirectory(lib)
-
 configure_file(
     ${CMAKE_SOURCE_DIR}/JASMConfig.hpp.in
     ${CMAKE_BINARY_DIR}/include/JASMConfig.hpp
@@ -43,6 +39,10 @@ include_directories(
 )
 
 # After the include call so everything includes those above
+add_subdirectory(lib)
+
+link_libraries(libs)
+
 add_subdirectory(src)
 
 set_target_properties(${CMAKE_PROJECT_NAME}
@@ -52,4 +52,8 @@ set_target_properties(${CMAKE_PROJECT_NAME}
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
 )
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE core libs)
+target_link_libraries(${CMAKE_PROJECT_NAME} 
+    PRIVATE 
+        core 
+        #        libs
+)
