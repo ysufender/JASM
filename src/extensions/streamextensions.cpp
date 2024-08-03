@@ -1,13 +1,15 @@
 #include <cctype>
+#include <ios>
 #include <istream>
 #include <sstream>
 #include <iostream>
+#include <string>
 
 #include "extensions/streamextensions.hpp"
 
 namespace Extensions::Stream
 {
-    std::string ForwardTokenize(std::istream& inputStream)
+    std::string Tokenize(std::istream& inputStream)
     {
         char ch;
         std::stringstream ss;
@@ -43,29 +45,5 @@ namespace Extensions::Stream
         }
 
         return std::move(ss.str());
-    }
-
-    std::string BackwardTokenize(std::istream& inputStream)
-    {
-        char ch { 'g' };
-
-        if (inputStream.tellg() == 0)
-            return "SOF";
-
-        while (!isspace(ch) && inputStream.tellg() > 1)
-        {
-            inputStream.seekg(-2, std::ios::cur);
-            inputStream.read(&ch, 1);
-        }
-
-        if (inputStream.tellg() == 1)
-            inputStream.seekg(0, std::ios::beg);
-
-        return ForwardTokenize(inputStream);
-    }
-
-    std::string Tokenize(std::istream& inputStream, bool backwards)
-    {
-        return backwards ? BackwardTokenize(inputStream) : ForwardTokenize(inputStream);
     }
 }

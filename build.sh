@@ -27,7 +27,12 @@ if [[ $refresh == true && -d build ]]; then
     rm -rf build
 fi
 
-cmake --preset Debug
+if [ -d build ]; then
+    echo "[BUILD_SCRIPT] Already generated."
+else
+    echo "[BUILD_SCRIPT] Generating build files."
+    cmake --preset Debug
+fi
 
 if [ $generate == true ]; then
     echo "[BUILD_SCRIPT] Generate-only mode"

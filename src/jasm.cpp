@@ -65,10 +65,10 @@ int main(int argc, char** args)
             auto collection = assembler.Assemble();
         }
     }
-    catch (const std::exception& exception)
+    catch (const std::string_view message)
     {
         std::cerr << "An error occured during process."
-                  << "\n\tProvided information: " << exception.what() << std::endl;
+                  << "\n\tProvided information: " << exception << std::endl;
         return 1;
     }
 

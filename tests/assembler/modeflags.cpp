@@ -1,6 +1,6 @@
 #include <unordered_map>
 
-#include "../test.hpp"
+#include "catch2/catch_all.hpp"
 
 //#include "src/assembler/modeflags.cpp"
 

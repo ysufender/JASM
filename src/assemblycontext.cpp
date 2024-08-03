@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ostream>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 
 #include "JASMConfig.hpp"
@@ -18,7 +17,7 @@ AssemblyContext::AssemblyContext(
 {
     if (in.size() == 0)
     {
-        throw std::runtime_error { "At least one input file is needed." };
+        throw "At least one input file is needed.";
         return;
     }
 

@@ -70,7 +70,7 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
             break;
         case System::LogLevel::High:
             std::cout  << "ALERT " << file.substr(idx, file.size() - idx) << ':' << line << '\n';
-            throw std::runtime_error(message.data());
+            throw message.data();
             break;
     }
 

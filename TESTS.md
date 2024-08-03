@@ -6,7 +6,6 @@ but at the bottom of each unit-tested C++ source file in the project.
 Tests To Implement:
     - assembler.cpp
     - instructions.cpp
-    - serialization.cpp
 
 Implemented Tests:
     - system.cpp
@@ -14,3 +13,4 @@ Implemented Tests:
     - modeflags.cpp
     - stringextensions.cpp
     - streamextensions.cpp
+    - serialization.cpp

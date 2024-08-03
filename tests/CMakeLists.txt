@@ -3,7 +3,10 @@ add_executable(tests
 
         asmcontext.cpp
 
-        extensions.cpp
+        extensions/string.cpp
+        extensions/stream.cpp
+        extensions/system.cpp
+        extensions/serialization.cpp
 
         assembler/modeflags.cpp
 )

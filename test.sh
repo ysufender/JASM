@@ -4,6 +4,8 @@ set -e
 
 refresh=false
 generate=false
+args=("$@")
+pStart=0
 
 while test $# -gt 0; do
     case "$1" in
@@ -27,13 +29,23 @@ if [[ $refresh == true && -d build ]]; then
     rm -rf build
 fi
 
-cmake --preset Test
+if [ -d build ]; then
+    echo "[TEST_SCRIPT] Already generated."
+else
+    echo "[TEST_SCRIPT] Generating build files."
+    cmake --preset Test
+fi
 
 if [ $generate == true ]; then
-    echo "[BUILD_SCRIPT] Generate-only mode"
+    echo "[TEST_SCRIPT] Generate-only mode"
     exit
 fi
 
 cmake --build --preset Test 
 
-build/bin/Test/tests
+if [ $refresh == true ]; then
+    pStart=$(pStart + 1)
+fi
+
+clear
+build/bin/Test/tests "${args[@]:pStart}"
