@@ -8,12 +8,8 @@
 #include "JASMConfig.hpp"
 
 #ifdef TEST_MODE
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN 
-#endif
 
-#include "test/test.hpp"
-
-#ifndef TEST_MODE
+#else
 #include <exception>
 
 #include "extensions/system.hpp"

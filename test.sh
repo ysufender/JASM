@@ -36,4 +36,4 @@ fi
 
 cmake --build --preset Test 
 
-build/bin/Test/jasm
+build/bin/Test/tests

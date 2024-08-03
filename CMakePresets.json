@@ -28,6 +28,7 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+
                 "OUTPUT_PATH": "Debug"
             }
         },
@@ -36,6 +37,7 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+
                 "OUTPUT_PATH": "Test",
                 "TEST_MODE": "ON"
             }

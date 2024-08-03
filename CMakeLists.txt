@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(jasm 
+project(JASM 
     VERSION 1.0.0
     DESCRIPTION "Assembler and linker for JASM"
     LANGUAGES CXX
@@ -28,10 +28,12 @@ configure_file(
     @ONLY
 )
 
-add_executable(${CMAKE_PROJECT_NAME} 
-    src/jasm.cpp 
-    src/assemblycontext.cpp
-)
+if(NOT ${TEST_MODE})
+    add_executable(jasm 
+        src/jasm.cpp 
+        src/assemblycontext.cpp
+    )
+endif(NOT ${TEST_MODE})
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -40,20 +42,24 @@ include_directories(
 
 # After the include call so everything includes those above
 add_subdirectory(lib)
-
 link_libraries(libs)
-
 add_subdirectory(src)
 
-set_target_properties(${CMAKE_PROJECT_NAME}
-    PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
-)
+if(${TEST_MODE})
+    add_subdirectory(tests)
+endif(${TEST_MODE})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} 
-    PRIVATE 
-        core 
-        #        libs
-)
+if(NOT ${TEST_MODE})
+    set_target_properties(jasm
+        PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
+    )
+
+    target_link_libraries(jasm 
+        PRIVATE 
+            core 
+            #libs
+    )
+endif(NOT ${TEST_MODE})

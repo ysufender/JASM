@@ -11,6 +11,7 @@ namespace Extensions::Stream
     {
         char ch;
         std::stringstream ss;
+
         inputStream.read(&ch, sizeof(ch));
 
         while (true)
@@ -48,11 +49,17 @@ namespace Extensions::Stream
     {
         char ch { 'g' };
 
-        while (!isspace(ch))
+        if (inputStream.tellg() == 0)
+            return "SOF";
+
+        while (!isspace(ch) && inputStream.tellg() > 1)
         {
             inputStream.seekg(-2, std::ios::cur);
-            inputStream.read(&ch, sizeof(ch));
+            inputStream.read(&ch, 1);
         }
+
+        if (inputStream.tellg() == 1)
+            inputStream.seekg(0, std::ios::beg);
 
         return ForwardTokenize(inputStream);
     }

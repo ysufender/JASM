@@ -5,7 +5,7 @@
 
 namespace ModeFlags
 {
-    static const std::unordered_map<std::string, char> nuModeMap {
+    const std::unordered_map<std::string, char> nuModeMap {
         {"%i", NumericModeFlags::Int},
         {"%f", NumericModeFlags::Float},
         {"%b", NumericModeFlags::Byte},
@@ -13,7 +13,7 @@ namespace ModeFlags
         {"%ub", NumericModeFlags::UByte},
     };
 
-    static const std::unordered_map<std::string, char> regModeMap {
+    const std::unordered_map<std::string, char> regModeMap {
         {"&eax", RegisterModeFlags::eax},
         {"&ebx", RegisterModeFlags::ebx},
         {"&ecx", RegisterModeFlags::ecx},
@@ -48,29 +48,3 @@ namespace ModeFlags
         return regModeMap.contains(identifier) ? regModeMap.at(identifier) : NoMode;
     }
 }
-
-//
-// Tests
-//
-#include "JASMConfig.hpp"
-#include "test/test.hpp"
-
-#ifdef TEST_MODE
-    TEST_CASE("ModeFlags::Register")
-    {
-        for (const auto& [reg, regFlag] : ModeFlags::regModeMap)
-            CHECK_FALSE(ModeFlags::GetRegisterModeFlag(reg) == regFlag);
-
-        CHECK_THROWS(ModeFlags::GetRegisterModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
-        CHECK(ModeFlags::GetRegisterModeFlag("unknown") == ModeFlags::NoMode);
-    }
-
-    TEST_CASE("ModeFlags::Mode")
-    {
-        for (const auto& [nu, flag] : ModeFlags::nuModeMap)
-            CHECK(ModeFlags::GetModeFlag(nu) == flag);
-
-        CHECK_THROWS_WITH(ModeFlags::GetModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
-        CHECK(ModeFlags::GetModeFlag("unknown") == ModeFlags::NoMode);
-    }
-#endif

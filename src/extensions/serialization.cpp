@@ -1,4 +1,5 @@
 #include "extensions/serialization.hpp"
+#include <streambuf>
 
 namespace Extensions::Serialization
 {
