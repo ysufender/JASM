@@ -80,6 +80,7 @@ namespace Instructions
         // stc <mode> <symbol>
         // stc <float>
         // stc <integer>
+        // stc <mode> <symbol>
 
         const std::string next { Stream::Tokenize(in) };
         const char modeFlag { ModeFlags::GetModeFlag(next) };
@@ -137,7 +138,7 @@ namespace Instructions
     void ReadAddress(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // rda <register>
-        // rda <mode> <register>
+        // rda <mode>
 
         const std::string next { Stream::Tokenize(in) };
         char modeFlag { ModeFlags::GetRegisterModeFlag(next) };
@@ -145,9 +146,8 @@ namespace Instructions
         if (modeFlag != ModeFlags::NoMode) // register
         {
             const char regMode { ModeFlags::GetRegisterModeFlag(next) };
-
             Serialization::SerializeInteger(OpCodes::rdr, out);
-            Serialization::SerializeInteger(regMode, out);
+
             return;
         }
         
@@ -161,10 +161,9 @@ namespace Instructions
 
     void Move(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
+        // mov <register>
         // mov <register> <register>
         // mov <value> <register>
-        // mov <symbol> <register>
-        // mov <mode>
 
         const std::string next { Stream::Tokenize(in) };
         char modeFlag { ModeFlags::GetModeFlag(next) };
@@ -194,22 +193,22 @@ namespace Instructions
         }
 
         // move from symbol
-        if (!std::isdigit(next.at(0)))
-        {
+        //if (!std::isdigit(next.at(0)))
+        //{
             // next = symbolName here
-            const std::string regToken { Stream::Tokenize(in) };
-            const char regMode { ModeFlags::GetRegisterModeFlag(regToken, true) };
-            systembit_t addr { info.symbolMap.contains(next) ? info.symbolMap.at(next) : 0 };
+            //const std::string regToken { Stream::Tokenize(in) };
+            //onst char regMode { ModeFlags::GetRegisterModeFlag(regToken, true) };
+            //systembit_t addr { info.symbolMap.contains(next) ? info.symbolMap.at(next) : 0 };
             
-            Serialization::SerializeInteger(OpCodes::movs, out);
+            //Serialization::SerializeInteger(OpCodes::movs, out);
 
-            if (!info.symbolMap.contains(next))
-                info.unknownSymbols.push_back({next, static_cast<systembit_t>(out.tellp())});
+            //if (!info.symbolMap.contains(next))
+                //info.unknownSymbols.push_back({next, static_cast<systembit_t>(out.tellp())});
 
-            Serialization::SerializeInteger(addr, out);
-            Serialization::SerializeInteger(regMode, out);
-            return;
-        }
+            //Serialization::SerializeInteger(addr, out);
+            //Serialization::SerializeInteger(regMode, out);
+            //return;
+        //}
 
 
         // move constant
@@ -235,5 +234,18 @@ namespace Instructions
             LOGE(System::LogLevel::High, "Register '", regToken, "' is too small for float value '", next, "'");
 
         Serialization::SerializeInteger(regMode, out);
+    }
+
+    void Add(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // add <mode>
+        
+        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+        _BoringNumSwitch(mode, out, {OpCodes::addi, OpCodes::addf, OpCodes::addb});
+    }
+
+    void AddSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+
     }
 }

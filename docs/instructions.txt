@@ -16,15 +16,22 @@ Note: words inside paranthesis "()" are optional
 [x] ldb;    0x09;   load (u)byte from stack on heap and set &eax to address 
 
 [x] rda;    ----;   
-[x] rdi;    0x0A;   read (u)int from heap on address &<given_stack> and store it on stack
-[x] rdf;    0x0B;   read float from heap on address &<given_stack> and store it on stack
-[x] rdb;    0x0C;   read (u)byte from heap on address &<given_stack> and store it on stack
+[x] rdi;    0x0A;   read (u)int from heap on address &ebx and store it on stack
+[x] rdf;    0x0B;   read float from heap on address &ebx and store it on stack
+[x] rdb;    0x0C;   read (u)byte from heap on address &ebx and store it on stack
 [x] rdr;    0x0D;   read the &<given_register> and store it on stack
 
 [x] mov;    ----;
 [x] movc;   0x0E;   set register to given constant value
-[x] movs;   0x0F;   set register to given value of symbol
+~[ ] movs;   0x0F;   set register to given value of symbol~
 [x] movr;   0x10;   set register to given register
 [x] movi;   0x11;   set register to the (u)int at top of the stack
 [x] movf;   0x12;   set register to the float at top of the stack
 [x] movb;   0x13;   set register to the (u)byte at top of the stack
+
+[ ] add;    ----;
+[ ] addi;   0x14;   pop and add two integers from stack. push the result. 
+[ ] addf;   0x15;   pop and add two floats from stack. push the result. 
+[ ] addb;   0x16;   pop and add two bytes from stack. push the result. 
+
+[ ] ads;   ----;

@@ -29,6 +29,8 @@ static const std::unordered_map<std::string, std::function<void(AssemblyInfo&, s
     {"ldc", &Instructions::LoadConstant}, 
     {"rda", &Instructions::ReadAddress},
     {"mov", &Instructions::Move },
+    {"add", &Instructions::Add },
+    {"ads", &Instructions::AddSafe },
 };
 
 
@@ -64,11 +66,15 @@ AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::istream
 {
     std::string token { Stream::Tokenize(sourceFile) };
 
-    while (token != ".body")
+    while (token != ".data")
     {
+        //
         // The prep instructions here
+        //
+
         if (token == "imp")
         {
+            // Letting the VM know that we need the particular shd file.
             token = Stream::Tokenize(sourceFile);
             assemblyInfo.runtimeImports.push_back(token);
         }
@@ -78,6 +84,17 @@ AssemblyInfo& Assembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::istream
                 "Unexpected token '", token , "' in prep section."
             );
 
+        token = Stream::Tokenize(sourceFile);
+    }
+
+    // token is now ".data". So we get the next one.
+    token = Stream::Tokenize(sourceFile);
+
+    while (token != ".body")
+    {
+       // TODO:
+       //   Implement global variables.
+        
         token = Stream::Tokenize(sourceFile);
     }
 

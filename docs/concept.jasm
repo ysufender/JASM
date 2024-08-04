@@ -1,0 +1,54 @@
+Everything before prep is discarded UNLESS its ".prep". Without the quotes of course.
+
+.prep
+    #This section contains preparation instructions. Obviously.#
+
+    #Comments are like this#
+#
+    They can be
+    multiline too.
+    But not nested. Do not nest comments.
+#
+    
+    #The following preparation instructions are only needed for executables. 
+    Containing entry point ofc.#
+    org main
+    sts 4200
+    sth 4200
+
+    #Saying that we need the following shared library in this code#
+    imp SomeSharedLib
+.body
+    #Contains the actual program instructions.#
+
+    main:
+        #This is the entry point, as stated in .prep section# 
+
+        #Different numeric modes exist for operations, I won't list them all here.#
+
+        stc %i 0xFF         #pushes integer constant to stack. Decimal is okay too.#         
+        stc 15              #pushes integer again.#
+        stc %f 15           #pushes float constant to stack, explicitly stating that its a float# 
+        stc 0.45            #pushes float again. No need for explicit typing#
+        stc %b 15           #pushes byte to stack. You always have to state that the constant is a byte#
+        stc %i someData     #pushes integer from given symbol to stack#
+
+        ldc %i      #copies and stores the integer at the top of the stack and sets the &eax to address#
+        ldc %f
+        ldc %b
+
+        #to load data from symbol to heap, you must first use stc#
+
+        rda &eax    #reads &eax and pushes it to stack#
+        rda %i &ebx #pushes an integer from heap at the address stored on ebx#
+
+        mov &eax &ebx       #copy eax to ebx# 
+        mov 156 &eax        #set eax to 156. No flags for numeric type because eax is fixed size
+                            So the constant value is always treated as 32-bits#
+        mov &ecx            #Same as above. But from the stack#
+
+        #mov someVal &edx# #maybe#    #set edx to the data at symbol someVal# 
+        #for now, its the same as ldc#
+.end
+
+This place is completely discarded, no matter what. The assembler stops reading at .end

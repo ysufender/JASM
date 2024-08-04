@@ -19,11 +19,11 @@
 // create enums so just plain ol' namespaces and constexprs
 namespace AssemblyFlags
 {
-    constexpr char Shared       = 1;
-    constexpr char Static       = 2;
-    constexpr char Executable   = 4;
-    constexpr char SymbolInfo   = 8;
-    constexpr char StoreName    = 16; // For possible future debugging
+    ENUMER char Shared       = 1;
+    ENUMER char Static       = 2;
+    ENUMER char Executable   = 4;
+    ENUMER char SymbolInfo   = 8;
+    ENUMER char StoreName    = 16; // For possible future debugging
 };
 
 struct SymbolInfo 
@@ -34,30 +34,30 @@ struct SymbolInfo
 
 struct AssemblyInfo
 {
-public:
-    //using SymbolCollection = std::vector<SymbolInfo>;
-    using ImportCollection = std::vector<std::string>;
-    using KeyReference = std::unique_ptr<const std::string>;
-    using DefinedSymbolCollection = std::vector<KeyReference>;
-    using UnknownSymbolCollection = std::vector<SymbolInfo>;
-    using SymbolMap = std::unordered_map<std::string, systembit_t>;
+    public:
+        //using SymbolCollection = std::vector<SymbolInfo>;
+        using ImportCollection = std::vector<std::string>;
+        using KeyReference = std::unique_ptr<const std::string>;
+        using DefinedSymbolCollection = std::vector<KeyReference>;
+        using UnknownSymbolCollection = std::vector<SymbolInfo>;
+        using SymbolMap = std::unordered_map<std::string, systembit_t>;
 
-    std::string path;
-    char flags;
-    DefinedSymbolCollection definedSymbols;
-    UnknownSymbolCollection unknownSymbols;
-    ImportCollection runtimeImports;
-    SymbolMap symbolMap;
+        std::string path;
+        char flags;
+        DefinedSymbolCollection definedSymbols;
+        UnknownSymbolCollection unknownSymbols;
+        ImportCollection runtimeImports;
+        SymbolMap symbolMap;
 
-public:
-    AssemblyInfo() = delete;
-    AssemblyInfo(const std::string& path, char flags);
-    void Serialize(std::ostream& outFile);
-    void Deserialize(std::istream& inFile);
-    void PrintAssemblyInfo() const;
+    public:
+        AssemblyInfo() = delete;
+        AssemblyInfo(const std::string& path, char flags);
+        void Serialize(std::ostream& outFile);
+        void Deserialize(std::istream& inFile);
+        void PrintAssemblyInfo() const;
 
-    void AddSymbol(std::string symbolName, systembit_t address);
-    void AddUnknownSymbol(std::string symbolName, systembit_t address);
+        void AddSymbol(std::string symbolName, systembit_t address);
+        void AddUnknownSymbol(std::string symbolName, systembit_t address);
 };
 
 class Assembler
