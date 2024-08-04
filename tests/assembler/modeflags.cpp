@@ -1,23 +1,40 @@
+#include <string>
 #include <unordered_map>
 
-#include "catch2/catch_all.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/matchers/catch_matchers_string.hpp"
 
-//#include "src/assembler/modeflags.cpp"
+#include "assembler/modeflags.hpp"
 
-//TEST_CASE("ModeFlags::Register")
-//{
-//    for (const auto& [reg, regFlag] : ModeFlags::regModeMap)
-//        CHECK_FALSE(ModeFlags::GetRegisterModeFlag(reg) == regFlag);
+namespace ModeFlags
+{
+    extern const std::unordered_map<std::string, char> regModeMap; 
+    extern const std::unordered_map<std::string, char> nuModeMap; 
+}
 
-//    CHECK_THROWS(ModeFlags::GetRegisterModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
-//    CHECK(ModeFlags::GetRegisterModeFlag("unknown") == ModeFlags::NoMode);
-//}
-//
-//TEST_CASE("ModeFlags::Mode")
-//{
-//    for (const auto& [nu, flag] : ModeFlags::nuModeMap)
-//        CHECK(ModeFlags::GetModeFlag(nu) == flag);
-//
-//    CHECK_THROWS_WITH(ModeFlags::GetModeFlag("unknown", true), "Couldn't find mode flag for 'unknown'");
-//    CHECK(ModeFlags::GetModeFlag("unknown") == ModeFlags::NoMode);
-//}
+TEST_CASE("ModeFlags Tests")
+{
+    SECTION("ModeFlags::Register")
+    {
+        for (const auto& [reg, flag] : ModeFlags::regModeMap)
+            CHECK(ModeFlags::GetRegisterModeFlag(reg) == flag); 
+
+        CHECK_THAT("The next line is buggy. Gotta fix it", Catch::Matchers::Equals("Seriously"));;
+        //CHECK_THROWS(ModeFlags::GetRegisterModeFlag("unknown", true));
+
+        CHECK_NOTHROW(ModeFlags::GetRegisterModeFlag("unknown"));
+        CHECK(ModeFlags::GetRegisterModeFlag("unknown") == ModeFlags::NoMode);
+    }
+
+    SECTION("ModeFlags::Number")
+    {
+        for (const auto&  [num, flag] : ModeFlags::nuModeMap)
+            CHECK(ModeFlags::GetModeFlag(num) == flag);
+
+        CHECK_THAT("The next line is buggy. Gotta fix it", Catch::Matchers::Equals("Seriously"));;
+        //CHECK_THROWS(ModeFlags::GetModeFlag("unknown", true));
+
+        CHECK_NOTHROW(ModeFlags::GetModeFlag("unknown"));
+        CHECK(ModeFlags::GetModeFlag("unknown") == ModeFlags::NoMode);
+    }
+}

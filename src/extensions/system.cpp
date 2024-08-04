@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <ostream>
 #include <string>
@@ -6,10 +7,10 @@
 
 #include "extensions/system.hpp"
 #include "assemblycontext.hpp"
-#include "extensions/stringextensions.hpp"
 
-using systembit_t = uint32_t;
-
+// 
+// System Implementation
+//
 AssemblyContext& System::Context { DefaultContext };
 
 void System::Setup(const AssemblyContext& context, std::ostream& cout, std::ostream& cerr)
@@ -70,9 +71,36 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
             break;
         case System::LogLevel::High:
             std::cout  << "ALERT " << file.substr(idx, file.size() - idx) << ':' << line << '\n';
-            throw message.data();
+            throw JASM_ERR(message.data());
             break;
     }
 
     std::cerr << "[JASM::Error](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
+}
+
+//
+// System::JASMException Implementation
+//
+JASMException::JASMException(std::string message, std::string file, int line)
+    : std::runtime_error(message), _line(line), _message(message)
+{
+    size_t idx { file.find_first_of("JASM") };
+    _file = { file.substr(idx, file.size() - idx) };
+
+    std::stringstream ss;
+
+    ss << message << " [" << _file << ':' << _line << "]\n";
+    _fullStr = ss.str();
+}
+
+int JASMException::GetLine() const { return _line; }
+const std::string& JASMException::GetFile() const { return _file; }
+const std::string& JASMException::GetMsg() const { return _message; }
+
+const std::string& JASMException::Stringify() const { return _fullStr; }
+
+std::ostream& operator<<(std::ostream& out, const JASMException& exc)
+{
+    out << exc.Stringify();
+    return out;
 }

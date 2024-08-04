@@ -7,11 +7,7 @@
 #include "CLIParser.hpp"
 #include "JASMConfig.hpp"
 
-#ifdef TEST_MODE
-
-#else
-#include <exception>
-
+#ifndef TEST_MODE
 #include "extensions/system.hpp"
 #include "assembler/assembler.hpp"
 #include "assemblycontext.hpp"
@@ -65,10 +61,10 @@ int main(int argc, char** args)
             auto collection = assembler.Assemble();
         }
     }
-    catch (const std::string_view message)
+    catch (const JASMException& exc)
     {
         std::cerr << "An error occured during process."
-                  << "\n\tProvided information: " << exception << std::endl;
+                  << "\n\tProvided information: " << exc << std::endl;
         return 1;
     }
 
@@ -114,5 +110,5 @@ void PrintHelp() noexcept
 
     WARNING:
         In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.
-    )";
+    )" << '\n';
 }

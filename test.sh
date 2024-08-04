@@ -29,7 +29,7 @@ if [[ $refresh == true && -d build ]]; then
     rm -rf build
 fi
 
-if [ -d build ]; then
+if [ -d build/Test ]; then
     echo "[TEST_SCRIPT] Already generated."
 else
     echo "[TEST_SCRIPT] Generating build files."

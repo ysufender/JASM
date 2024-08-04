@@ -1,5 +1,5 @@
-#include "catch2/catch_all.hpp"
-#include "catch2/matchers/catch_matchers_all.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/matchers/catch_matchers.hpp"
 
 #include "JASMConfig.hpp"
 
@@ -10,9 +10,9 @@ TEST_CASE("Assembly Context Tests")
 {
     SECTION("AssemblyContext::ctor::Error")
     {
-        CHECK_THROWS_WITH(
+        CHECK_THROWS_AS(
             AssemblyContext (false, false, "out", "stc", {}, {}),
-            "At least one input file is needed."
+            JASMException
         );
     }
 

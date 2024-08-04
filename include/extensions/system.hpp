@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <ostream>
+#include <stdexcept>
 
 #include "extensions/stringextensions.hpp"
 #include "assemblycontext.hpp"
@@ -10,9 +12,12 @@
 #else
     #define LOGD(message)
 #endif
+
 #define LOG(...) System::Log(Extensions::String::Concat({__VA_ARGS__}))
 #define LOGW(...) System::LogWarning(Extensions::String::Concat({__VA_ARGS__}), __FILE__, __LINE__)
 #define LOGE(level, ...) System::LogError(Extensions::String::Concat({__VA_ARGS__}), level, __FILE__, __LINE__)
+
+#define JASM_ERR(message) JASMException { message, __FILE__, __LINE__ };
 
 struct System
 {
@@ -32,3 +37,26 @@ struct System
     static void LogError(std::string_view message, LogLevel level, std::string_view file, int line);
     static void Setup(const AssemblyContext& context, std::ostream& cout = std::cout, std::ostream& cerr = std::cerr);
 };
+
+class JASMException : std::runtime_error
+{
+    private:
+        int _line;
+        std::string _file;
+        std::string _message;
+
+        std::string _fullStr;
+
+    public:
+        JASMException(std::string message, std::string file, int line);
+        
+        int GetLine() const;
+        const std::string& GetFile() const;
+        const std::string& GetMsg() const;
+
+        const std::string& Stringify() const;
+
+        friend std::ostream& operator<<(std::ostream& out, const JASMException& exc);
+};
+
+

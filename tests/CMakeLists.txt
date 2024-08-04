@@ -1,6 +1,4 @@
 add_executable(tests
-        ../src/assemblycontext.cpp
-
         asmcontext.cpp
 
         extensions/string.cpp
@@ -9,6 +7,7 @@ add_executable(tests
         extensions/serialization.cpp
 
         assembler/modeflags.cpp
+        assembler/instructions.cpp
 )
 
 set_target_properties(tests
@@ -26,6 +25,5 @@ target_include_directories(tests
 
 target_link_libraries(tests
     PRIVATE
-        libs
-        core
+        jasm
 )

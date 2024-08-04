@@ -1,4 +1,5 @@
-#include "catch2/catch_all.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/matchers/catch_matchers.hpp"
 
 #include "extensions/system.hpp"
 
@@ -57,9 +58,9 @@ TEST_CASE("System Tests")
 
             SECTION("System::LogTest::LogError::High")
             {
-                CHECK_THROWS_WITH(
+                CHECK_THROWS_AS(
                     LOGE(System::LogLevel::High, "Testing Testing..."),
-                    "Testing Testing..."
+                    JASMException
                 );
 
                 CHECK(in.str() == Concat({"ALERT JASM/tests/extensions/system.cpp:", std::to_string(__LINE__-4), "\n"}));

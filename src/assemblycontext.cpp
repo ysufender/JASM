@@ -6,6 +6,8 @@
 #include "JASMConfig.hpp"
 #include "assemblycontext.hpp"
 
+#include "extensions/system.hpp"
+
 AssemblyContext::AssemblyContext(
         bool silent,
         bool single, 
@@ -17,7 +19,7 @@ AssemblyContext::AssemblyContext(
 {
     if (in.size() == 0)
     {
-        throw "At least one input file is needed.";
+        throw JASM_ERR("At least one input file is needed.");
         return;
     }
 

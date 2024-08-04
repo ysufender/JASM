@@ -28,12 +28,18 @@ configure_file(
     @ONLY
 )
 
-if(NOT ${TEST_MODE})
+if(${TEST_MODE})
+    add_library(jasm
+        STATIC 
+            src/jasm.cpp
+            src/assemblycontext.cpp
+    )
+else()
     add_executable(jasm 
         src/jasm.cpp 
         src/assemblycontext.cpp
     )
-endif(NOT ${TEST_MODE})
+endif(${TEST_MODE})
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -42,24 +48,22 @@ include_directories(
 
 # After the include call so everything includes those above
 add_subdirectory(lib)
-link_libraries(libs)
+#link_libraries(libs)
 add_subdirectory(src)
+
+target_link_libraries(jasm 
+    PUBLIC 
+        libs
+        core 
+)
 
 if(${TEST_MODE})
     add_subdirectory(tests)
-endif(${TEST_MODE})
-
-if(NOT ${TEST_MODE})
+else()
     set_target_properties(jasm
         PROPERTIES
             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
     )
-
-    target_link_libraries(jasm 
-        PRIVATE 
-            core 
-            #libs
-    )
-endif(NOT ${TEST_MODE})
+endif(${TEST_MODE})

@@ -12,5 +12,11 @@
 #cmakedefine TEST_MODE
 #cmakedefine USE_PIPELINES_OPT
 
+#ifdef TEST_MODE
+    #define TESTCONST extern const
+#else
+    #define TESTCONST const
+#endif
+
 using systembit_t = uint32_t;
 using sybmolsize_t = uint16_t;

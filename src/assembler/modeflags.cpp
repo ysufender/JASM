@@ -1,11 +1,13 @@
 #include <unordered_map>
 
+#include "JASMConfig.hpp"
+
 #include "assembler/modeflags.hpp"
 #include "extensions/system.hpp"
 
 namespace ModeFlags
 {
-    const std::unordered_map<std::string, char> nuModeMap {
+    TESTCONST std::unordered_map<std::string, char> nuModeMap {
         {"%i", NumericModeFlags::Int},
         {"%f", NumericModeFlags::Float},
         {"%b", NumericModeFlags::Byte},
@@ -13,7 +15,7 @@ namespace ModeFlags
         {"%ub", NumericModeFlags::UByte},
     };
 
-    const std::unordered_map<std::string, char> regModeMap {
+    TESTCONST std::unordered_map<std::string, char> regModeMap {
         {"&eax", RegisterModeFlags::eax},
         {"&ebx", RegisterModeFlags::ebx},
         {"&ecx", RegisterModeFlags::ecx},
@@ -27,7 +29,7 @@ namespace ModeFlags
 
     void _ErrCall(const std::string& identifier)
     {
-        LOGE(System::LogLevel::High, "Couldn't find mode flag for '", identifier, "'");
+        LOGE(System::LogLevel::High, "Couldn't find mode flag for '", identifier, "'.");
     };
 
     char GetModeFlag(const std::string& identifier, bool throws)
@@ -40,8 +42,6 @@ namespace ModeFlags
 
     char GetRegisterModeFlag(const std::string& identifier, bool throws)
     {
-        return identifier.starts_with('&') ? regModeMap.at(identifier) : ModeFlags::NoMode;
-
         if (!regModeMap.contains(identifier) && throws)
             _ErrCall(identifier);
 
