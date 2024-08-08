@@ -117,13 +117,15 @@ namespace Instructions
         // Store symbol by mode
         _BoringNumSwitch(modeFlag, out, {OpCodes::stis, OpCodes::stfs, OpCodes::stbs});
 
-        if (!info.symbolMap.contains(symOrVal)) 
+        size_t symbolHash { String::Hash(symOrVal) };
+
+        if (!info.symbolMap.contains(symbolHash)) 
         {
-            info.unknownSymbols.push_back({symOrVal, static_cast<systembit_t>(out.tellp())});
+            info.unknownSymbols.push_back({symbolHash, static_cast<systembit_t>(out.tellp())});
             Serialization::SerializeInteger<systembit_t>(0, out);
         }
         else 
-            Serialization::SerializeInteger(info.symbolMap.at(symOrVal), out);
+            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
     }
 
     void LoadConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)

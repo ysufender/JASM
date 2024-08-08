@@ -28,7 +28,7 @@ namespace AssemblyFlags
 
 struct SymbolInfo 
 {
-    std::string SymbolName;
+    size_t SymbolHash;
     systembit_t Address;
 };
 
@@ -37,10 +37,10 @@ struct AssemblyInfo
     public:
         //using SymbolCollection = std::vector<SymbolInfo>;
         using ImportCollection = std::vector<std::string>;
-        using KeyReference = std::unique_ptr<const std::string>;
-        using DefinedSymbolCollection = std::vector<KeyReference>;
+        using KeyType = size_t;
+        using DefinedSymbolCollection = std::vector<KeyType>;
         using UnknownSymbolCollection = std::vector<SymbolInfo>;
-        using SymbolMap = std::unordered_map<std::string, systembit_t>;
+        using SymbolMap = std::unordered_map<size_t, systembit_t>;
 
         std::string path;
         char flags;

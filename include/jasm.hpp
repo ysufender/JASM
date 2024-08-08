@@ -1,4 +1,6 @@
-#pragma oncejasm
+#pragma once
+
+#include "CLIParser.hpp"
 
 void PrintHeader() noexcept;
-void PrintHelp() noexcept;
+void PrintHelp(const CLIParser::Flags& flags) noexcept;

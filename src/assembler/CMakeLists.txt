@@ -4,3 +4,5 @@ add_library(assembler
         instructions.cpp
         modeflags.cpp
 )
+
+target_link_libraries(assembler PRIVATE libs)

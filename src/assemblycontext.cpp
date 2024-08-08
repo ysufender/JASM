@@ -11,11 +11,13 @@
 AssemblyContext::AssemblyContext(
         bool silent,
         bool single, 
+        bool pipelines,
         const std::string& out, 
         const std::string& libT, 
+        const std::string& workingDir,
         const std::vector<std::string>& in,
         const std::vector<std::string>& libs
-    ) : silentMode(silent), singleAssembly(single)
+    ) : _pipelines(pipelines), _workingDir(workingDir), _silentMode(silent), _singleAssembly(single), _contextString("")
 {
     if (in.size() == 0)
     {
@@ -23,68 +25,80 @@ AssemblyContext::AssemblyContext(
         return;
     }
 
-    inputFiles = in;
-    isLib = (libT == "shd" || libT == "stc");
-    libType = (isLib ? (libT == "shd" ? LibTypeEnum::Shared : LibTypeEnum::Static) : LibTypeEnum::Executable);
-    libraries = libs;
+    _inputFiles = in;
+    _isLib = (libT == "shd" || libT == "stc");
+    _libType = (_isLib ? (libT == "shd" ? LibTypeEnum::Shared : LibTypeEnum::Static) : LibTypeEnum::Executable);
+    _libraries = libs;
 
     std::stringstream ss;
 
     // Input file extensions are '.jasm' for files
     if (out.empty())
     {
-        std::string copy { inputFiles.at(0) };
+        std::string copy { _inputFiles.at(0) };
         ss << copy.erase(copy.size()-5, 5);
     }
     else
         ss << out;
 
-    ss << "." << (isLib ? libT : "jef");
-    outFile = ss.str();
+    ss << "." << (_isLib ? libT : "jef");
+    _outFile = ss.str();
 }
 
-const bool& AssemblyContext::IsSilent() const { return silentMode; }
-const bool& AssemblyContext::IsSingle() const { return singleAssembly; }
-const std::string& AssemblyContext::OutFile() const { return outFile; }
-const bool& AssemblyContext::IsLib() const { return isLib; }
-LibTypeEnum AssemblyContext::LibType() const { return libType; }
-const std::vector<std::string>& AssemblyContext::InputFiles() const { return inputFiles; }
-const std::vector<std::string>& AssemblyContext::Libraries() const { return libraries; }
+const bool& AssemblyContext::IsSilent() const { return _silentMode; }
+const bool& AssemblyContext::IsSingle() const { return _singleAssembly; }
+const std::string& AssemblyContext::OutFile() const { return _outFile; }
+const bool& AssemblyContext::IsLib() const { return _isLib; }
+LibTypeEnum AssemblyContext::LibType() const { return _libType; }
+const std::vector<std::string>& AssemblyContext::InputFiles() const { return _inputFiles; }
+const std::vector<std::string>& AssemblyContext::Libraries() const { return _libraries; }
 
 void AssemblyContext::PrintContext() const 
 {
-    if (silentMode)
+    if (_silentMode)
         return;
 
-    std::cout << "JASM Version " << JASM_VERSION << " Assembly Context"
-              << "\n\tSingle Mode: " << (singleAssembly ? "Enabled" : "Disabled");
+    if (!_contextString.empty())
+        std::cout << _contextString;
 
-    if (!singleAssembly) { std::cout << "\n\tOutput File: " << outFile; }
-    if (isLib) { std::cout << "\n\tLibrary Type: " << (libType == LibTypeEnum::Shared ? "Shared" : "Static" ); }
-
-    std::cout << "\n\tInput Files: " << inputFiles.size() << " total {";
-    for (const std::string& file : inputFiles)
+    // _contextString prep
     {
-        std::cout << "\n\t\t\"" << file << '\"';
-        
-        if (inputFiles.back() != file)
-            std::cout << ',';
-    }
-    std::cout << "\n\t}";
-    
-    if(libraries.size() == 0)
-    {
-        std::cout << "\n\tLibraries: No Library Provided\n";
-        return;
-    }
+        std::stringstream ss;
 
-    std::cout << "\n\tLibraries: " << libraries.size() << " total {";
-    for (const std::string& lib : libraries) 
-    {
-        std::cout << "\n\t\t\"" << lib << '\"';
+        ss << "JASM Version " << JASM_VERSION << " Assembly Context"
+            << "\n\tSingle Mode: " << (_singleAssembly ? "Enabled" : "Disabled")
+            << "\n\tPipelines: " << (_pipelines ? "Enabled" : "Disabled")
+            << "\n\tWorking Directory: " << _workingDir;
 
-        if (libraries.back() != lib)
-            std::cout << ',';
+        if (!_singleAssembly) { ss << "\n\tOutput File: " << _outFile; }
+        if (_isLib) { ss << "\n\tLibrary Type: " << (_libType == LibTypeEnum::Shared ? "Shared" : "Static" ); }
+
+        ss << "\n\tInput Files: " << _inputFiles.size() << " total {";
+        for (const std::string& file : _inputFiles)
+        {
+            ss << "\n\t\t\"" << file << '\"';
+
+            if (_inputFiles.back() != file)
+                ss << ',';
+        }
+        ss << "\n\t}";
+
+        if(_libraries.size() == 0)
+        {
+            ss << "\n\tLibraries: No Library Provided\n";
+            return;
+        }
+
+        ss << "\n\tLibraries: " << _libraries.size() << " total {";
+        for (const std::string& lib : _libraries) 
+        {
+            ss << "\n\t\t\"" << lib << '\"';
+
+            if (_libraries.back() != lib)
+                ss << ',';
+        }
+        ss << "\n\t}\n";
+
+        _contextString = ss.str();
     }
-    std::cout << "\n\t}\n";
 }

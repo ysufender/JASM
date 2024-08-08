@@ -1,3 +1,5 @@
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -5,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include "CLIParser.hpp"
 #include "extensions/system.hpp"
 #include "assemblycontext.hpp"
 
@@ -13,9 +16,23 @@
 //
 AssemblyContext& System::Context { DefaultContext };
 
-void System::Setup(const AssemblyContext& context, std::ostream& cout, std::ostream& cerr)
+void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostream& cerr)
 {
-    Context = context;
+    using FT = CLIParser::FlagType;
+
+    Context = AssemblyContext { 
+        flags.GetFlag<FT::Bool>("silent"), 
+        flags.GetFlag<FT::Bool>("single"), 
+        flags.GetFlag<FT::Bool>("pipelines"),
+        flags.GetFlag<FT::String>("out"), 
+        flags.GetFlag<FT::String>("lib-type"),
+        flags.GetFlag<FT::String>("working-dir"),
+        flags.GetFlag<FT::StringList>("libs"),
+        flags.GetFlag<FT::StringList>("in"),
+    };
+
+    std::filesystem::current_path(flags.GetFlag<FT::String>("working-dir"));
+
     std::cout.rdbuf(cout.rdbuf());
     std::cerr.rdbuf(cerr.rdbuf());
 }
@@ -76,6 +93,32 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
     }
 
     std::cerr << "[JASM::Error](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
+}
+
+std::ifstream System::OpenInFile(const std::string& path, const std::ios::openmode mode)
+{
+    if (!std::filesystem::exists(path))
+        LOGE(LogLevel::High, "The file at path '", path, "' does not exist.");
+
+    std::ifstream file { path.data(), mode };
+
+    if (file.fail())
+        LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
+
+    return file;
+}
+
+std::ofstream System::OpenOutFile(const std::string& path, const std::ios::openmode mode)
+{
+    if (!std::filesystem::exists(path))
+        LOGE(LogLevel::High, "The file at path '", path, "' does not exist.");
+
+    std::ofstream file { path.data(), mode };
+
+    if (file.fail())
+        LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
+
+    return file;
 }
 
 //

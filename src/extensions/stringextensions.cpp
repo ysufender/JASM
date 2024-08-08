@@ -66,4 +66,10 @@ namespace Extensions::String
 
         return std::move(ss.str());
     }
+
+    size_t Hash(const std::string& str)
+    {
+        static constexpr auto hasher { std::hash<std::string>{} };;
+        return hasher(str);
+    }
 }

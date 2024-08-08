@@ -2,10 +2,10 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 
 #include "JASMConfig.hpp"
+#include "extensions/stringextensions.hpp"
 #include "extensions/system.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
@@ -152,8 +152,8 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     // Process
     // TODO: Read the first section of assembly containing max heap size, stack size and entry point.
     // TODO: The rest is the same as assembling a library.
-    std::ifstream sourceFile { file };
-    std::ofstream outFile { outPath, std::ios_base::binary };
+    std::ifstream sourceFile { System::OpenInFile(file) };
+    std::ofstream outFile { System::OpenOutFile(outPath) };
 
     if (sourceFile.bad())
     {
@@ -203,8 +203,7 @@ AssemblyInfo Assembler::AssembleExecutable(const std::string& file)
     }
 
     //AssembleCommon(assemblyInfo, sourceFile, outFile);
-    LOGW("Assemble Common is not called for ", file);
-    //assemblyInfo.Serialize(outFile);
+    LOGW("AssembleCommon is not called for ", file);
 
     sourceFile.close();
     outFile.close();
@@ -231,16 +230,21 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
     };
 
     // Process
-    std::ifstream sourceFile { file };
-    std::ofstream outFile { outPath, std::ios_base::binary };
+    std::ifstream sourceFile { System::OpenInFile(file) };
+    std::ofstream outFile { System::OpenOutFile(outPath) };
 
-    while (Stream::Tokenize(sourceFile) != ".prep") {}
+    while (Stream::Tokenize(sourceFile) != ".prep") { }
 
     AssembleCommon(assemblyInfo, sourceFile, outFile);
 
-    //assemblyInfo.Serialize(outFile);
+    // Since the process just ends after this.
+    if (System::Context.IsSingle())
+    {
+        outFile.seekp(0, std::ios::beg); 
+        assemblyInfo.Serialize(outFile);
+    }
     
-    //sourceFile.close();
+    sourceFile.close();
     outFile.close();
     return assemblyInfo;
 }
@@ -254,16 +258,18 @@ AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : symbolMap(), p
 
 void AssemblyInfo::AddSymbol(std::string symbolName, systembit_t address)
 {
-    if (symbolMap.contains(symbolName))
+    size_t symbolHash { String::Hash(symbolName) };
+
+    if (symbolMap.contains(symbolHash))
         LOGW("A symbol with name '", symbolName, "' already exists.");
 
-    symbolMap[symbolName] = address;
-    definedSymbols.push_back(std::make_unique<std::string>(symbolMap.find(symbolName)->first));
+    symbolMap[symbolHash] = address;
+    definedSymbols.push_back(symbolHash);
 }
 
 void AssemblyInfo::AddUnknownSymbol(std::string symbolName, systembit_t address)
 {
-    unknownSymbols.push_back({symbolName, address});
+    unknownSymbols.push_back({String::Hash(symbolName), address});
 }
 
 void AssemblyInfo::Serialize(std::ostream& outFile)
@@ -294,7 +300,7 @@ void AssemblyInfo::Serialize(std::ostream& outFile)
         );
 
     // Imports
-    Serialization::SerializeContainer<AssemblyInfo::ImportCollection, systembit_t, std::string>(
+    Serialization::SerializeContainer<ImportCollection, systembit_t, std::string>(
         runtimeImports,
         outFile,
         [](const std::string& data, std::ostream& stream){
@@ -311,17 +317,12 @@ void AssemblyInfo::Serialize(std::ostream& outFile)
         return;
 
     // Known Symbols
-    Serialization::SerializeContainer<DefinedSymbolCollection, systembit_t, KeyReference>(
+    Serialization::SerializeContainer<DefinedSymbolCollection, systembit_t, KeyType>(
         definedSymbols, 
         outFile,
-        [this](const KeyReference& symbolName, std::ostream& out){
-            Serialization::SerializeContainer<std::string, uint16_t, char>(
-                *symbolName.get(), 
-                out,
-                &Serialization::SerializeInteger<char>
-            ); 
-
-            Serialization::SerializeInteger(this->symbolMap.at(*symbolName.get()), out);
+        [this](KeyType symbolHash, std::ostream& out){
+            Serialization::SerializeInteger(symbolHash, out); 
+            Serialization::SerializeInteger(this->symbolMap.at(symbolHash), out);
         }
     );
 
@@ -330,11 +331,7 @@ void AssemblyInfo::Serialize(std::ostream& outFile)
         unknownSymbols, 
         outFile,
         [](const SymbolInfo& symbolInfo, std::ostream& out){
-            Serialization::SerializeContainer<std::string, uint16_t, char>(
-                symbolInfo.SymbolName, 
-                out,
-                &Serialization::SerializeInteger<char> 
-            ); 
+            Serialization::SerializeInteger(symbolInfo.SymbolHash, out); 
             Serialization::SerializeInteger(symbolInfo.Address, out);
         }
     );
@@ -374,21 +371,15 @@ void AssemblyInfo::Deserialize(std::istream& inFile)
         return;
 
     // Defined Symbols
-    Serialization::DeserializeContainer<DefinedSymbolCollection, systembit_t, KeyReference>(
+    Serialization::DeserializeContainer<DefinedSymbolCollection, systembit_t, KeyType>(
         definedSymbols, 
         inFile,
-        [this](KeyReference& info, std::istream& in) {
-            std::string name;
+        [this](KeyType& symbolHash, std::istream& in) {
             systembit_t addr;
-            Serialization::DeserializeContainer<std::string, uint16_t, char>(
-                name, 
-                in,
-                Serialization::DeserializeInteger<char>
-            );
+            Serialization::DeserializeInteger(symbolHash, in);
             Serialization::DeserializeInteger(addr, in);
 
-            this->symbolMap[name] = addr;
-            info = std::make_unique<std::string>(this->symbolMap.find(name)->first);
+            this->symbolMap[symbolHash] = addr;
         } 
     );
 
@@ -397,11 +388,7 @@ void AssemblyInfo::Deserialize(std::istream& inFile)
         unknownSymbols, 
         inFile,
         [](SymbolInfo& symbolInfo, std::istream& in) {
-            Serialization::DeserializeContainer<std::string, uint16_t, char>(
-                symbolInfo.SymbolName,
-                in,
-                Serialization::DeserializeInteger<char>
-            );
+            Serialization::DeserializeInteger(symbolInfo.SymbolHash,in);
             Serialization::DeserializeInteger(symbolInfo.Address, in);
         }
     );
@@ -414,12 +401,12 @@ void AssemblyInfo::PrintAssemblyInfo() const
               << "\nDefined Symbols [ordered](" << definedSymbols.size() << "):";
 
     for (const auto& info : definedSymbols)
-        std::cout << "\n\t" << *info.get() << " at address " << symbolMap.at(*info.get());
+        std::cout << "\n\t" << info << " at address " << symbolMap.at(info);
 
     std::cout << "\nUnknown Symbols [ordered](" << unknownSymbols.size() << "):";
 
     for (const auto& info : unknownSymbols)
-        std::cout << "\n\t" << info.SymbolName << " at address " << info.Address;
+        std::cout << "\n\t" << info.SymbolHash << " at address " << info.Address;
 
     std::cout << "\nRuntime Imports (" << runtimeImports.size() << "):";
 

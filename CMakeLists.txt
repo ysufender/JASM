@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
 
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
-
 project(JASM 
     VERSION 1.0.0
     DESCRIPTION "Assembler and linker for JASM"
@@ -22,11 +18,21 @@ option(TEST_MODE "Activate the unit tests" OFF)
 option(USE_PIPELINES_OPT "Pipeline support" OFF)
 set(OUTPUT_PATH "" CACHE STRING "")
 
+#
+# File Configures
+#
 configure_file(
     ${CMAKE_SOURCE_DIR}/JASMConfig.hpp.in
     ${CMAKE_BINARY_DIR}/include/JASMConfig.hpp
     @ONLY
 )
+
+file(GLOB JASM_FILES CONFIGURE_DEPENDS "tests/script/*.jasm")
+foreach(JASM_FILE ${JASM_FILES})
+    file(RELATIVE_PATH OUT_JASM "${CMAKE_CURRENT_SOURCE_DIR}/tests" ${JASM_FILE})
+    file(COPY ${JASM_FILE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/${OUT_JASM}")
+endforeach(JASM_FILE ${JASM_FILES})
+
 
 if(${TEST_MODE})
     add_library(jasm
@@ -39,6 +45,13 @@ else()
         src/jasm.cpp 
         src/assemblycontext.cpp
     )
+
+    set_target_properties(jasm
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
+    )
 endif(${TEST_MODE})
 
 include_directories(
@@ -48,7 +61,6 @@ include_directories(
 
 # After the include call so everything includes those above
 add_subdirectory(lib)
-#link_libraries(libs)
 add_subdirectory(src)
 
 target_link_libraries(jasm 
@@ -59,11 +71,4 @@ target_link_libraries(jasm
 
 if(${TEST_MODE})
     add_subdirectory(tests)
-else()
-    set_target_properties(jasm
-        PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
-    )
 endif(${TEST_MODE})
