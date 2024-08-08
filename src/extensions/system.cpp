@@ -20,15 +20,15 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
 {
     using FT = CLIParser::FlagType;
 
-    Context = AssemblyContext { 
-        flags.GetFlag<FT::Bool>("silent"), 
-        flags.GetFlag<FT::Bool>("single"), 
+    Context = AssemblyContext {
+        flags.GetFlag<FT::Bool>("silent"),
+        flags.GetFlag<FT::Bool>("single"),
         flags.GetFlag<FT::Bool>("pipelines"),
-        flags.GetFlag<FT::String>("out"), 
+        flags.GetFlag<FT::String>("out"),
         flags.GetFlag<FT::String>("lib-type"),
         flags.GetFlag<FT::String>("working-dir"),
-        flags.GetFlag<FT::StringList>("libs"),
         flags.GetFlag<FT::StringList>("in"),
+        flags.GetFlag<FT::StringList>("libs")
     };
 
     std::filesystem::current_path(flags.GetFlag<FT::String>("working-dir"));
@@ -110,8 +110,8 @@ std::ifstream System::OpenInFile(const std::string& path, const std::ios::openmo
 
 std::ofstream System::OpenOutFile(const std::string& path, const std::ios::openmode mode)
 {
-    if (!std::filesystem::exists(path))
-        LOGE(LogLevel::High, "The file at path '", path, "' does not exist.");
+    if (std::filesystem::exists(path))
+        LOGW("A file at path '", path, "' already exists. Overwriting...");
 
     std::ofstream file { path.data(), mode };
 

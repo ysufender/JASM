@@ -43,7 +43,6 @@ std::vector<AssemblyInfo> Assembler::Assemble()
 
     std::vector<AssemblyInfo> outputVector { };
 
-    // TODO: Loop through all input files and call specified assembler . 
     const std::vector<std::string>& inFiles { System::Context.InputFiles() };
     size_t i { 0 };
 
@@ -239,10 +238,7 @@ AssemblyInfo Assembler::AssembleLibrary(const std::string& file)
 
     // Since the process just ends after this.
     if (System::Context.IsSingle())
-    {
-        outFile.seekp(0, std::ios::beg); 
         assemblyInfo.Serialize(outFile);
-    }
     
     sourceFile.close();
     outFile.close();
@@ -276,6 +272,8 @@ void AssemblyInfo::Serialize(std::ostream& outFile)
 {
     if (outFile.fail() || outFile.bad())
         LOGE(System::LogLevel::High, "Couldn't open file while serializing assembly info");
+
+    outFile.seekp(0, std::ios::beg); 
 
     // Format:
     //      flags
@@ -341,6 +339,8 @@ void AssemblyInfo::Deserialize(std::istream& inFile)
 {
     if (inFile.fail() || inFile.bad())
         LOGE(System::LogLevel::High, "Couldn't open file while deserializing assembly info");
+
+    inFile.seekg(0, std::ios::beg); 
 
     // Flags
     Serialization::DeserializeInteger(flags, inFile);
