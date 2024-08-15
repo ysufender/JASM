@@ -31,12 +31,12 @@ namespace ModeFlags
         ENUMER char cl          = 0x0E;
         ENUMER char dl          = 0x0F;
 
-        // 32-bit system
-        ENUMER char PC          = 0x10;
-        ENUMER char SP          = 0x11;
-
         // 8-bit system
-        ENUMER char FLG         = 0x12;
+        ENUMER char FLG         = 0x10;
+
+        // 32-bit system
+        ENUMER char PC          = 0x11;
+        ENUMER char SP          = 0x12;
     }
 
     char GetModeFlag(const std::string& identifier, bool throws = false); 

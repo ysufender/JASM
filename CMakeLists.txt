@@ -27,11 +27,11 @@ configure_file(
     @ONLY
 )
 
-file(GLOB JASM_FILES CONFIGURE_DEPENDS "tests/script/*.jasm")
-foreach(JASM_FILE ${JASM_FILES})
-    file(RELATIVE_PATH OUT_JASM "${CMAKE_CURRENT_SOURCE_DIR}/tests" ${JASM_FILE})
-    file(COPY ${JASM_FILE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/${OUT_JASM}")
-endforeach(JASM_FILE ${JASM_FILES})
+#file(GLOB JASM_FILES CONFIGURE_DEPENDS "tests/script/*.jasm")
+#foreach(JASM_FILE ${JASM_FILES})
+#    file(RELATIVE_PATH OUT_JASM "${CMAKE_SOURCE_DIR}/tests" ${JASM_FILE})
+#    file(COPY ${JASM_FILE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/${OUT_JASM}")
+#endforeach(JASM_FILE ${JASM_FILES})
 
 
 if(${TEST_MODE})
@@ -39,18 +39,20 @@ if(${TEST_MODE})
         STATIC 
             src/jasm.cpp
             src/assemblycontext.cpp
+            src/system.cpp
     )
 else()
     add_executable(jasm 
         src/jasm.cpp 
         src/assemblycontext.cpp
+        src/system.cpp
     )
 
     set_target_properties(jasm
         PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
     )
 endif(${TEST_MODE})
 

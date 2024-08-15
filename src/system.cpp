@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -7,9 +8,12 @@
 #include <string>
 #include <string_view>
 
+#include "JASMConfig.hpp"
+
 #include "CLIParser.hpp"
-#include "extensions/system.hpp"
+#include "system.hpp"
 #include "assemblycontext.hpp"
+
 
 // 
 // System Implementation
@@ -30,12 +34,25 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
         flags.GetFlag<FT::StringList>("in"),
         flags.GetFlag<FT::StringList>("libs")
     };
-
-    std::filesystem::current_path(flags.GetFlag<FT::String>("working-dir"));
-
+    std::filesystem::current_path(Context.WorkingDir());
     std::cout.rdbuf(cout.rdbuf());
     std::cerr.rdbuf(cerr.rdbuf());
 }
+
+#ifdef TEST_MODE
+void System::Setup(const AssemblyContext&& context, std::ostream& cout, std::ostream& cerr)
+{
+    Setup(context, cout, cerr);
+}
+
+void System::Setup(const AssemblyContext& context, std::ostream& cout, std::ostream& cerr)
+{
+    Context = context;
+    std::filesystem::current_path(Context.WorkingDir());
+    std::cout.rdbuf(cout.rdbuf());
+    std::cerr.rdbuf(cerr.rdbuf());
+}
+#endif
 
 void System::Log(std::string_view message)
 {
@@ -95,27 +112,27 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
     std::cerr << "[JASM::Error](" << file.substr(idx, file.size() - idx) << ':' << line << ") >>> " << message << '\n';
 }
 
-std::ifstream System::OpenInFile(const std::string& path, const std::ios::openmode mode)
+std::ifstream System::OpenInFile(const std::filesystem::path& path, const std::ios::openmode mode)
 {
     if (!std::filesystem::exists(path))
         LOGE(LogLevel::High, "The file at path '", path, "' does not exist.");
 
-    std::ifstream file { path.data(), mode };
+    std::ifstream file { path, mode };
 
-    if (file.fail())
+    if (file.fail() || file.bad() || !file.is_open())
         LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
 
     return file;
 }
 
-std::ofstream System::OpenOutFile(const std::string& path, const std::ios::openmode mode)
+std::ofstream System::OpenOutFile(const std::filesystem::path& path, const std::ios::openmode mode)
 {
     if (std::filesystem::exists(path))
         LOGW("A file at path '", path, "' already exists. Overwriting...");
 
-    std::ofstream file { path.data(), mode };
+    std::ofstream file { path, mode };
 
-    if (file.fail())
+    if (file.fail() || file.bad() || !file.is_open())
         LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
 
     return file;

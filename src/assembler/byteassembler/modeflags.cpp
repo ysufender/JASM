@@ -2,8 +2,8 @@
 
 #include "JASMConfig.hpp"
 
-#include "assembler/modeflags.hpp"
-#include "extensions/system.hpp"
+#include "assembler/byteassembler/modeflags.hpp"
+#include "system.hpp"
 
 namespace ModeFlags
 {

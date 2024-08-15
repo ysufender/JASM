@@ -6,17 +6,19 @@
 #include <string>
 #include <iostream>
 
-#include "assembler/instructions.hpp"
+#include "assembler/byteassembler/instructions.hpp"
 #include "JASMConfig.hpp"
-#include "assembler/modeflags.hpp"
+#include "assembler/byteassembler/modeflags.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
 #include "extensions/stringextensions.hpp"
-#include "extensions/system.hpp"
+#include "system.hpp"
 
 
 namespace Instructions
 {
+    using namespace ByteAssembler;
+
     //
     // Util
     //
@@ -80,7 +82,6 @@ namespace Instructions
         // stc <mode> <symbol>
         // stc <float>
         // stc <integer>
-        // stc <mode> <symbol>
 
         const std::string next { Stream::Tokenize(in) };
         const char modeFlag { ModeFlags::GetModeFlag(next) };
@@ -93,7 +94,7 @@ namespace Instructions
             const char fakeFlag { next.find_first_of('.' == std::string::npos) ? NMode::Int : NMode::Float };
 
             _BoringNumSwitch(fakeFlag, out, {OpCodes::sti, OpCodes::stf, 0x00}, {
-                [&next, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(next), out);},
+                [&next, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(next), out);},
                 [&next, &out](){Serialization::SerializeFloat(std::stof(next), out);}
             });
 
@@ -102,11 +103,12 @@ namespace Instructions
 
         const std::string symOrVal { Stream::Tokenize(in) };
 
-        // Store by mode
+        // Store constant by mode
+        // stc $<i/f/b> <value>
         if (std::isdigit(symOrVal.at(0)))
         {
             _BoringNumSwitch(modeFlag, out, {OpCodes::sti, OpCodes::stf, OpCodes::stb}, {
-                [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<uint32_t>(symOrVal), out); },
+                [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(symOrVal), out); },
                 [&symOrVal, &out](){Serialization::SerializeFloat(std::stof(symOrVal), out); },
                 [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<char>(symOrVal), out); },
             });
@@ -163,9 +165,9 @@ namespace Instructions
 
     void Move(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // mov <register>
-        // mov <register> <register>
-        // mov <value> <register>
+        // mov <register> [from stack]
+        // mov <register> <register> [from register]
+        // mov <value> <register> [from constant]
 
         const std::string next { Stream::Tokenize(in) };
         char modeFlag { ModeFlags::GetModeFlag(next) };
@@ -185,12 +187,13 @@ namespace Instructions
         modeFlag = ModeFlags::GetRegisterModeFlag(next);;
         if (modeFlag != ModeFlags::NoMode)
         {
+            char fromReg { modeFlag };
             const std::string regToken { Stream::Tokenize(in) };
-            const char reg2 { ModeFlags::GetRegisterModeFlag(regToken, true) };; 
+            const char toReg { ModeFlags::GetRegisterModeFlag(regToken, true) };; 
 
             Serialization::SerializeInteger(OpCodes::movr, out); 
-            Serialization::SerializeInteger(modeFlag, out);
-            Serialization::SerializeInteger(reg2, out);
+            Serialization::SerializeInteger(fromReg, out);
+            Serialization::SerializeInteger(toReg, out);
             return;
         }
 
@@ -219,7 +222,7 @@ namespace Instructions
         namespace Regs = ModeFlags::RegisterModeFlags;
         const std::string regToken { Stream::Tokenize(in) };
         const char regMode { ModeFlags::GetRegisterModeFlag(regToken, true) };
-        bool regIs8Bit { regMode >= Regs::al && regMode <= Regs::dl };
+        bool regIs8Bit { regMode >= Regs::al && regMode <= Regs::FLG };
 
         Serialization::SerializeInteger(OpCodes::movc, out);
 
@@ -248,6 +251,5 @@ namespace Instructions
 
     void AddSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-
     }
 }

@@ -1,18 +1,19 @@
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 
 #include "jasm.hpp"
 #include "CLIParser.hpp"
 #include "JASMConfig.hpp"
+#include "assembler/byteassembler/assembler.hpp"
 
 #ifndef TEST_MODE
-#include "extensions/system.hpp"
-#include "assembler/assembler.hpp"
+#include <fstream>
+
+#include "system.hpp"
+#include "assembler/all.hpp"
 
 int main(int argc, char** args)
 {
-
     try
     {
         CLIParser::Flags flags { SetUpCLI(args, argc) };
@@ -37,37 +38,45 @@ int main(int argc, char** args)
                     out = System::OpenOutFile(rdout[0]);
                     err = System::OpenOutFile(rdout[0]);
                 }
-                else
+                else if (rdout.size() == 2)
                 {
                     out = System::OpenOutFile(rdout[0]);
                     err = System::OpenOutFile(rdout[1]);
                 }
+                else
+                    LOGE(System::LogLevel::High, "--redirect-stdout cannot take more than 2 arguments.");
             }
 
-            if (out.is_open())
+            if (out.is_open() && err.is_open())
                 System::Setup(flags, out, err);
             else
                 System::Setup(flags, std::cout, std::cerr);
 
-            Assembler assembler;
-            Assembler::AssemblyInfoCollection collection = assembler.Assemble();
+            using BAsm = typename ByteAssembler::ByteAssembler;
 
-            for (const auto& inf : collection)
-            {
-                AssemblyInfo info {"", 0};
+            BAsm assembler;
+            BAsm::AssemblyInfoCollection collection = assembler.Assemble();
 
-                std::ifstream in { inf.path, std::ios::binary };
-                info.Deserialize(in);
+            //for (const auto& inf : collection)
+            //{
+                //AssemblyInfo info {"", 0};
 
-                info.PrintAssemblyInfo();
-            }
+                //std::ifstream in { inf.path, std::ios::binary };
+                //info.Deserialize(in);
+
+                //info.PrintAssemblyInfo();
+            //}
         }
     }
     catch (const JASMException& exc)
     {
-        std::cerr << "An error occured during process."
-                  << "\n\tProvided information: " << exc << std::endl;
-
+        std::cerr << "ERROR: " << exc << std::endl;
+        return 1;
+    }
+    catch (const std::exception& exc)
+    {
+        std::cerr << "An unexpected error occured during process."
+                  << "\n\tProvided information: " << exc.what() << std::endl;
         return 1;
     }
 
@@ -99,8 +108,7 @@ void PrintHelp(const CLIParser::Flags& flags) noexcept
 {
     PrintHeader();
     std::cout << flags.GetHelpText() << '\n'
-              << "\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.\n";
-
+              << "\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.\n\n";
 }
 
 CLIParser::Flags SetUpCLI(char** args, int argc)

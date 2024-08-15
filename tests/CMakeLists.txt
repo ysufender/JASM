@@ -1,14 +1,14 @@
 add_executable(tests
         asmcontext.cpp
+        system.cpp
 
         extensions/string.cpp
         extensions/stream.cpp
-        extensions/system.cpp
         extensions/serialization.cpp
 
-        assembler/modeflags.cpp
-        assembler/instructions.cpp
-        assembler/assembler.cpp
+        assembler/byteasm/modeflags.cpp
+        assembler/byteasm/instructions.cpp
+        assembler/byteasm/assembler.cpp
 )
 
 set_target_properties(tests

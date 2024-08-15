@@ -1,4 +1,5 @@
 #include <cctype>
+#include <cstdlib>
 #include <ios>
 #include <istream>
 #include <sstream>
@@ -6,6 +7,7 @@
 #include <string>
 
 #include "extensions/streamextensions.hpp"
+#include "system.hpp"
 
 namespace Extensions::Stream
 {
@@ -18,32 +20,38 @@ namespace Extensions::Stream
 
         while (true)
         {
+            if (inputStream.bad())
+                LOGE(System::LogLevel::High, "An error occured while reading the source file.");
+
             if (inputStream.eof())
                 return "EOF";
+
             while (isspace(ch))
                 inputStream.read(&ch, sizeof(ch));
+
             while (!isspace(ch) && !inputStream.eof())
             {
-                if (ch == '#')
+                if (ch != '#')
                 {
-                    if (!ss.str().empty())
-                        break;
-
-                    do inputStream.read(&ch, sizeof(ch));
-                    while (ch != '#');
-
+                    ss << ch;
                     inputStream.read(&ch, sizeof(ch));
                     continue;
                 }
 
-                ss << ch;
+                if (!ss.str().empty())
+                    break;
+
+                do inputStream.read(&ch, sizeof(ch)); 
+                while (ch != '#');
+
                 inputStream.read(&ch, sizeof(ch));
+
             }
 
             if (!ss.str().empty())
                 break;
         }
 
-        return std::move(ss.str());
+        return ss.str();
     }
 }

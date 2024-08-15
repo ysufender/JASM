@@ -1,7 +1,8 @@
 #pragma once
 
-#include <bitset>
+#include <filesystem>
 #include <string>
+#include <string_view>
 #include <vector>
 
 enum class LibTypeEnum 
@@ -19,7 +20,7 @@ class AssemblyContext
         bool _isLib;
         bool _pipelines;
         std::string _outFile;
-        std::string _workingDir;
+        std::filesystem::path _workingDir;
         LibTypeEnum _libType;
         std::vector<std::string> _inputFiles;
         std::vector<std::string> _libraries;
@@ -34,7 +35,7 @@ class AssemblyContext
             bool pipelines,
             const std::string& out, 
             const std::string& libT, 
-            const std::string& workingDir,
+            const std::filesystem::path& workingDir,
             const std::vector<std::string>& in,
             const std::vector<std::string>& libs
         );
@@ -44,11 +45,13 @@ class AssemblyContext
         AssemblyContext(AssemblyContext&) = delete;
 
 
-        const bool& IsSilent() const;
-        const bool& IsSingle() const;
-        const bool& IsLib() const;
-        const std::string& OutFile() const;
+        bool IsSilent() const;
+        bool IsSingle() const;
+        bool IsUsingPipelines() const;
+        bool IsLib() const;
+        std::string_view OutFile() const;
         LibTypeEnum LibType() const;
+        std::string_view WorkingDir() const;
         const std::vector<std::string>& InputFiles() const;
         const std::vector<std::string>& Libraries() const;
 

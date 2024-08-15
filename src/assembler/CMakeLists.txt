@@ -1,8 +1,8 @@
-add_library(assembler 
-    STATIC 
-        assembler.cpp
-        instructions.cpp
-        modeflags.cpp
-)
+add_subdirectory(byteassembler)
 
-target_link_libraries(assembler PRIVATE libs)
+add_library(assembler INTERFACE)
+
+target_link_libraries(assembler
+    INTERFACE
+        byteassembler
+)

@@ -23,7 +23,7 @@ Note: words inside paranthesis "()" are optional
 
 [x] mov;    ----;
 [x] movc;   0x0E;   set register to given constant value
-~[ ] movs;   0x0F;   set register to given value of symbol~
+~[?] movs;   0x0F;   set register to given value of symbol~
 [x] movr;   0x10;   set register to given register
 [x] movi;   0x11;   set register to the (u)int at top of the stack
 [x] movf;   0x12;   set register to the float at top of the stack

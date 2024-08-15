@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
@@ -11,7 +12,7 @@
 #ifndef NDEBUG
     #define LOGD(...) System::LogInternal(Extensions::String::Concat({__VA_ARGS__}), __FILE__, __LINE__)
 #else
-    #define LOGD(message)
+    #define LOGD(...)
 #endif
 
 #define LOG(...) System::Log(Extensions::String::Concat({__VA_ARGS__}))
@@ -36,10 +37,13 @@ struct System
     static void LogInternal(std::string_view message, std::string_view file, int line);
     static void LogWarning(std::string_view message, std::string_view file, int line);
     static void LogError(std::string_view message, LogLevel level, std::string_view file, int line);
+
     static void Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostream& cerr);
+    static void Setup(const AssemblyContext&& context, std::ostream& cout, std::ostream& cerr);
+    static void Setup(const AssemblyContext& context, std::ostream& cout, std::ostream& cerr);
     
-    static std::ifstream OpenInFile(const std::string& path, const std::ios::openmode mode = std::ios::binary);
-    static std::ofstream OpenOutFile(const std::string& path, const std::ios::openmode mode = std::ios::binary);
+    static std::ifstream OpenInFile(const std::filesystem::path& path, const std::ios::openmode mode = std::ios::binary);
+    static std::ofstream OpenOutFile(const std::filesystem::path& path, const std::ios::openmode mode = std::ios::binary);
 };
 
 class JASMException : std::runtime_error
