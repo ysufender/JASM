@@ -34,20 +34,18 @@ TEST_CASE("Assembler Tests")
         constexpr char desiredOutput[] {
             0x01, 0x0F, 0x00, 0x00, 0x00,
             0x07,
-            0x10, 0x09, 0x08,
+            0x10, 0x08, 0x09,
             0x0A,
-
-            0x0E, 0x0F, 0x08
+            0x11, 0x08
         };
 
         using BAsm = typename ByteAssembler::ByteAssembler;
         BAsm assembler;
         BAsm::AssemblyInfoCollection collection = assembler.Assemble();
-        //std::ifstream resultStream { System::Context.InputFiles().at(0), std::ios::binary};
+        std::ifstream resultStream { System::Context.InputFiles().at(0), std::ios::binary};
 
-        //resultStream.read(resultBytes, 13);
-        //CHECK(std::ranges::equal(resultBytes, desiredOutput));
-
-        //CHECK(resultStream.good());
+        resultStream.read(resultBytes, 13);
+        for (int i = 0; i < 13; i++)
+            CHECK(resultBytes[i] == desiredOutput[i]);
     }
 }

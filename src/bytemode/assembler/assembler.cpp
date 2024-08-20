@@ -101,6 +101,8 @@ namespace ByteAssembler
             }
             else if (instructionMap.contains(token))
                 instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
+            else if (token == "EOF")
+                LOGE(System::LogLevel::High, "Expected '.end' at the end of the file.");
             else
                 LOGE(System::LogLevel::High, "Couldn't find '", token, "' on inscturcion map.");
 
@@ -200,7 +202,6 @@ namespace ByteAssembler
 
         //std::string directories { outPath.substr(0, outPath.find_last_of('/') + 1) };
         //std::filesystem::path directories { outPath.parent_path() };
-
         //if (!directories.empty())
         //std::filesystem::create_directories(directories);
 

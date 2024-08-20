@@ -40,14 +40,15 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
         #to load data from symbol to heap, you must first use stc#
 
         rda &eax    #reads &eax and pushes it to stack#
-        rda %i &ebx #pushes an integer from heap at the address stored on ebx#
+        rda %i   #pushes an integer from heap at the address stored on ebx#
 
         mov &eax &ebx       #copy eax to ebx# 
         mov 156 &eax        #set eax to 156. No flags for numeric type because eax is fixed size
-                            So the constant value is always treated as 32-bits#
+                            So the constant value is always treated as 32-bit integer or float
+                            (depending on the existence of '.' symbol)#
         mov &ecx            #Same as above. But from the stack#
 
-        #mov someVal &edx# #maybe#    #set edx to the data at symbol someVal# 
+        #you might use stc %i symbol and then mov %i# #mov someVal &edx# #maybe#    #set edx to the data at symbol someVal# 
         #for now, its the same as ldc#
 .end
 

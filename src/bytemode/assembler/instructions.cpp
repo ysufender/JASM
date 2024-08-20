@@ -30,10 +30,18 @@ namespace Instructions
     template<integer T>
     T _TokenToInt(const std::string& token)
     {
-        if (token.starts_with("0x"))
-            return String::HexToInt<T>(token);
-        else
-            return static_cast<T>(std::stoul(token));
+        try
+        {
+            if (token.starts_with("0x"))
+                return String::HexToInt<T>(token);
+            else
+                return static_cast<T>(std::stoul(token));
+        }
+        catch (const std::exception& e)
+        {
+            LOGE(System::LogLevel::High, "Token: ", token);
+            return static_cast<T>(0);
+        }
     }
 
 
@@ -43,28 +51,23 @@ namespace Instructions
     {
         namespace NModes = ModeFlags::NumericModeFlags;
 
-        static const auto callTheBack = [&callbacks](int index){
-            if (callbacks.at(index))
-                callbacks.at(index)();
-        };
-
         switch (modeFlag)
         {
             case NModes::UInt: 
             case NModes::Int: 
                 Serialization::SerializeInteger(op.at(0), out);
-                callTheBack(0);
+                if (callbacks.at(0)) callbacks.at(0)();
                 break;
 
             case NModes::Float:
                 Serialization::SerializeInteger(op.at(1), out);
-                callTheBack(1);
+                if (callbacks.at(1)) callbacks.at(1)();
                 break;
 
             case NModes::UByte:
             case NModes::Byte:
                 Serialization::SerializeInteger(op.at(2), out); 
-                callTheBack(2);
+                if (callbacks.at(2)) callbacks.at(2)();
                 break;
 
             default:
@@ -146,20 +149,19 @@ namespace Instructions
 
         const std::string next { Stream::Tokenize(in) };
         char modeFlag { ModeFlags::GetRegisterModeFlag(next) };
-
-        if (modeFlag != ModeFlags::NoMode) // register
+        
+        // rda <mode> [read the address &ebx]
+        if (modeFlag == ModeFlags::NoMode)
         {
-            const char regMode { ModeFlags::GetRegisterModeFlag(next) };
-            Serialization::SerializeInteger(OpCodes::rdr, out);
-
+            modeFlag = ModeFlags::GetModeFlag(next);
+            //_BoringNumSwitch(modeFlag, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
+            _BoringNumSwitch(modeFlag, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
             return;
         }
-        
-        modeFlag = ModeFlags::GetModeFlag(next);
-        const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
 
-        _BoringNumSwitch(modeFlag, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
-
+        // rda <register> [read the given register]
+        const char regMode { ModeFlags::GetRegisterModeFlag(next) };
+        Serialization::SerializeInteger(OpCodes::rdr, out);
         Serialization::SerializeInteger(regMode, out);
     }
 
@@ -178,7 +180,6 @@ namespace Instructions
             const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
             _BoringNumSwitch(modeFlag, out, {OpCodes::movi, OpCodes::movf, OpCodes::movb});
             Serialization::SerializeInteger(regMode, out);
-
             return;
         }
 
