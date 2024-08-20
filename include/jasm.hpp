@@ -2,6 +2,8 @@
 
 #include "CLIParser.hpp"
 
+int jasmmain(int argc, char** args);
+
 void PrintHeader() noexcept;
 void PrintHelp(const CLIParser::Flags& flags) noexcept;
 

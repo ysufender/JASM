@@ -5,7 +5,7 @@
 #include <ostream>
 
 #include "extensions/serialization.hpp"
-#include "assembler/byteassembler/assembler.hpp"
+#include "bytemode/assembler/assembler.hpp"
 
 namespace Instructions
 {

@@ -10,8 +10,8 @@
 #include "extensions/stringextensions.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
-#include "assembler/byteassembler/assembler.hpp"
-#include "assembler/byteassembler/instructions.hpp"
+#include "bytemode/assembler/assembler.hpp"
+#include "bytemode/assembler/instructions.hpp"
 
 namespace ByteAssembler
 {
@@ -27,12 +27,12 @@ namespace ByteAssembler
     //
     static const std::unordered_map<std::string, std::function<void(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
         {"nop", &Instructions::Nop},
-            {"stc", &Instructions::StoreConstant},
-            {"ldc", &Instructions::LoadConstant}, 
-            {"rda", &Instructions::ReadAddress},
-            {"mov", &Instructions::Move },
-            {"add", &Instructions::Add },
-            {"ads", &Instructions::AddSafe },
+        {"stc", &Instructions::StoreConstant},
+        {"ldc", &Instructions::LoadConstant}, 
+        {"rda", &Instructions::ReadAddress},
+        {"mov", &Instructions::Move },
+        {"add", &Instructions::Add },
+        {"ads", &Instructions::AddSafe },
     };
 
 
@@ -80,9 +80,9 @@ namespace ByteAssembler
             }
             else
                 LOGE(
-                        System::LogLevel::High,
-                        "Unexpected token '", token , "' in prep section."
-                    );
+                    System::LogLevel::High,
+                    "Unexpected token '", token , "' in prep section."
+                );
 
             token = Stream::Tokenize(sourceFile);
         }
@@ -128,7 +128,7 @@ namespace ByteAssembler
 
         AssemblyInfo assemblyInfo {
             outPath,
-                outFlags
+            outFlags
         };
 
         std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
@@ -206,7 +206,7 @@ namespace ByteAssembler
 
         AssemblyInfo assemblyInfo {
             outPath,
-                outFlags
+            outFlags
         };
 
         // Process
@@ -273,23 +273,23 @@ namespace ByteAssembler
         // Name
         if (flags & AssemblyFlags::StoreName)
             Serialization::SerializeContainer<std::string, size_t, char>(
-                    path, 
-                    outFile,
-                    &Serialization::SerializeInteger<char> 
-                    );
+                path, 
+                outFile,
+                &Serialization::SerializeInteger<char> 
+            );
 
         // Imports
         Serialization::SerializeContainer<ImportCollection, systembit_t, std::string>(
-                runtimeImports,
-                outFile,
-                [](const std::string& data, std::ostream& stream){
-                Serialization::SerializeContainer<std::string, uint16_t, char>(
-                        data,
-                        stream,
-                        &Serialization::SerializeInteger<char>
-                        );
-                }
+            runtimeImports,
+            outFile,
+            [](const std::string& data, std::ostream& stream){
+            Serialization::SerializeContainer<std::string, uint16_t, char>(
+                    data,
+                    stream,
+                    &Serialization::SerializeInteger<char>
                 );
+            }
+        );
 
         // Symbol Info
         if (!(flags & AssemblyFlags::SymbolInfo))
@@ -302,8 +302,8 @@ namespace ByteAssembler
                 [this](KeyType symbolHash, std::ostream& out){
                 Serialization::SerializeInteger(symbolHash, out); 
                 Serialization::SerializeInteger(this->symbolMap.at(symbolHash), out);
-                }
-                );
+            }
+        );
 
         // Unknown Symbols
         Serialization::SerializeContainer<UnknownSymbolCollection, systembit_t, SymbolInfo>(
@@ -312,8 +312,8 @@ namespace ByteAssembler
                 [](const SymbolInfo& symbolInfo, std::ostream& out){
                 Serialization::SerializeInteger(symbolInfo.SymbolHash, out); 
                 Serialization::SerializeInteger(symbolInfo.Address, out);
-                }
-                );
+            }
+        );
     }
 
     void AssemblyInfo::Deserialize(std::istream& inFile)
@@ -329,23 +329,23 @@ namespace ByteAssembler
         //Name
         if (flags & AssemblyFlags::StoreName)
             Serialization::DeserializeContainer<std::string, size_t, char>(
-                    path, 
-                    inFile,
-                    Serialization::DeserializeInteger<char>
-                    );
+                path, 
+                inFile,
+                Serialization::DeserializeInteger<char>
+            );
 
         // Imports
         Serialization::DeserializeContainer<AssemblyInfo::ImportCollection, systembit_t, std::string>(
-                runtimeImports, 
-                inFile,
-                [](std::string& data, std::istream& stream){
-                Serialization::DeserializeContainer<std::string, uint16_t, char>(
-                        data, 
-                        stream,
-                        &Serialization::DeserializeInteger<char>
-                        );
-                } 
+            runtimeImports, 
+            inFile,
+            [](std::string& data, std::istream& stream){
+            Serialization::DeserializeContainer<std::string, uint16_t, char>(
+                    data, 
+                    stream,
+                    &Serialization::DeserializeInteger<char>
                 );
+            } 
+        );
 
         // Symbol Info
         if (!(flags & AssemblyFlags::SymbolInfo))
@@ -361,8 +361,8 @@ namespace ByteAssembler
                 Serialization::DeserializeInteger(addr, in);
 
                 this->symbolMap[symbolHash] = addr;
-                } 
-                );
+            } 
+        );
 
         // Unknown Symbols
         Serialization::DeserializeContainer<UnknownSymbolCollection, systembit_t, SymbolInfo>(
@@ -371,8 +371,8 @@ namespace ByteAssembler
                 [](SymbolInfo& symbolInfo, std::istream& in) {
                 Serialization::DeserializeInteger(symbolInfo.SymbolHash,in);
                 Serialization::DeserializeInteger(symbolInfo.Address, in);
-                }
-                );
+            }
+        );
     }
 
     void AssemblyInfo::PrintAssemblyInfo() const

@@ -37,15 +37,11 @@ configure_file(
 if(${TEST_MODE})
     add_library(jasm
         STATIC 
-            src/jasm.cpp
-            src/assemblycontext.cpp
-            src/system.cpp
+            src/main.cpp
     )
 else()
     add_executable(jasm 
-        src/jasm.cpp 
-        src/assemblycontext.cpp
-        src/system.cpp
+        src/main.cpp
     )
 
     set_target_properties(jasm
@@ -68,7 +64,7 @@ add_subdirectory(src)
 target_link_libraries(jasm 
     PUBLIC 
         libs
-        core 
+        src
 )
 
 if(${TEST_MODE})

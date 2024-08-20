@@ -1,12 +1,12 @@
-add_subdirectory(assembler)
-add_subdirectory(linker)
+add_subdirectory(bytemode)
 add_subdirectory(extensions)
+add_subdirectory(core)
 
-add_library(core INTERFACE)
+add_library(src INTERFACE)
 
-target_link_libraries(core 
+target_link_libraries(src 
     INTERFACE 
-        assembler 
-        linker
+        bytemode
         extensions
+        core
 )

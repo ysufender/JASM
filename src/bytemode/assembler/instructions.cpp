@@ -6,9 +6,9 @@
 #include <string>
 #include <iostream>
 
-#include "assembler/byteassembler/instructions.hpp"
+#include "bytemode/assembler/instructions.hpp"
 #include "JASMConfig.hpp"
-#include "assembler/byteassembler/modeflags.hpp"
+#include "bytemode/assembler/modeflags.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
 #include "extensions/stringextensions.hpp"

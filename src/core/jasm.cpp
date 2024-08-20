@@ -1,18 +1,15 @@
 #include <filesystem>
 #include <iostream>
-
-#include "jasm.hpp"
-#include "CLIParser.hpp"
-#include "JASMConfig.hpp"
-#include "assembler/byteassembler/assembler.hpp"
-
-#ifndef TEST_MODE
 #include <fstream>
 
-#include "system.hpp"
-#include "assembler/all.hpp"
+#include "CLIParser.hpp"
 
-int main(int argc, char** args)
+#include "jasm.hpp"
+#include "system.hpp"
+#include "JASMConfig.hpp"
+#include "bytemode/assembler/assembler.hpp"
+
+int jasmmain(int argc, char** args)
 {
     try
     {
@@ -82,7 +79,6 @@ int main(int argc, char** args)
 
     return 0;
 }
-#endif
 
 void PrintHeader() noexcept
 {
