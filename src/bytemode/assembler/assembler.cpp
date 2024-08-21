@@ -129,7 +129,7 @@ namespace ByteAssembler
         //std::filesystem::create_directories(directories);
 
         AssemblyInfo assemblyInfo {
-            outPath,
+            outPath.generic_string(),
             outFlags
         };
 
@@ -184,7 +184,7 @@ namespace ByteAssembler
         }
 
         //AssembleCommon(assemblyInfo, sourceFile, outFile);
-        LOGW("AssembleCommon is not called for ", file);
+        LOGW("AssembleCommon is not called for ", file.generic_string());
 
         sourceFile.close();
         outFile.close();
@@ -206,7 +206,7 @@ namespace ByteAssembler
         //std::filesystem::create_directories(directories);
 
         AssemblyInfo assemblyInfo {
-            outPath,
+            outPath.generic_string(),
             outFlags
         };
 

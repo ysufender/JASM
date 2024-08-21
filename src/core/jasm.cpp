@@ -124,7 +124,7 @@ CLIParser::Flags SetUpCLI(char** args, int argc)
     parser.AddFlag<FlagType::StringList>("libs", "Libraries used and to be linked.");
     parser.Seperator();
     parser.AddFlag<FlagType::Bool>("pipelines", "Use pipeline-streams instead of intermediate files.", false);
-    parser.AddFlag<FlagType::String>("working-dir", "Set the working directory of the assembler.", std::filesystem::current_path());
+    parser.AddFlag<FlagType::String>("working-dir", "Set the working directory of the assembler.", std::filesystem::current_path().generic_string());
     parser.AddFlag<FlagType::StringList>("redirect-stdout", "Redirect stdout and stderr to given files. If only one is provided, both get redirected to it.");
 
     parser.BindFlag("h", "help");

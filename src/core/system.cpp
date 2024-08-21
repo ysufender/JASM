@@ -115,12 +115,12 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
 std::ifstream System::OpenInFile(const std::filesystem::path& path, const std::ios::openmode mode)
 {
     if (!std::filesystem::exists(path))
-        LOGE(LogLevel::High, "The file at path '", path, "' does not exist.");
+        LOGE(LogLevel::High, "The file at path '", path.generic_string(), "' does not exist.");
 
     std::ifstream file { path, mode };
 
     if (file.fail() || file.bad() || !file.is_open())
-        LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
+        LOGE(LogLevel::High, "An error occured while opening the file '", path.generic_string(), "'.");
 
     return file;
 }
@@ -128,12 +128,12 @@ std::ifstream System::OpenInFile(const std::filesystem::path& path, const std::i
 std::ofstream System::OpenOutFile(const std::filesystem::path& path, const std::ios::openmode mode)
 {
     if (std::filesystem::exists(path))
-        LOGW("A file at path '", path, "' already exists. Overwriting...");
+        LOGW("A file at path '", path.generic_string(), "' already exists. Overwriting...");
 
     std::ofstream file { path, mode };
 
     if (file.fail() || file.bad() || !file.is_open())
-        LOGE(LogLevel::High, "An error occured while opening the file '", path, "'.");
+        LOGE(LogLevel::High, "An error occured while opening the file '", path.generic_string(), "'.");
 
     return file;
 }

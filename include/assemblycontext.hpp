@@ -25,10 +25,12 @@ class AssemblyContext
         std::vector<std::string> _inputFiles;
         std::vector<std::string> _libraries;
 
+        std::string_view _workingDirStr;
+        
+        // I know it's a bad practice but...
         mutable std::string _contextString;
 
     public:
-        // silent, single, out, libType, in, libs
         AssemblyContext(
             bool silent,
             bool single, 

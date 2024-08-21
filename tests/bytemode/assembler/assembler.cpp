@@ -36,7 +36,7 @@ TEST_CASE("Assembler Tests")
             0x07,
             0x10, 0x08, 0x09,
             0x0A,
-            0x11, 0x08
+            0x0E, 0x0F, 0x00, 0x00, 0x00, 0x08 
         };
 
         using BAsm = typename ByteAssembler::ByteAssembler;
