@@ -33,7 +33,6 @@ AssemblyContext::AssemblyContext(
     _libraries = libs;
 
     _workingDir = (workingDir.empty() ? std::filesystem::current_path() : workingDir);
-    _workingDirStr = _workingDir.generic_string();
 
     std::stringstream ss;
 
@@ -56,7 +55,7 @@ bool AssemblyContext::IsUsingPipelines() const { return _pipelines; }
 bool AssemblyContext::IsLib() const { return _isLib; }
 std::string_view AssemblyContext::OutFile() const { return _outFile; }
 LibTypeEnum AssemblyContext::LibType() const { return _libType; }
-std::string_view AssemblyContext::WorkingDir() const { return _workingDirStr; }
+const std::filesystem::path& AssemblyContext::WorkingDir() const { return _workingDir; }
 const std::vector<std::string>& AssemblyContext::InputFiles() const { return _inputFiles; }
 const std::vector<std::string>& AssemblyContext::Libraries() const { return _libraries; }
 

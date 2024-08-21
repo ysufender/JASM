@@ -25,8 +25,6 @@ class AssemblyContext
         std::vector<std::string> _inputFiles;
         std::vector<std::string> _libraries;
 
-        std::string_view _workingDirStr;
-        
         // I know it's a bad practice but...
         mutable std::string _contextString;
 
@@ -53,7 +51,7 @@ class AssemblyContext
         bool IsLib() const;
         std::string_view OutFile() const;
         LibTypeEnum LibType() const;
-        std::string_view WorkingDir() const;
+        const std::filesystem::path& WorkingDir() const;
         const std::vector<std::string>& InputFiles() const;
         const std::vector<std::string>& Libraries() const;
 

@@ -3,12 +3,23 @@ param(
     [switch]$generate
 )
 
+$ErrorActionPreference='Stop'
+
 if ($refresh) {
+    echo "[BUILD_SCRIPT] Cleaning the build directory..."
     rm -r -Force build
 }
 
-cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug
-
-if (-not $generate) {
-    cmake --build build
+if (Test-Path "build/Debug") {
+    echo "[BUILD_SCRIPT] Already generated."
+} else {
+    echo "[BUILD_SCRIPT] Generating build files..."
+    cmake --preset Debug
 }
+
+if ($generate) {
+    echo "[BUILD_SCRIPT] Generate-only mode."
+    exit
+}
+
+cmake --build build --preset Debug

@@ -42,10 +42,13 @@ TEST_CASE("Assembler Tests")
         using BAsm = typename ByteAssembler::ByteAssembler;
         BAsm assembler;
         BAsm::AssemblyInfoCollection collection = assembler.Assemble();
-        std::ifstream resultStream { System::Context.InputFiles().at(0), std::ios::binary};
+        std::filesystem::path resPath { System::Context.InputFiles().at(0) };
+        resPath.replace_extension(".jo");
+        std::ifstream resultStream { resPath, std::ios::binary};
 
         resultStream.read(resultBytes, 13);
+        // To see the differences in case of fail
         for (int i = 0; i < 13; i++)
-            CHECK(resultBytes[i] == desiredOutput[i]);
+            CHECK((int)resultBytes[i] == (int)desiredOutput[i]);
     }
 }
