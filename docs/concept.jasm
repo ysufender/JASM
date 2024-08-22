@@ -44,12 +44,21 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
 
         mov &eax &ebx       #copy eax to ebx# 
         mov 156 &eax        #set eax to 156. No flags for numeric type because eax is fixed size
-                            So the constant value is always treated as 32-bit integer or float
-                            (depending on the existence of '.' symbol)#
-        mov &ecx            #Same as above. But from the stack#
+                                So the constant value is always treated as 32-bit integer or float
+                                (depending on the existence of '.' symbol)#
+        mov %i &ecx            #Same as above. But from the stack#
 
         #you might use stc %i symbol and then mov %i# #mov someVal &edx# #maybe#    #set edx to the data at symbol someVal# 
         #for now, its the same as ldc#
+
+        add %i                  #pop two integers from stack, add them then push the result to stack#
+        addr %f %ebx %ecx       #add the two floats in ebx and ecx set eax to result#
+        addr %b %bl %cl         #add two bytes in bl and cl set al to result#
+        adds %i                 #adds the two integer at the top of stack, DO NOT POP, push the result#
+
+        mcp                     #copy the heap starting at &eax to &ebx with the size of &ecx#
+        scp                     #copy the stack starting at &eax to &ebx with the size of &ecx#
+        rcp someSymbol          #copy the stack starting at &eax to given symbol with the size of &ebx#
 .end
 
 This place is completely discarded, no matter what. The assembler stops reading at .end

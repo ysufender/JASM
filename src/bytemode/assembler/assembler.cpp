@@ -30,9 +30,13 @@ namespace ByteAssembler
         {"stc", &Instructions::StoreConstant},
         {"ldc", &Instructions::LoadConstant}, 
         {"rda", &Instructions::ReadAddress},
-        {"mov", &Instructions::Move },
-        {"add", &Instructions::Add },
-        {"ads", &Instructions::AddSafe },
+        {"mov", &Instructions::Move},
+        {"add", &Instructions::Add},
+        {"addr", &Instructions::AddRegister},
+        {"adds", &Instructions::AddSafe},
+        {"hcp", &Instructions::HeapCopy},
+        {"scp", &Instructions::StackCopy},
+        {"rcp", &Instructions::RomCopy},
     };
 
 
@@ -104,7 +108,7 @@ namespace ByteAssembler
             else if (token == "EOF")
                 LOGE(System::LogLevel::High, "Expected '.end' at the end of the file.");
             else
-                LOGE(System::LogLevel::High, "Couldn't find '", token, "' on inscturcion map.");
+                LOGE(System::LogLevel::High, "Couldn't find '", token, "' on instruction map.");
 
             token = Stream::Tokenize(sourceFile);
         }
@@ -116,7 +120,7 @@ namespace ByteAssembler
     {
         // Setup
         std::filesystem::path outPath { file };
-        outPath.replace_extension(".jo");
+        outPath.concat(".jo");
         char outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
 
         if (std::filesystem::exists(outPath))
@@ -194,7 +198,7 @@ namespace ByteAssembler
     AssemblyInfo ByteAssembler::AssembleLibrary(const std::filesystem::path& file)
     {
         std::filesystem::path outPath { file };
-        outPath.replace_extension(".jo");
+        outPath.concat(".jo");
         char outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo };
 
         if (std::filesystem::exists(outPath))

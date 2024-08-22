@@ -45,7 +45,7 @@ TEST_CASE("Assembly Context Tests")
             CHECK_FALSE(context.IsLib());
             CHECK_FALSE(context.IsSilent());
             CHECK(context.IsSingle());
-            CHECK(context.WorkingDir() == std::filesystem::current_path());
+            CHECK(context.WorkingDir() == std::filesystem::current_path().generic_string());
             CHECK(context.Libraries().size() == 1);
             CHECK(context.InputFiles().size() == 2);
 

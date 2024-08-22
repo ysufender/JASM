@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <ios>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>

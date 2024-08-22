@@ -45,17 +45,32 @@ namespace Instructions
         ENUMERC addi    = 0x14; 
         ENUMERC addf    = 0x15; 
         ENUMERC addb    = 0x16; 
+
+        // addr
+        ENUMERC addri   = 0x17;
+        ENUMERC addrf   = 0x18;
+        ENUMERC addrb   = 0x19;
+
+        // addr
+        ENUMERC addsi   = 0x1A;
+        ENUMERC addsf   = 0x1B;
+        ENUMERC addsb   = 0x1C;
+
+        // hcp - scp - rcp
+        ENUMERC hcp     = 0x1D;
+        ENUMERC scp     = 0x1F;
+        ENUMERC rcp     = 0x20;
     }
 
-    inline void Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out)
-    {
-        Extensions::Serialization::SerializeInteger(OpCodes::nop, out);
-    }
-
+    void Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void StoreConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void LoadConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void ReadAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void Move(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void Add(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    void AddRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     void AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    void HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    void StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    void RomCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

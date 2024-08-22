@@ -2,6 +2,9 @@
 #include <cassert>
 #include <cctype>
 #include <concepts>
+#include <fstream>
+#include <ios>
+#include <istream>
 #include <ostream>
 #include <string>
 #include <iostream>
@@ -79,6 +82,13 @@ namespace Instructions
     //
     // Implementation
     //
+    //
+    void Nop(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // nop
+        Extensions::Serialization::SerializeInteger(OpCodes::nop, out);
+    }
+
     void StoreConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // stc <mode> <value>
@@ -250,7 +260,54 @@ namespace Instructions
         _BoringNumSwitch(mode, out, {OpCodes::addi, OpCodes::addf, OpCodes::addb});
     }
 
+    void AddRegister(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // addr <mode> <register> <register>
+        
+        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+        const char reg1 { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+        const char reg2 { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+
+        _BoringNumSwitch(mode, out, {OpCodes::addri, OpCodes::addrf, OpCodes::addrb});
+        Serialization::SerializeInteger(reg1, out);
+        Serialization::SerializeInteger(reg2, out);
+    }
+    
     void AddSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
+        // adds <mode>
+
+        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+        _BoringNumSwitch(mode, out, {OpCodes::addsi, OpCodes::addsf, OpCodes::addsb});
+    }
+
+    void HeapCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // hcp
+        Serialization::SerializeInteger(OpCodes::hcp, out);
+    }
+
+    void StackCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // scp
+        Serialization::SerializeInteger(OpCodes::scp, out);
+    }
+
+    void RomCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // rcp <symbol>
+        Serialization::SerializeInteger(OpCodes::rcp, out);
+
+        const std::string symbol { Stream::Tokenize(in) };
+        size_t symHash = String::Hash(symbol);
+
+        if (info.symbolMap.contains(symHash))
+            Serialization::SerializeInteger(symHash, out);
+        else
+        {
+            StreamPos(out);
+            info.AddUnknownSymbol(symbol, addr);
+            Serialization::SerializeInteger<uint32_t>(0x00, out);
+        }
     }
 }

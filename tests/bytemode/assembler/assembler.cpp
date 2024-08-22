@@ -6,6 +6,9 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include "bytemode/assembler/assembler.hpp"
+#include "bytemode/assembler/instructions.hpp"
+#include "bytemode/assembler/modeflags.hpp"
+#include "catch2/internal/catch_source_line_info.hpp"
 #include "system.hpp"
 
 TEST_CASE("Assembler Tests")
@@ -30,25 +33,35 @@ TEST_CASE("Assembler Tests")
     {
         CHECK(System::Context.IsLib());
 
-        char resultBytes[13] { };
-        constexpr char desiredOutput[] {
-            0x01, 0x0F, 0x00, 0x00, 0x00,
-            0x07,
-            0x10, 0x08, 0x09,
-            0x0A,
-            0x0E, 0x0F, 0x00, 0x00, 0x00, 0x08 
+        namespace op = Instructions::OpCodes;
+        namespace reg = ModeFlags::RegisterModeFlags;
+
+        constexpr char desiredBytes[] {
+            op::sti, 0x0F, 0x00, 0x00, 0x00,
+            op::ldi,
+            op::movr, reg::eax, reg::ebx,
+            op::rdi,
+            op::movc, 0x0F, 0x00, 0x00, 0x00, reg::eax,
+            op::addf,
+            op::addrf, reg::ebx, reg::ecx,
+            op::addsb,
+            op::hcp,
+            op::scp,
+            op::rcp, 0x0A
         };
+        char resultBytes[sizeof(desiredBytes)] { };
 
         using BAsm = typename ByteAssembler::ByteAssembler;
         BAsm assembler;
         BAsm::AssemblyInfoCollection collection = assembler.Assemble();
         std::filesystem::path resPath { System::Context.InputFiles().at(0) };
-        resPath.replace_extension(".jo");
+        resPath.concat(".jo");
         std::ifstream resultStream { resPath, std::ios::binary};
 
-        resultStream.read(resultBytes, 13);
+        resultStream.read(resultBytes, sizeof(desiredBytes));
+
         // To see the differences in case of fail
-        for (int i = 0; i < 13; i++)
-            CHECK((int)resultBytes[i] == (int)desiredOutput[i]);
+        for (int i = 0; i < sizeof(desiredBytes); i++)
+            CHECK((int)desiredBytes[i] == (int)resultBytes[i]);
     }
 }
