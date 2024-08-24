@@ -37,6 +37,18 @@ namespace ByteAssembler
         {"hcp", &Instructions::HeapCopy},
         {"scp", &Instructions::StackCopy},
         //{"rcp", &Instructions::RomCopy},
+        {"inc", &Instructions::IncrementStack},
+        {"incr", &Instructions::IncrementRegister},
+        {"incs", &Instructions::IncrementSafe},
+        {"dcr", &Instructions::DecrementStack},
+        {"dcrr", &Instructions::DecrementRegister},
+        {"dcrs", &Instructions::DecrementSafe},
+        {"and", &Instructions::AndStack},
+        {"andr", &Instructions::AndRegister},
+        {"or", &Instructions::OrStack},
+        {"orrr", &Instructions::OrRegister},
+        {"nor", &Instructions::NorStack},
+        {"norr", &Instructions::NorRegister},
     };
 
     //

@@ -17,7 +17,7 @@ TEST_CASE("Instructions Tests")
             true,
             "", 
             "stc", 
-            "asm/",
+            "",
             { "test.jasm" }, 
             { }
         },

@@ -14,4 +14,24 @@
     adds %b
     hcp
     scp
+
+    inc %i 15
+    inc %f 15
+    inc %b 15
+
+    incr &eax 15 
+
+    incs %i 15 
+    incs %f 15 
+    incs %b 15 
+
+    inc %i 15
+    inc %f 15
+    inc %b 15
+
+    incr &eax 15 
+
+    incs %i 15 
+    incs %f 15 
+    incs %b 15 
 .end
