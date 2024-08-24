@@ -23,32 +23,38 @@ Note: words inside paranthesis "()" are optional
 
 [x] mov;    ----;
 [x] movc;   0x0E;   set register to given constant value
-~[?] movs;   0x0F;   set register to given value of symbol~
+[x] movs;   0x0F;   set register to the value at the top of the stack (based on register size)
 [x] movr;   0x10;   set register to given register
-[x] movi;   0x11;   set register to the (u)int at top of the stack
-[x] movf;   0x12;   set register to the float at top of the stack
-[x] movb;   0x13;   set register to the (u)byte at top of the stack
 
 [x] add;    ----;
-[x] addi;   0x14;   pop and add two integers from stack. push the result. 
-[x] addf;   0x15;   pop and add two floats from stack. push the result. 
-[x] addb;   0x16;   pop and add two bytes from stack. push the result. 
+[x] addi;   0x11;   pop and add two (u)ints from stack. push the result. 
+[x] addf;   0x12;   pop and add two floats from stack. push the result. 
+[x] addb;   0x13;   pop and add two (u)bytes from stack. push the result. 
 
 [x] addr;   ----;
-[x] addri;  0x17;   add the two (u)ints stored in given two registers and set &eax to result
-[x] addrf;  0x18;   add the two floats stored in given two registers and set &eax to result
-[x] addrb;  0x19;   add the two (u)bytes stored in given two registers and set &al to result
+[x] addri;  0x14;   add the two (u)ints stored in given two registers and set the second one to result
+[x] addrf;  0x15;   add the two floats stored in given two registers and set the second to result
+[x] addrb;  0x16;   add the two (u)bytes stored in given two registers and set the second one to result
 
 [x] adds;   ----;
-[x] addsi;  0x1A;   pop and add two integers from stack. DO NOT POP. push the result. 
-[x] addsf;  0x1B;   pop and add two floats from stack. DO NOT POP. push the result. 
-[x] addsb;  0x1C;   add two bytes on top of the stack. DO NOT POP. push the result. 
+[x] addsi;  0x17;   pop and add two (u)ints from stack. DO NOT POP. push the result. 
+[x] addsf;  0x18;   pop and add two floats from stack. DO NOT POP. push the result. 
+[x] addsb;  0x19;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[ ] hcp;    0x1D;   copy the heap starting at &eax to &ebx with the size of &ecx
-[ ] scp;    0x1F;   copy the stack starting at &eax to &ebx with the size of &ecx 
-[ ] rcp;    0x20;   copy the stack starting at &eax to given symbol with the size of &ebx 
+[x] hcp;    0x1A;   copy the heap starting at &eax to heap starting at &ebx with the size of &ecx
+[x] scp;    0x1B;   copy the stack starting at &eax to stack starting at &ebx with the size of &ecx 
+~[ ] rcp;    0x1C;   copy the stack starting at &eax to given symbol with the size of &ebx~
+
+% The increments are not by one but by a given constant. Must be known at compile time.
 
 [ ] inc;    ----;
-[ ] inci;   0x21;   increment the (u)int at the top of the stack
-[ ] incf;   0x22;   increment the float at the top of the stack
-[ ] incb;   0x23;   increment the (u)byte at the top of the stack
+[ ] inci;   0x1D;   increment the (u)int at the top of the stack
+[ ] incf;   0x1E;   increment the float at the top of the stack
+[ ] incb;   0x1F;   increment the (u)byte at the top of the stack
+
+[ ] incr;   0x20;   increment the register
+
+[ ] incs;   ----;   
+[ ] incsi;  0x21;   increment the (u)int at the top of the stack, don't modify but push
+[ ] incsf;  0x22;   increment the (u)int at the top of the stack, don't modify but push
+[ ] incsb;  0x23;   increment the (u)int at the top of the stack, don't modify but push

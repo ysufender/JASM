@@ -5,13 +5,13 @@
     mov &eax &ebx   #move eax to ebx#
     rda %i          #read the int at address &ebx and store it on stack#
 
-    somelbl:
+    somelbl: #some data here#
 
     mov 15 &eax     #move constant 15 to eax#
+    mov &edx
     add %f
     addr %f &ebx &ecx
     adds %b
     hcp
     scp
-    rcp somelbl
 .end

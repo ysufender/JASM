@@ -3,17 +3,13 @@ eax;    uint32;     stores return values and returned pointers
 ebx;    uint32;     general purpose. main purpose is storing addresses
 ecx;    uint32;     general purpose. 
 edx;    uint32;     general purpose. 
-efx;    uint32;     general purpose. 
-egx;    uint32;     general purpose. 
-ehx;    uint32;     general purpose. 
+esi;    uint32;     general purpose. 
+edi;    uint32;     general purpose. 
 
 al;     uint8;      stores return values. might be used for temporal bytes and bools.
 bl;     uint8;      general purpose. might be used for temporal bytes and bools.
 cl;     uint8;      general purpose. might be used for temporal bytes and bools.
 dl;     uint8;      general purpose. might be used for temporal bytes and bools.
-fl;     uint8;      general purpose. might be used for temporal bytes and bools.
-gl;     uint8;      general purpose. might be used for temporal bytes and bools.
-hl;     uint8;      general purpose. might be used for temporal bytes and bools.
 
 PC;     uint32;     Program Counter. 
 SP;     uint32;     Stack Poiner. 

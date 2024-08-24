@@ -3,6 +3,7 @@
 
 #include "catch2/catch_all.hpp"
 
+#include "catch2/catch_test_macros.hpp"
 #include "extensions/streamextensions.hpp"
 
 TEST_CASE("Stream Extensions Tests")
@@ -17,8 +18,12 @@ TEST_CASE("Stream Extensions Tests")
     std::istream in { ss.rdbuf() };
 
     const std::array<std::string, 7> desiredTokens {
-        "fn", "main(args,", "argc)", "{",
-        "print('Test", "Stream');",
+        "fn", 
+        "main(args,", 
+        "argc)", 
+        "{",
+        "print('Test", 
+        "Stream');",
         "}"
     };
 
@@ -34,4 +39,3 @@ TEST_CASE("Stream Extensions Tests")
         CHECK(Tokenize(in) == "EOF");
     }
 }
-

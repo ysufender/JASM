@@ -33,7 +33,7 @@ namespace Extensions::String
         }
         
         vec.push_back(ss.str());
-        return std::move(vec);
+        return vec;
     }
 
     std::string Concat(const std::vector<std::string>& strings)
@@ -46,7 +46,7 @@ namespace Extensions::String
         std::stringstream ss;
         for (const auto& str : strings)
             ss << str;
-        return std::move(ss.str());
+        return ss.str();
     }
 
     std::string Join(const std::vector<std::string>& strings, char delimiter)
@@ -64,7 +64,7 @@ namespace Extensions::String
                 ss << delimiter;
         }
 
-        return std::move(ss.str());
+        return ss.str();
     }
 
     size_t Hash(const std::string& str)

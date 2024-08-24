@@ -5,9 +5,9 @@
 
 #include "system.hpp"
 
-#define StreamPos(stream) \
-    std::streamoff addr { stream.tellp() }; \
-    if (addr == -1) LOGE(System::LogLevel::High, "Couldn't get the position of stream.");
+#define StreamPos(stream, varName) \
+    std::streamoff varName { stream.tellp() }; \
+    if (varName == -1) LOGE(System::LogLevel::High, "Couldn't get the position of stream.");
 
 namespace Extensions::Stream
 {

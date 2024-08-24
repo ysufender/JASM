@@ -6,37 +6,39 @@
 
 namespace ModeFlags
 {
-    ENUMER char NoMode = 0x00;
+    ENUMERC NoMode = 0x00;
 
     namespace NumericModeFlags 
     {
-        ENUMER char Int         = 0x01;
-        ENUMER char Float       = 0x02;
-        ENUMER char Byte        = 0x03;
-        ENUMER char UInt        = 0x04;
-        ENUMER char UByte       = 0x05;
+        ENUMERC Int         = 0x01;
+        ENUMERC Float       = 0x02;
+        ENUMERC Byte        = 0x03;
+        ENUMERC UInt        = 0x04;
+        ENUMERC UByte       = 0x05;
     }
 
     namespace RegisterModeFlags
     {
         // 32-bit
-        ENUMER char eax         = 0x08;
-        ENUMER char ebx         = 0x09;
-        ENUMER char ecx         = 0x0A;
-        ENUMER char edx         = 0x0B;
+        ENUMERC eax         = 0x08;
+        ENUMERC ebx         = 0x09;
+        ENUMERC ecx         = 0x0A;
+        ENUMERC edx         = 0x0B;
+        ENUMERC esi         = 0x0C;
+        ENUMERC edi         = 0x0D;
 
         // 8-bit
-        ENUMER char al          = 0x0C;
-        ENUMER char bl          = 0x0D;
-        ENUMER char cl          = 0x0E;
-        ENUMER char dl          = 0x0F;
+        ENUMERC al          = 0x0E;
+        ENUMERC bl          = 0x0F;
+        ENUMERC cl          = 0x10;
+        ENUMERC dl          = 0x11;
 
         // 8-bit system
-        ENUMER char FLG         = 0x10;
+        ENUMERC flg         = 0x12;
 
         // 32-bit system
-        ENUMER char PC          = 0x11;
-        ENUMER char SP          = 0x12;
+        ENUMERC pc          = 0x13;
+        ENUMERC sp          = 0x14;
     }
 
     char GetModeFlag(const std::string& identifier, bool throws = false); 

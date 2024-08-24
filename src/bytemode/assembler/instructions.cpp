@@ -6,6 +6,7 @@
 #include <ios>
 #include <istream>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <iostream>
 
@@ -15,6 +16,7 @@
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
 #include "extensions/stringextensions.hpp"
+#include "extensions/syntaxextensions.hpp"
 #include "system.hpp"
 
 
@@ -42,7 +44,7 @@ namespace Instructions
         }
         catch (const std::exception& e)
         {
-            LOGE(System::LogLevel::High, "Token: ", token);
+            LOGE(System::LogLevel::High, "Couldn't convert '", token, "' to '", typeid(T).name(), "'");
             return static_cast<T>(0);
         }
     }
@@ -50,11 +52,11 @@ namespace Instructions
 
     // I don't care about anything, I just don't want to write this
     // thing again and again
-    void _BoringNumSwitch(const char modeFlag, std::ostream& out, std::array<char, 3> op, std::array<std::function<void()>, 3> callbacks = {})
+    void _BoringModeSwitch(const char mode, std::ostream& out, std::array<char, 3> op, std::array<std::function<void()>, 3> callbacks = {})
     {
         namespace NModes = ModeFlags::NumericModeFlags;
 
-        switch (modeFlag)
+        switch (mode)
         {
             case NModes::UInt: 
             case NModes::Int: 
@@ -74,7 +76,7 @@ namespace Instructions
                 break;
 
             default:
-                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(modeFlag), "'");
+                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "'");
                 break;
         }
     }
@@ -83,13 +85,14 @@ namespace Instructions
     // Implementation
     //
     //
-    void Nop(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string Nop(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // nop
         Extensions::Serialization::SerializeInteger(OpCodes::nop, out);
+        return Stream::Tokenize(in);
     }
 
-    void StoreConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string StoreConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // stc <mode> <value>
         // stc <mode> <symbol>
@@ -97,21 +100,21 @@ namespace Instructions
         // stc <integer>
 
         const std::string next { Stream::Tokenize(in) };
-        const char modeFlag { ModeFlags::GetModeFlag(next) };
+        const char fromReg { ModeFlags::GetModeFlag(next) };
 
         // Store integer or float
-        if (modeFlag == ModeFlags::NoMode)
+        if (fromReg == ModeFlags::NoMode)
         {
             namespace NMode = ModeFlags::NumericModeFlags;
 
             const char fakeFlag { next.find_first_of('.' == std::string::npos) ? NMode::Int : NMode::Float };
 
-            _BoringNumSwitch(fakeFlag, out, {OpCodes::sti, OpCodes::stf, 0x00}, {
+            _BoringModeSwitch(fakeFlag, out, {OpCodes::sti, OpCodes::stf, OpCodes::nop}, {
                 [&next, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(next), out);},
                 [&next, &out](){Serialization::SerializeFloat(std::stof(next), out);}
             });
 
-            return;
+            return Stream::Tokenize(in);
         }
 
         const std::string symOrVal { Stream::Tokenize(in) };
@@ -120,20 +123,18 @@ namespace Instructions
         // stc $<i/f/b> <value>
         if (std::isdigit(symOrVal.at(0)))
         {
-            _BoringNumSwitch(modeFlag, out, {OpCodes::sti, OpCodes::stf, OpCodes::stb}, {
+            _BoringModeSwitch(fromReg, out, {OpCodes::sti, OpCodes::stf, OpCodes::stb}, {
                 [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(symOrVal), out); },
                 [&symOrVal, &out](){Serialization::SerializeFloat(std::stof(symOrVal), out); },
                 [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<char>(symOrVal), out); },
             });
-            return;
+            return Stream::Tokenize(in);
         }
             
-
         // Store symbol by mode
-        _BoringNumSwitch(modeFlag, out, {OpCodes::stis, OpCodes::stfs, OpCodes::stbs});
+        _BoringModeSwitch(fromReg, out, {OpCodes::stis, OpCodes::stfs, OpCodes::stbs});
 
         size_t symbolHash { String::Hash(symOrVal) };
-
         if (!info.symbolMap.contains(symbolHash)) 
         {
             info.unknownSymbols.push_back({symbolHash, static_cast<systembit_t>(out.tellp())});
@@ -141,126 +142,112 @@ namespace Instructions
         }
         else 
             Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+
+        return Stream::Tokenize(in);
     }
 
-    void LoadConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string LoadConstant(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // ldc <mode>
         const std::string next { Stream::Tokenize(in) };
-        const char modeFlag { ModeFlags::GetModeFlag(next) };
+        const char fromReg { ModeFlags::GetModeFlag(next) };
 
-        _BoringNumSwitch(modeFlag, out, {OpCodes::ldi, OpCodes::ldf, OpCodes::ldb}, { });
+        _BoringModeSwitch(fromReg, out, {OpCodes::ldi, OpCodes::ldf, OpCodes::ldb}, { });
+
+        return Stream::Tokenize(in);
     }
 
-    void ReadAddress(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string ReadAddress(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // rda <register>
         // rda <mode>
 
         const std::string next { Stream::Tokenize(in) };
-        char modeFlag { ModeFlags::GetRegisterModeFlag(next) };
+        char fromReg { ModeFlags::GetRegisterModeFlag(next) };
         
         // rda <mode> [read the address &ebx]
-        if (modeFlag == ModeFlags::NoMode)
+        if (fromReg == ModeFlags::NoMode)
         {
-            modeFlag = ModeFlags::GetModeFlag(next);
-            //_BoringNumSwitch(modeFlag, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
-            _BoringNumSwitch(modeFlag, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
-            return;
+            fromReg = ModeFlags::GetModeFlag(next);
+            _BoringModeSwitch(fromReg, out, {OpCodes::rdi, OpCodes::rdf, OpCodes::rdb});
+            return Stream::Tokenize(in);
         }
 
         // rda <register> [read the given register]
         const char regMode { ModeFlags::GetRegisterModeFlag(next) };
         Serialization::SerializeInteger(OpCodes::rdr, out);
         Serialization::SerializeInteger(regMode, out);
+
+        return Stream::Tokenize(in);
     }
 
-    void Move(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string Move(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // mov <register> [from stack]
         // mov <register> <register> [from register]
         // mov <value> <register> [from constant]
 
-        const std::string next { Stream::Tokenize(in) };
-        char modeFlag { ModeFlags::GetModeFlag(next) };
+        const std::string firstParam { Stream::Tokenize(in) };
+        const std::string secondParam { Stream::Tokenize(in) };
+        const char firstReg { ModeFlags::GetRegisterModeFlag(firstParam) };
+        const char secondReg { ModeFlags::GetRegisterModeFlag(secondParam) };
 
         // move from stack
-        if (modeFlag != ModeFlags::NoMode)
+        if (secondReg == ModeFlags::NoMode)
         {
-            const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
-            _BoringNumSwitch(modeFlag, out, {OpCodes::movi, OpCodes::movf, OpCodes::movb});
-            Serialization::SerializeInteger(regMode, out);
-            return;
+            //const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+            //_BoringNumSwitch(fromReg, out, {OpCodes::movi, OpCodes::movf, OpCodes::movb});
+            Serialization::SerializeInteger(OpCodes::movs, out);
+            Serialization::SerializeInteger(firstReg, out);
+            return secondParam;
         }
-
 
         // move from register
-        modeFlag = ModeFlags::GetRegisterModeFlag(next);;
-        if (modeFlag != ModeFlags::NoMode)
+        if (firstReg != ModeFlags::NoMode)
         {
-            char fromReg { modeFlag };
-            const std::string regToken { Stream::Tokenize(in) };
-            const char toReg { ModeFlags::GetRegisterModeFlag(regToken, true) };; 
-
             Serialization::SerializeInteger(OpCodes::movr, out); 
-            Serialization::SerializeInteger(fromReg, out);
-            Serialization::SerializeInteger(toReg, out);
-            return;
+            Serialization::SerializeInteger(firstReg, out);
+            Serialization::SerializeInteger(secondReg, out);
+            return Stream::Tokenize(in);
         }
-
-        // move from symbol
-        //if (!std::isdigit(next.at(0)))
-        //{
-            // next = symbolName here
-            //const std::string regToken { Stream::Tokenize(in) };
-            //onst char regMode { ModeFlags::GetRegisterModeFlag(regToken, true) };
-            //systembit_t addr { info.symbolMap.contains(next) ? info.symbolMap.at(next) : 0 };
-            
-            //Serialization::SerializeInteger(OpCodes::movs, out);
-
-            //if (!info.symbolMap.contains(next))
-                //info.unknownSymbols.push_back({next, static_cast<systembit_t>(out.tellp())});
-
-            //Serialization::SerializeInteger(addr, out);
-            //Serialization::SerializeInteger(regMode, out);
-            //return;
-        //}
-
 
         // move constant
         // constant size check
         // next = value token here
         namespace Regs = ModeFlags::RegisterModeFlags;
-        const std::string regToken { Stream::Tokenize(in) };
-        const char regMode { ModeFlags::GetRegisterModeFlag(regToken, true) };
-        bool regIs8Bit { regMode >= Regs::al && regMode <= Regs::FLG };
+        const char regMode { ModeFlags::GetRegisterModeFlag(secondParam, true) };
+        bool regIs8Bit { regMode >= Regs::al && regMode <= Regs::flg };
 
         Serialization::SerializeInteger(OpCodes::movc, out);
 
-        if (next.find_first_of('.') == std::string::npos)
+        if (firstParam.find_first_of('.') == std::string::npos)
         {
             if (regIs8Bit)
-                Serialization::SerializeInteger(_TokenToInt<char>(next), out); 
+                Serialization::SerializeInteger(_TokenToInt<char>(firstParam), out); 
             else
-                Serialization::SerializeInteger(_TokenToInt<systembit_t>(next), out); 
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(firstParam), out); 
         }
         else if (!regIs8Bit)
-            Serialization::SerializeFloat(std::stof(next), out);
+            Serialization::SerializeFloat(std::stof(firstParam), out);
         else
-            LOGE(System::LogLevel::High, "Register '", regToken, "' is too small for float value '", next, "'");
+            LOGE(System::LogLevel::High, "Register '", secondParam, "' is too small for float value '", firstParam, "'");
 
         Serialization::SerializeInteger(regMode, out);
+
+        return Stream::Tokenize(in);
     }
 
-    void Add(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string AddStack(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // add <mode>
         
         const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-        _BoringNumSwitch(mode, out, {OpCodes::addi, OpCodes::addf, OpCodes::addb});
+        _BoringModeSwitch(mode, out, {OpCodes::addi, OpCodes::addf, OpCodes::addb});
+
+        return Stream::Tokenize(in);
     }
 
-    void AddRegister(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string AddRegister(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // addr <mode> <register> <register>
         
@@ -268,46 +255,104 @@ namespace Instructions
         const char reg1 { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
         const char reg2 { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
 
-        _BoringNumSwitch(mode, out, {OpCodes::addri, OpCodes::addrf, OpCodes::addrb});
+        _BoringModeSwitch(mode, out, {OpCodes::addri, OpCodes::addrf, OpCodes::addrb});
         Serialization::SerializeInteger(reg1, out);
         Serialization::SerializeInteger(reg2, out);
+
+        return Stream::Tokenize(in);
     }
     
-    void AddSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string AddSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // adds <mode>
 
         const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-        _BoringNumSwitch(mode, out, {OpCodes::addsi, OpCodes::addsf, OpCodes::addsb});
+        _BoringModeSwitch(mode, out, {OpCodes::addsi, OpCodes::addsf, OpCodes::addsb});
+
+        return Stream::Tokenize(in);
     }
 
-    void HeapCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string HeapCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // hcp
         Serialization::SerializeInteger(OpCodes::hcp, out);
+
+        return Stream::Tokenize(in);
     }
 
-    void StackCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    std::string StackCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // scp
         Serialization::SerializeInteger(OpCodes::scp, out);
+
+        return Stream::Tokenize(in);
     }
 
-    void RomCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    //std::string RomCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    //{
+        //// rcp <symbol>
+        //Serialization::SerializeInteger(OpCodes::rcp, out);
+
+        //const std::string symbol { Stream::Tokenize(in) };
+        //size_t symHash = String::Hash(symbol);
+
+        //if (info.symbolMap.contains(symHash))
+            //Serialization::SerializeInteger(info.symbolMap.at(symHash), out);
+        //else
+        //{
+            //StreamPos(out, addr);
+            //info.AddUnknownSymbol(symbol, addr);
+            //Serialization::SerializeInteger<uint32_t>(0x00, out);
+        //}
+
+        //return Stream::Tokenize(in);
+    //}
+
+    std::string IncrementStack(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // rcp <symbol>
-        Serialization::SerializeInteger(OpCodes::rcp, out);
+        // inc <mode> <value>
 
-        const std::string symbol { Stream::Tokenize(in) };
-        size_t symHash = String::Hash(symbol);
+        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
 
-        if (info.symbolMap.contains(symHash))
-            Serialization::SerializeInteger(symHash, out);
+        _BoringModeSwitch(mode, out, {OpCodes::inci, OpCodes::incf, OpCodes::incb}, {
+            [&in, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);},
+            [&in, &out](){Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);},
+            [&in, &out](){Serialization::SerializeInteger(_TokenToInt<char>(Stream::Tokenize(in)), out);}
+        });
+
+        return Stream::Tokenize(in);
+    }
+
+    std::string IncrementRegister(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // incr <register> <value>
+
+        const char mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+        Serialization::SerializeInteger(mode, out);
+
+        namespace Regs = ModeFlags::RegisterModeFlags;
+        bool regIs8Bit { mode >= Regs::al && mode <= Regs::flg };
+
+        if (regIs8Bit)
+            Serialization::SerializeInteger(_TokenToInt<char>(Stream::Tokenize(in)), out);
         else
-        {
-            StreamPos(out);
-            info.AddUnknownSymbol(symbol, addr);
-            Serialization::SerializeInteger<uint32_t>(0x00, out);
-        }
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+        
+        return Stream::Tokenize(in);
+    }
+
+    std::string IncrementSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // incs <mode> <value>
+
+        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+
+        _BoringModeSwitch(mode, out, {OpCodes::incsi, OpCodes::nop, OpCodes::incsb}, {
+            [&in, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);},
+            [&in, &out](){Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);},
+            [&in, &out](){Serialization::SerializeInteger(_TokenToInt<char>(Stream::Tokenize(in)), out);}
+        });
+
+        return Stream::Tokenize(in);
     }
 }

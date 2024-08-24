@@ -25,20 +25,19 @@ namespace ByteAssembler
     // It's better than a bunch of if-else statements
     // I think
     //
-    static const std::unordered_map<std::string, std::function<void(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
+    static const std::unordered_map<std::string, std::function<std::string(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
         {"nop", &Instructions::Nop},
         {"stc", &Instructions::StoreConstant},
         {"ldc", &Instructions::LoadConstant}, 
         {"rda", &Instructions::ReadAddress},
         {"mov", &Instructions::Move},
-        {"add", &Instructions::Add},
+        {"add", &Instructions::AddStack},
         {"addr", &Instructions::AddRegister},
         {"adds", &Instructions::AddSafe},
         {"hcp", &Instructions::HeapCopy},
         {"scp", &Instructions::StackCopy},
-        {"rcp", &Instructions::RomCopy},
+        //{"rcp", &Instructions::RomCopy},
     };
-
 
     //
     // Assembler Implementation
@@ -64,7 +63,7 @@ namespace ByteAssembler
             outputVector.push_back(AssembleLibrary(inputFile));
         }
 
-        return std::move(outputVector);
+        return outputVector;
     }
 
     AssemblyInfo& ByteAssembler::AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile)
@@ -99,18 +98,20 @@ namespace ByteAssembler
             if (token.back() == ':')
             {
                 token.pop_back();
-                systembit_t index { static_cast<systembit_t>(outFile.tellp()) }; 
-
+                StreamPos(outFile, index); 
                 assemblyInfo.AddSymbol(token, index);
+
+                token = Stream::Tokenize(sourceFile);
             }
             else if (instructionMap.contains(token))
-                instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
+                token = instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
             else if (token == "EOF")
                 LOGE(System::LogLevel::High, "Expected '.end' at the end of the file.");
             else
                 LOGE(System::LogLevel::High, "Couldn't find '", token, "' on instruction map.");
 
-            token = Stream::Tokenize(sourceFile);
+            // token = Stream::Tokenize(sourceFile);
+            // It's the Instructions's responsibility to get the next
         }
 
         return assemblyInfo;
@@ -187,12 +188,15 @@ namespace ByteAssembler
             Serialization::SerializeInteger(size, outFile);
         }
 
-        //AssembleCommon(assemblyInfo, sourceFile, outFile);
-        LOGW("AssembleCommon is not called for ", file.generic_string());
+        //LOGW("AssembleCommon is not called for ", file.generic_string());
+
+        AssembleCommon(assemblyInfo, sourceFile, outFile);
+        
+        LOGW("TODO: Serialize Assembly Info");
 
         sourceFile.close();
         outFile.close();
-        return std::move(assemblyInfo);
+        return assemblyInfo;
     }
 
     AssemblyInfo ByteAssembler::AssembleLibrary(const std::filesystem::path& file)
@@ -222,9 +226,7 @@ namespace ByteAssembler
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
 
-        // Since the process just ends after this.
-        //if (System::Context.IsSingle())
-        //assemblyInfo.Serialize(outFile);
+        LOGW("TODO: Serialize Assembly Info");
 
         sourceFile.close();
         outFile.close();

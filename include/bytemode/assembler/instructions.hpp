@@ -3,6 +3,7 @@
 #include <fstream>
 #include <istream>
 #include <ostream>
+#include <string>
 
 #include "extensions/serialization.hpp"
 #include "bytemode/assembler/assembler.hpp"
@@ -37,40 +38,53 @@ namespace Instructions
         ENUMERC movc    = 0x0E;
         ENUMERC movs    = 0x0F;
         ENUMERC movr    = 0x10;
-        ENUMERC movi    = 0x11;
-        ENUMERC movf    = 0x12;
-        ENUMERC movb    = 0x13;
 
         // add
-        ENUMERC addi    = 0x14; 
-        ENUMERC addf    = 0x15; 
-        ENUMERC addb    = 0x16; 
+        ENUMERC addi    = 0x11; 
+        ENUMERC addf    = 0x12; 
+        ENUMERC addb    = 0x13; 
 
         // addr
-        ENUMERC addri   = 0x17;
-        ENUMERC addrf   = 0x18;
-        ENUMERC addrb   = 0x19;
+        ENUMERC addri   = 0x14;
+        ENUMERC addrf   = 0x15;
+        ENUMERC addrb   = 0x16;
 
         // addr
-        ENUMERC addsi   = 0x1A;
-        ENUMERC addsf   = 0x1B;
-        ENUMERC addsb   = 0x1C;
+        ENUMERC addsi   = 0x17;
+        ENUMERC addsf   = 0x18;
+        ENUMERC addsb   = 0x19;
 
         // hcp - scp - rcp
-        ENUMERC hcp     = 0x1D;
-        ENUMERC scp     = 0x1F;
-        ENUMERC rcp     = 0x20;
+        ENUMERC hcp     = 0x1A;
+        ENUMERC scp     = 0x1B;
+        //ENUMERC rcp     = 0x1C;
+
+        // inc
+        ENUMERC inci    = 0x1D;
+        ENUMERC incf    = 0x1E;
+        ENUMERC incb    = 0x1F;
+        
+        // incr
+        ENUMERC incr    = 0x20;
+
+        // incs
+        ENUMERC incsi    = 0x21;
+        ENUMERC incsf    = 0x22;
+        ENUMERC incsb    = 0x23;
     }
 
-    void Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void StoreConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void LoadConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void ReadAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void Move(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void Add(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void AddRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    void RomCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string StoreConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string LoadConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string ReadAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Move(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string AddStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string AddRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string RomCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string IncrementStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string IncrementRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string IncrementSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

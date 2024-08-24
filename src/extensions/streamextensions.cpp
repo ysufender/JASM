@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstdlib>
+#include <deque>
 #include <ios>
 #include <istream>
 #include <sstream>

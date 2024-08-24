@@ -18,6 +18,8 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
 
     #Saying that we need the following shared library in this code#
     imp SomeSharedLib
+.data
+    #this section contains read-only#
 .body
     #Contains the actual program instructions.#
 
@@ -33,7 +35,7 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
         stc %b 15           #pushes byte to stack. You always have to state that the constant is a byte#
         stc %i someData     #pushes integer from given symbol to stack#
 
-        ldc %i      #copies and stores the integer at the top of the stack and sets the &eax to address#
+        ldc %i      #copies and stores the integer at the top of the stack on heap and sets the &eax to address#
         ldc %f
         ldc %b
 
@@ -46,7 +48,7 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
         mov 156 &eax        #set eax to 156. No flags for numeric type because eax is fixed size
                                 So the constant value is always treated as 32-bit integer or float
                                 (depending on the existence of '.' symbol)#
-        mov %i &ecx            #Same as above. But from the stack#
+        mov &ecx            #reads 32 or 8 bits from the stack, based on the size of the register#
 
         #you might use stc %i symbol and then mov %i# #mov someVal &edx# #maybe#    #set edx to the data at symbol someVal# 
         #for now, its the same as ldc#
