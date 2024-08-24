@@ -1,5 +1,11 @@
 ## TODO
 
+### Redesigns
+
+- I made a bunch of instructions available to user. Might just reduce it and use modeflags
+instead. Also might just reduce function count (the implementations in instructions.cpp)
+But for now it's also good for unit tests.
+
 ### The ISA
 
 - [x] Stack Manipulation
@@ -32,19 +38,19 @@
         - [x] Increment the value on stack
         - [x] Increment the value on stack, and push it
         - [x] Increment a register (no floats)
-    - [ ] Decrement
-        - [ ] Decrement the value on stack
-        - [ ] Decrement the value on stack, and push it
-        - [ ] Decrement a register (no floats)
-    - [ ] And
-        - [ ] On stack, push the result
-        - [ ] On registers, set the second
-    - [ ] Or 
-        - [ ] On stack, push the result
-        - [ ] On registers, set the second
-    - [ ] Nor 
-        - [ ] On stack, push the result
-        - [ ] On registers, set the second
+    - [x] Decrement
+        - [x] Decrement the value on stack
+        - [x] Decrement the value on stack, and push it
+        - [x] Decrement a register (no floats)
+    - [x] And
+        - [x] On stack, push the result
+        - [x] On registers, set the second
+    - [x] Or 
+        - [x] On stack, push the result
+        - [x] On registers, set the second
+    - [x] Nor 
+        - [x] On stack, push the result
+        - [x] On registers, set the second
     - [ ] Negation
         - [ ] On stack
         - [ ] On stack, push the result
