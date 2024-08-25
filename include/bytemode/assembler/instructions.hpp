@@ -44,13 +44,11 @@ namespace Instructions
         ENUMERC addi    = 0x11; 
         ENUMERC addf    = 0x12; 
         ENUMERC addb    = 0x13; 
-
-        // addr
         ENUMERC addri   = 0x14;
         ENUMERC addrf   = 0x15;
         ENUMERC addrb   = 0x16;
 
-        // addr
+        // adds
         ENUMERC addsi   = 0x17;
         ENUMERC addsf   = 0x18;
         ENUMERC addsb   = 0x19;
@@ -65,33 +63,37 @@ namespace Instructions
         ENUMERC incf    = 0x1E;
         ENUMERC incb    = 0x1F;
         // incr
-        ENUMERC incr    = 0x20;
+        ENUMERC incri   = 0x20;
+        ENUMERC incrf   = 0x21;
+        ENUMERC incrb   = 0x22;
         // incs
-        ENUMERC incsi   = 0x21;
-        ENUMERC incsf   = 0x22;
-        ENUMERC incsb   = 0x23;
+        ENUMERC incsi   = 0x23;
+        ENUMERC incsf   = 0x24;
+        ENUMERC incsb   = 0x25;
 
         // dcr
-        ENUMERC dcri    = 0x24;
-        ENUMERC dcrf    = 0x25;
-        ENUMERC dcrb    = 0x26;
-        ENUMERC dcrr    = 0x27;
+        ENUMERC dcri    = 0x26;
+        ENUMERC dcrf    = 0x27;
+        ENUMERC dcrb    = 0x28;
+        ENUMERC dcrri   = 0x29;
+        ENUMERC dcrrf   = 0x2A;
+        ENUMERC dcrrb   = 0x2B;
         // dcrs
-        ENUMERC dcrsi   = 0x28;
-        ENUMERC dcrsf   = 0x29;
-        ENUMERC dcrsb   = 0x2A;
+        ENUMERC dcrsi   = 0x2C;
+        ENUMERC dcrsf   = 0x2D;
+        ENUMERC dcrsb   = 0x2E;
 
         // and
-        ENUMERC ands    = 0x2B;
-        ENUMERC andr    = 0x2C;
+        ENUMERC ands    = 0x2F;
+        ENUMERC andr    = 0x30;
 
         // or 
-        ENUMERC ors     = 0x2D;
-        ENUMERC orr     = 0x2E;
+        ENUMERC ors     = 0x31;
+        ENUMERC orr     = 0x32;
 
         // nor 
-        ENUMERC nors    = 0x2F;
-        ENUMERC norr    = 0x30;
+        ENUMERC nors    = 0x33;
+        ENUMERC norr    = 0x34;
     }
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -99,22 +101,28 @@ namespace Instructions
     std::string LoadConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string ReadAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Move(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string AddStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string AddRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Add(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string AddStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string AddRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     //std::string RomCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string IncrementStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string IncrementRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Increment(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string IncrementStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string IncrementRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string IncrementSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string DecrementStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string DecrementRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Decrement(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string DecrementStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string DecrementRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string DecrementSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string AndStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string AndRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string OrStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string OrRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string NorStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string NorRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string And(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string AndStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string AndRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Or(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string OrStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string OrRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Nor(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string NorStack(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    //std::string NorRegister(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

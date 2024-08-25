@@ -1,37 +1,29 @@
 .prep
 .body
-    stc %i 15       #store 15 on stack#
-    ldc %i          #store the top int on stack in heap. Set &eax to address#
-    mov &eax &ebx   #move eax to ebx#
-    rda %i          #read the int at address &ebx and store it on stack#
+    main:
+        stc %i 15
+        stc %f 15
+        stc %b 15
 
-    somelbl: #some data here#
+    symbol:
+        stc %i symbol 
+        stc %f symbol 
+        stc %b symbol 
 
-    mov 15 &eax     #move constant 15 to eax#
-    mov &edx
-    add %f
-    addr %f &ebx &ecx
-    adds %b
-    hcp
-    scp
+        stc 15.0
+        stc 15
+        
+        ldc %i
+        ldc %f
+        ldc %b
 
-    inc %i 15
-    inc %f 15
-    inc %b 15
+        rda &eax
+        rda %i
+        rda %f
+        rda %b
 
-    incr &eax 15 
-
-    incs %i 15 
-    incs %f 15 
-    incs %b 15 
-
-    inc %i 15
-    inc %f 15
-    inc %b 15
-
-    incr &eax 15 
-
-    incs %i 15 
-    incs %f 15 
-    incs %b 15 
+        mov &eax
+        mov &eax &ebx
+        mov 15 &eax
+        mov 15.0 &eax
 .end

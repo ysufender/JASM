@@ -37,11 +37,11 @@ But for now it's also good for unit tests.
     - [x] Increment
         - [x] Increment the value on stack
         - [x] Increment the value on stack, and push it
-        - [x] Increment a register (no floats)
+        - [x] Increment a register
     - [x] Decrement
         - [x] Decrement the value on stack
         - [x] Decrement the value on stack, and push it
-        - [x] Decrement a register (no floats)
+        - [x] Decrement a register
     - [x] And
         - [x] On stack, push the result
         - [x] On registers, set the second

@@ -20,11 +20,18 @@ namespace ModeFlags
         {"&ebx", RegisterModeFlags::ebx},
         {"&ecx", RegisterModeFlags::ecx},
         {"&edx", RegisterModeFlags::edx},
+        {"&esi", RegisterModeFlags::esi},
+        {"&edi", RegisterModeFlags::edi},
 
         {"&al", RegisterModeFlags::al},
         {"&bl", RegisterModeFlags::bl},
         {"&cl", RegisterModeFlags::cl},
         {"&dl", RegisterModeFlags::dl},
+
+        {"&flg", RegisterModeFlags::flg},
+
+        {"&pc", RegisterModeFlags::pc},
+        {"&sp", RegisterModeFlags::sp},
     };
 
     void _ErrCall(const std::string& identifier)
