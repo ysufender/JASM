@@ -2,9 +2,11 @@
 
 ### Redesigns
 
-- I made a bunch of instructions available to user. Might just reduce it and use modeflags
+- [x] I made a bunch of instructions available to user. Might just reduce it and use modeflags
 instead. Also might just reduce function count (the implementations in instructions.cpp)
 But for now it's also good for unit tests.
+- [ ] stc/ldc et cetera... doesn't need the type specifiers. They just need to know if type
+is 32 or 8 bits
 
 ### The ISA
 
