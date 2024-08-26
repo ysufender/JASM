@@ -1,3 +1,4 @@
 .prep
 .body
+    and %g
 .end

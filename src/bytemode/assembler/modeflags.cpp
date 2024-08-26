@@ -1,3 +1,4 @@
+#include <string>
 #include <unordered_map>
 
 #include "JASMConfig.hpp"
@@ -7,7 +8,8 @@
 
 namespace ModeFlags
 {
-    TESTCONST std::unordered_map<std::string, char> nuModeMap {
+    TESTCONST std::unordered_map<std::string, char> modeMap {
+    //TESTCONST std::unordered_map<std::string, char> nuModeMap {
         {"%i", NumericModeFlags::Int},
         {"%f", NumericModeFlags::Float},
         {"%b", NumericModeFlags::Byte},
@@ -16,9 +18,8 @@ namespace ModeFlags
 
         {"%s", MemoryModeFlags::Stack},
         {"%h", MemoryModeFlags::Heap},
-    };
-
-    TESTCONST std::unordered_map<std::string, char> regModeMap {
+    //};
+    //TESTCONST std::unordered_map<std::string, char> regModeMap {
         {"&eax", RegisterModeFlags::eax},
         {"&ebx", RegisterModeFlags::ebx},
         {"&ecx", RegisterModeFlags::ecx},
@@ -42,19 +43,37 @@ namespace ModeFlags
         LOGE(System::LogLevel::High, "Couldn't find mode flag for '", identifier, "'.");
     };
 
-    char GetModeFlag(const std::string& identifier, bool throws)
+    char GetModeFlag(const std::string &identifier, char start, char end, bool throws)
     {
-        if (!nuModeMap.contains(identifier) && throws)
-            _ErrCall(identifier);
+            if (!modeMap.contains(identifier) && throws)
+                _ErrCall(identifier);
+            else if (!modeMap.contains(identifier))
+                return NoMode;
 
-        return nuModeMap.contains(identifier) ? nuModeMap.at(identifier) : NoMode;
+            char mode { modeMap.at(identifier) };
+            bool isInRange { start <= mode && mode <= end };
+
+            if (throws && !isInRange)
+                _ErrCall(identifier);
+            else if (isInRange)
+                return mode;
+
+            return NoMode;
     }
 
-    char GetRegisterModeFlag(const std::string& identifier, bool throws)
-    {
-        if (!regModeMap.contains(identifier) && throws)
-            _ErrCall(identifier);
+    //char GetModeFlag(const std::string& identifier, bool throws)
+    //{
+        //if (!nuModeMap.contains(identifier) && throws)
+            //_ErrCall(identifier);
 
-        return regModeMap.contains(identifier) ? regModeMap.at(identifier) : NoMode;
-    }
+        //return nuModeMap.contains(identifier) ? nuModeMap.at(identifier) : NoMode;
+    //}
+
+    //char GetRegisterModeFlag(const std::string& identifier, bool throws)
+    //{
+        //if (!regModeMap.contains(identifier) && throws)
+            //_ErrCall(identifier);
+
+        //return regModeMap.contains(identifier) ? regModeMap.at(identifier) : NoMode;
+    //}
 }

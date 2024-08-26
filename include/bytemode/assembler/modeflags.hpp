@@ -47,6 +47,7 @@ namespace ModeFlags
         ENUMERC sp          = 0x14;
     }
 
-    char GetModeFlag(const std::string& identifier, bool throws = false); 
-    char GetRegisterModeFlag(const std::string& identifier, bool throws = false);
+    char GetModeFlag(const std::string& identifier, char start, char end, bool throws = false);
+    //char GetModeFlag(const std::string& identifier, bool throws = false); 
+    //char GetRegisterModeFlag(const std::string& identifier, bool throws = false);
 }

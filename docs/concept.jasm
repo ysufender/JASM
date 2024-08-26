@@ -20,8 +20,6 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
     imp "SomeSharedLibWithExtension.shd"
     imp "path/to shared lib/lib.shd"
     imp "this also can be a/staticFile.stc" #because everything is an illusion#
-.data
-    #this section contains read-only#
 .body
     #Contains the actual program instructions.#
 
@@ -60,12 +58,12 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
         add %b &bl &cl          #add two bytes in bl and cl set al to result#
         adds %i                 #adds the two integer at the top of stack, DO NOT POP, push the result#
 
-        mcp                     #copy the heap starting at &eax to &ebx with the size of &ecx#
+        hcp                     #copy the heap starting at &eax to &ebx with the size of &ecx#
         scp                     #copy the stack starting at &eax to &ebx with the size of &ecx#
         #rcp someSymbol#  #deprecated#          #copy the stack starting at &eax to given symbol with the size of &ebx#
 
         inc %f 5.4 #increment the float at the top of the stack by 5.4#
-        inc %f &e
+        inc %f &edx 5.4
 .end
 
 This place is completely discarded, no matter what. The assembler stops reading at .end
