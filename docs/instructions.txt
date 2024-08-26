@@ -73,4 +73,30 @@ Note: words inside paranthesis "()" are optional
 [x] dcrsb;  0x29;   decrement the (u)byte at the top of the stack, don't modify but push
 
 [x] and;    ----;
-[x] ands;   ----; 
+[x] andst;  0x2A;   apply and operation on top 2 32-bits on stack
+[x] andse;  0x2B;   apply and operation on top 2 8-bits on stack
+[x] andr;   0x2C;   apply and operation on given two registers 
+
+[x] or;     ----;
+[x] orst;   0x2D;   apply or operation on top 2 32-bits on stack
+[x] orse;   0x2E;   apply or operation on top 2 8-bits on stack
+[x] orr;    0x2F;   apply or operation on given two registers
+
+[x] nor;    ----;
+[x] norst;  0x30;   apply nor operation on top 2 32-bits on stack
+[x] norse;  0x31;   apply nor operation on top 2 8-bits on stack
+[x] norr;   0x32;   apply nor operation on given two registers
+
+[x] swp;    ----;
+[x] swpt;   0x33;   swap the top 2 32-bits on stack
+[x] swpe;   0x34;   swap the top 2 8-bits on stack
+[x] swpe;   0x34;   swap the top 2 8-bits on stack
+[x] swpr;   0x35;   swap the given registers 
+
+[x] dupt;   0x36;   duplicate the top 32-bits on stack 
+[x] dupe;   0x37;   duplicate the top 8-bits on stack 
+
+[x] rom;    ----;   store given series of bytes on ROM
+
+[x] raw;    0x38;   store given series of bytes on stack
+[x] raws;   0x39;   store the given number of bytes residing at given symbol 

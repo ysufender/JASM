@@ -51,6 +51,9 @@ namespace ByteAssembler
             ImportCollection runtimeImports;
             SymbolMap symbolMap;
 
+        private:
+            mutable std::string _infStr = "";
+
         public:
             AssemblyInfo() = delete;
             AssemblyInfo(const std::string& path, char flags);
@@ -59,7 +62,7 @@ namespace ByteAssembler
             void PrintAssemblyInfo() const;
 
             void AddSymbol(std::string symbolName, systembit_t address);
-            void AddUnknownSymbol(std::string symbolName, systembit_t address);
+            void AddUnknownSymbol(size_t symbolName, systembit_t address);
     };
 
     class ByteAssembler

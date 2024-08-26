@@ -13,6 +13,9 @@ namespace ModeFlags
         {"%b", NumericModeFlags::Byte},
         {"%ui", NumericModeFlags::UInt},
         {"%ub", NumericModeFlags::UByte},
+
+        {"%s", MemoryModeFlags::Stack},
+        {"%h", MemoryModeFlags::Heap},
     };
 
     TESTCONST std::unordered_map<std::string, char> regModeMap {

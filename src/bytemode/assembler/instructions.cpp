@@ -242,6 +242,35 @@ namespace Instructions
         return Stream::Tokenize(in);
     }
 
+    void _BoringRawData(std::string& token, std::istream& in, std::ostream& out)
+    {
+        while (token != "__JASM__ENDL__")
+        {
+            if (token.starts_with('"'))
+            {
+                token.pop_back();
+                token.erase(0, 1);
+                for (systembit_t i = 0; i < token.size(); i++)
+                    Serialization::SerializeInteger(token.data()[i], out);
+
+                token = Stream::Tokenize(in);
+                continue;
+            }
+
+            if (!std::isdigit(token.at(0)))
+                LOGE(System::LogLevel::High, "Expected a numeric constant. {", token, "}");
+
+            if (token.find_first_of('.') != std::string::npos)
+                Serialization::SerializeFloat(std::stof(token), out);
+            else if ((token.find_first_of('x') != std::string::npos) && (token.size() >= 3 && token.size() <= 4))
+                Serialization::SerializeInteger(_TokenToInt<char>(token), out);
+            else
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(token), out);
+
+            token = Stream::Tokenize(in);
+        }
+    }
+
     //
     // Implementation
     //
@@ -298,7 +327,7 @@ namespace Instructions
         size_t symbolHash { String::Hash(symOrVal) };
         if (!info.symbolMap.contains(symbolHash)) 
         {
-            info.unknownSymbols.push_back({symbolHash, static_cast<systembit_t>(out.tellp())});
+            info.AddUnknownSymbol(symbolHash, out.tellp());
             Serialization::SerializeInteger<systembit_t>(0, out);
         }
         else 
@@ -429,6 +458,12 @@ namespace Instructions
         return Stream::Tokenize(in);
     }
 
+    std::string MemCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // mcp <from> <to>
+        return Stream::Tokenize(in);
+    }
+
     std::string StackCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // scp
@@ -531,34 +566,43 @@ namespace Instructions
     std::string RawData(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // raw <..data..> ; <--- the semicolon terminates the sequence
+        // raw <symbol> <size> <--- no need for semicolon
         std::string token { Stream::Tokenize(in) };
 
-        while (token != "__JASM__ENDL__")
+        // raw <symbol> <size>
+        // because symbol names must start with a non-numeric character
+        if (std::isalpha(token.at(0)))
         {
-            if (token.starts_with('"'))
-            {
-                token.pop_back();
-                token.erase(0, 1);
-                for (systembit_t i = 0; i < token.size()+1; i++)
-                    Serialization::SerializeInteger(token.data()[i], out);
+            size_t symbolHash { String::Hash(token) };
 
-                token = Stream::Tokenize(in);
-                continue;
+            Serialization::SerializeInteger(OpCodes::raws, out);
+
+            if (info.symbolMap.contains(symbolHash))
+                Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+            else
+            {
+                info.AddUnknownSymbol(symbolHash, out.tellp());
+                Serialization::SerializeInteger<systembit_t>(0, out);
             }
 
-            if (!std::isdigit(token.at(0)))
-                LOGE(System::LogLevel::High, "Expected a numeric constant. {", token, "}");
+            const std::string sizeToken { Stream::Tokenize(in) };
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(sizeToken), out);
 
-            if (token.find_first_of('.') != std::string::npos)
-                Serialization::SerializeFloat(std::stof(token), out);
-            else if ((token.find_first_of('x') != std::string::npos) && (token.size() == 4))
-                Serialization::SerializeInteger(_TokenToInt<char>(token), out);
-            else
-                Serialization::SerializeInteger(_TokenToInt<systembit_t>(token), out);
-
-            token = Stream::Tokenize(in);
+            return Stream::Tokenize(in);
         }
 
+        // raw <..data..> ;
+        // This mode does NOT serialize an instruction. It directly writes data to ROM.
+        Serialization::SerializeInteger(OpCodes::raw, out);
+        _BoringRawData(token, in, out);
+        return Stream::Tokenize(in);
+    }
+
+    std::string RomData(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // rom <..data..> ; <--- the semicolon terminates the sequence 
+        std::string token { Stream::Tokenize(in) };
+        _BoringRawData(token, in, out);
         return Stream::Tokenize(in);
     }
 }

@@ -19,5 +19,5 @@ namespace Extensions::String
         return static_cast<T>(std::stoul(hex, 0, 16));
     }
 
-    size_t Hash(const std::string& str);
+    size_t Hash(const std::string_view str);
 }

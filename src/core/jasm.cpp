@@ -54,15 +54,8 @@ int jasmmain(int argc, char** args)
             BAsm assembler;
             BAsm::AssemblyInfoCollection collection = assembler.Assemble();
 
-            //for (const auto& inf : collection)
-            //{
-                //AssemblyInfo info {"", 0};
-
-                //std::ifstream in { inf.path, std::ios::binary };
-                //info.Deserialize(in);
-
-                //info.PrintAssemblyInfo();
-            //}
+            for (const auto& inf : collection)
+                inf.PrintAssemblyInfo();
         }
     }
     catch (const JASMException& exc)

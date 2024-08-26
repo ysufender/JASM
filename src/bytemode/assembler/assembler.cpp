@@ -2,6 +2,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "system.hpp"
@@ -33,6 +34,7 @@ namespace ByteAssembler
         {"mov", &Instructions::Move},
         {"add", &Instructions::Add},
         {"adds", &Instructions::AddSafe},
+        {"mcp", &Instructions::MemCopy},
         {"hcp", &Instructions::HeapCopy},
         {"scp", &Instructions::StackCopy},
         {"inc", &Instructions::Increment},
@@ -45,6 +47,7 @@ namespace ByteAssembler
         {"swp", &Instructions::Swap},
         {"dup", &Instructions::Duplicate},
         {"raw", &Instructions::RawData},
+        {"rom", &Instructions::RomData},
     };
 
     //
@@ -143,12 +146,6 @@ namespace ByteAssembler
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
 
-        //std::string directories { outPath.substr(0, outPath.find_last_of('/') + 1) };
-        //std::filesystem::path directories { outPath.parent_path() };
-
-        //if (!directories.empty())
-        //std::filesystem::create_directories(directories);
-
         AssemblyInfo assemblyInfo {
             outPath.generic_string(),
             outFlags
@@ -175,7 +172,7 @@ namespace ByteAssembler
         { 
             std::string entryName { Stream::Tokenize(sourceFile) };
             Serialization::SerializeInteger<systembit_t>(0, outFile);
-            assemblyInfo.AddUnknownSymbol(entryName, 0);
+            assemblyInfo.AddUnknownSymbol(String::Hash(entryName), 0);
         }
 
         //
@@ -267,9 +264,9 @@ namespace ByteAssembler
         definedSymbols.push_back(symbolHash);
     }
 
-    void AssemblyInfo::AddUnknownSymbol(std::string symbolName, systembit_t address)
+    void AssemblyInfo::AddUnknownSymbol(size_t symbolHash, systembit_t address)
     {
-        unknownSymbols.push_back({String::Hash(symbolName), address});
+        unknownSymbols.push_back({symbolHash, address});
     }
 
     void AssemblyInfo::Serialize(std::ostream& outFile)
@@ -363,11 +360,10 @@ namespace ByteAssembler
             inFile,
             [](std::string& data, std::istream& stream){
             Serialization::DeserializeContainer<std::string, uint16_t, char>(
-                    data, 
-                    stream,
-                    &Serialization::DeserializeInteger<char>
-                );
-            } 
+                data, 
+                stream,
+                &Serialization::DeserializeInteger<char>
+            );} 
         );
 
         // Symbol Info
@@ -376,9 +372,9 @@ namespace ByteAssembler
 
         // Defined Symbols
         Serialization::DeserializeContainer<DefinedSymbolCollection, systembit_t, KeyType>(
-                definedSymbols, 
-                inFile,
-                [this](KeyType& symbolHash, std::istream& in) {
+            definedSymbols, 
+            inFile,
+            [this](KeyType& symbolHash, std::istream& in) {
                 systembit_t addr;
                 Serialization::DeserializeInteger(symbolHash, in);
                 Serialization::DeserializeInteger(addr, in);
@@ -400,24 +396,33 @@ namespace ByteAssembler
 
     void AssemblyInfo::PrintAssemblyInfo() const
     {
-        std::cout << "\n\nInfo " << (path.empty() ? "Unknown" : path) 
-            << "\nFlags: " << static_cast<int>(flags)
-            << "\nDefined Symbols [ordered](" << definedSymbols.size() << "):";
+        if (_infStr.empty())
+        {
+            std::stringstream ss;
 
-        for (const auto& info : definedSymbols)
-            std::cout << "\n\t" << info << " at address " << symbolMap.at(info);
+            ss << "\n\nInfo " << (path.empty() ? "Unknown" : path) 
+                << "\nFlags: " << static_cast<int>(flags)
+                << "\nDefined Symbols [ordered](" << definedSymbols.size() << "):";
 
-        std::cout << "\nUnknown Symbols [ordered](" << unknownSymbols.size() << "):";
+            for (const auto& info : definedSymbols)
+                ss << "\n\t" << info << " at address " << symbolMap.at(info);
 
-        for (const auto& info : unknownSymbols)
-            std::cout << "\n\t" << info.SymbolHash << " at address " << info.Address;
+            ss << "\nUnknown Symbols [ordered](" << unknownSymbols.size() << "):";
 
-        std::cout << "\nRuntime Imports (" << runtimeImports.size() << "):";
+            for (const auto& info : unknownSymbols)
+                ss << "\n\t" << info.SymbolHash << " at address " << info.Address;
 
-        for (const auto& info : runtimeImports)
-            std::cout << "\n\t" << info;
+            ss << "\nRuntime Imports (" << runtimeImports.size() << "):";
 
-        std::cout << '\n';
+            for (const auto& info : runtimeImports)
+                ss << "\n\t" << info;
+
+            ss << '\n';
+
+            _infStr = ss.str();
+        }
+
+        std::cout << _infStr;
     }
 }
 

@@ -1,6 +1,3 @@
 .prep
 .body
-    data: raw 15 0x0F 15.0 ;
-
-    and %i
 .end

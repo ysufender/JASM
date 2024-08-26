@@ -33,3 +33,8 @@ with the state of JASM and move on. That doesn't mean I won't maintain it but ne
 as the time passes. So every inch of help is much greatly appreciated, just don't forget to add your name to CONTRIBUTORS.md
 and also don't forget to update necessary documents in the repository when you add/remove a dependency/feature/bug. If you
 are new around here like me, take a look at --Contributing.md link here--!
+
+## Footnotes
+
+The licenses, readmes and citations for every library used lies within its own directory
+under `lib`.

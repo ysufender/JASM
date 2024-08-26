@@ -80,30 +80,33 @@ namespace Instructions
 
         // and
         ENUMERC andst   = 0x2A;
-        ENUMERC andse   = 0x2C;
-        ENUMERC andr    = 0x2D;
+        ENUMERC andse   = 0x2B;
+        ENUMERC andr    = 0x2C;
 
         // or 
-        ENUMERC orst    = 0x2E;
-        ENUMERC orse    = 0x2F;
-        ENUMERC orr     = 0x30;
+        ENUMERC orst    = 0x2D;
+        ENUMERC orse    = 0x2E;
+        ENUMERC orr     = 0x2F;
 
         // nor 
-        ENUMERC norst   = 0x31;
-        ENUMERC norse   = 0x32;
-        ENUMERC norr    = 0x33;
+        ENUMERC norst   = 0x30;
+        ENUMERC norse   = 0x31;
+        ENUMERC norr    = 0x32;
 
         // swp
-        ENUMERC swpt    = 0x34;
-        ENUMERC swpe    = 0x35;
-        ENUMERC swpr    = 0x36;
+        ENUMERC swpt    = 0x33;
+        ENUMERC swpe    = 0x34;
+        ENUMERC swpr    = 0x35;
 
         // dup
-        ENUMERC dupt    = 0x37;
-        ENUMERC dupe    = 0x38;
+        ENUMERC dupt    = 0x36;
+        ENUMERC dupe    = 0x37;
 
         // raw
-        ENUMERC raw     = 0x39; 
+        ENUMERC raw     = 0x38; 
+        ENUMERC raws    = 0x39;
+
+        // 
     }
     
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -113,6 +116,7 @@ namespace Instructions
     std::string Move(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Add(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string MemCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Increment(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -125,4 +129,5 @@ namespace Instructions
     std::string Swap(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Duplicate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string RawData(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string RomData(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

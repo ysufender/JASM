@@ -17,6 +17,12 @@ namespace ModeFlags
         ENUMERC UByte       = 0x05;
     }
 
+    namespace MemoryModeFlags
+    {
+        ENUMERC Stack       = 0x06;
+        ENUMERC Heap        = 0x07;
+    }
+
     namespace RegisterModeFlags
     {
         // 32-bit
