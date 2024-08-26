@@ -57,7 +57,7 @@ TEST_CASE("Assembly Context Tests")
             System::Setup(context, fakeCout, fakeCout);
             context.PrintContext();
 
-            CHECK(ss.str() == fakeCout.str());
+            CHECK(ss.view() == fakeCout.view());
         }
     }
 }

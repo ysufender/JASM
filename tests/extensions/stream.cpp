@@ -35,7 +35,7 @@ TEST_CASE("Stream Extensions Tests")
             CHECK(Tokenize(in) == token);
 
         // Gotta double check
-        CHECK(Tokenize(in) == "EOF");
-        CHECK(Tokenize(in) == "EOF");
+        CHECK(Tokenize(in) == "__JASM__EOF__");
+        CHECK(Tokenize(in) == "__JASM__EOF__");
     }
 }

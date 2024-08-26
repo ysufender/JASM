@@ -2,59 +2,75 @@ Note: words inside paranthesis "()" are optional
 
 [x] nop;    0x00;   no operation
 
-[x] stc;    ----;   
-[x] sti;    0x01;   store (u)int constant on stack
-[x] stf;    0x02;   store float constant on stack
-[x] stb;    0x03;   store (u)byte constant on stack
-[x] stis;   0x04;   store the (u)int at given symbol on stack
-[x] stfs;   0x05;   store the float at given symbol on stack
-[x] stbs;   0x06;   store the (u)byte at given symbol on stack
+[x] stc;    ----;
+[x] stt;    0x01;   stores a 32-bit constant on stack
+[x] ste;    0x02;   stores an 8-bit constant on stack
+[x] stts;   0x03;   stores a 32-bit constant on stack from given symbol
+[x] stes;   0x04;   stores an 8-bit constant on stack from given symbol
 
-[x] ldc;    ----;   
-[x] ldi;    0x07;   load (u)int from stack on heap and set &eax to address 
-[x] ldf;    0x08;   load float from stack on heap and set &eax to address 
-[x] ldb;    0x09;   load (u)byte from stack on heap and set &eax to address 
+[x] ldc;    ----;
+[x] ldt;    0x05;   load 32-bits from stack on heap and set &eax to address
+[x] lde;    0x06;   load 8-bits from stack on heap and set &eax to address
 
-[x] rda;    ----;   
-[x] rdi;    0x0A;   read (u)int from heap on heap at address &ebx and store it on stack
-[x] rdf;    0x0B;   read float from heap on heap at address &ebx and store it on stack
-[x] rdb;    0x0C;   read (u)byte from heap on heap at address &ebx and store it on stack
-[x] rdr;    0x0D;   read the &<given_register> and store it on stack
+[x] rda;    ----;
+[x] rdt;    0x07;   read 32-bits from heap at address &ebx and store it on stack.
+[x] rde;    0x08;   read 32-bits from heap at address &ebx and store it on stack.
+[x] rdr;    0x09;   read the given register and store it on stack
 
 [x] mov;    ----;
-[x] movc;   0x0E;   set register to given constant value
-[x] movs;   0x0F;   set register to the value at the top of the stack (based on register size)
-[x] movr;   0x10;   set register to given register
+[x] movc;   0x0A;   set register to given constant value
+[x] movs;   0x0B;   set register to the value at the top of the stack (based on register size)
+[x] movr;   0x0C;   set register to given register
 
 [x] add;    ----;
-[x] addi;   0x11;   pop and add two (u)ints from stack. push the result. 
-[x] addf;   0x12;   pop and add two floats from stack. push the result. 
-[x] addb;   0x13;   pop and add two (u)bytes from stack. push the result. 
+[x] addi;   0x0D;   pop and add two (u)ints from stack. push the result. 
+[x] addf;   0x0E;   pop and add two floats from stack. push the result. 
+[x] addb;   0x0F;   pop and add two (u)bytes from stack. push the result. 
 
 [x] addr;   ----;
-[x] addri;  0x14;   add the two (u)ints stored in given two registers and set the second one to result
-[x] addrf;  0x15;   add the two floats stored in given two registers and set the second to result
-[x] addrb;  0x16;   add the two (u)bytes stored in given two registers and set the second one to result
+[x] addri;  0x10;   add the two (u)ints stored in given two registers and set the second one to result
+[x] addrf;  0x11;   add the two floats stored in given two registers and set the second to result
+[x] addrb;  0x12;   add the two (u)bytes stored in given two registers and set the second one to result
 
 [x] adds;   ----;
-[x] addsi;  0x17;   pop and add two (u)ints from stack. DO NOT POP. push the result. 
-[x] addsf;  0x18;   pop and add two floats from stack. DO NOT POP. push the result. 
-[x] addsb;  0x19;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
+[x] addsi;  0x13;   pop and add two (u)ints from stack. DO NOT POP. push the result. 
+[x] addsf;  0x14;   pop and add two floats from stack. DO NOT POP. push the result. 
+[x] addsb;  0x15;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[x] hcp;    0x1A;   copy the heap starting at &eax to heap starting at &ebx with the size of &ecx
-[x] scp;    0x1B;   copy the stack starting at &eax to stack starting at &ebx with the size of &ecx 
-~[ ] rcp;    0x1C;   copy the stack starting at &eax to given symbol with the size of &ebx~
+[x] hcp;    0x16;   copy the heap starting at &eax to heap starting at &ebx with the size of &ecx
+[x] scp;    0x17;   copy the stack starting at &eax to stack starting at &ebx with the size of &ecx 
 
 % The increments are not by one but by a given constant. Must be known at compile time.
+[x] inc;    ----;
+[x] inci;   0x18;   increment the (u)int at the top of the stack
+[x] incf;   0x19;   increment the float at the top of the stack
+[x] incb;   0x1A;   increment the (u)byte at the top of the stack
 
-[ ] inc;    ----;
-[ ] inci;   0x1D;   increment the (u)int at the top of the stack
-[ ] incf;   0x1E;   increment the float at the top of the stack
-[ ] incb;   0x1F;   increment the (u)byte at the top of the stack
+[x] incr;   ----;
+[x] incri;  0x1B;   increment the (u)int at the given register 
+[x] incrf;  0x1C;   increment the float at the given register 
+[x] incrb;  0x1D;   increment the (u)byte at the given register 
 
-[ ] incr;   0x20;   increment the register
+[x] incs;   ----;
+[x] incsi;  0x1E;   increment the (u)int at the top of the stack, don't modify but push
+[x] incsf;  0x1F;   increment the float at the top of the stack, don't modify but push
+[x] incsb;  0x20;   increment the (u)byte at the top of the stack, don't modify but push
 
-[ ] incs;   ----;   
-[ ] incsi;  0x21;   increment the (u)int at the top of the stack, don't modify but push
-[ ] incsf;  0x22;   increment the (u)int at the top of the stack, don't modify but push
-[ ] incsb;  0x23;   increment the (u)int at the top of the stack, don't modify but push
+% The decrements are not by one but by a given constant. Must be known at compile time.
+[x] dcr;    ----;
+[x] dcri;   0x21;   decrement the (u)int at the top of the stack
+[x] dcrf;   0x22;   decrement the float at the top of the stack
+[x] dcrb;   0x23;   decrement the (u)byte at the top of the stack
+
+[x] dcrr;   ----;
+[x] dcrri;  0x24;   decrement the (u)int at the given register 
+[x] dcrrf;  0x25;   decrement the float at the given register 
+[x] dcrrb;  0x26;   decrement the (u)byte at the given register 
+
+[x] dcrs;   ----;
+[x] dcrsi;  0x27;   decrement the (u)int at the top of the stack, don't modify but push
+[x] dcrsf;  0x28;   decrement the float at the top of the stack, don't modify but push
+[x] dcrsb;  0x29;   decrement the (u)byte at the top of the stack, don't modify but push
+
+[x] and;    ----;
+[x] ands;   ----; 

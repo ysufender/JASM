@@ -1,29 +1,6 @@
 .prep
 .body
-    main:
-        stc %i 15
-        stc %f 15
-        stc %b 15
+    data: raw 15 0x0F 15.0 ;
 
-    symbol:
-        stc %i symbol 
-        stc %f symbol 
-        stc %b symbol 
-
-        stc 15.0
-        stc 15
-        
-        ldc %i
-        ldc %f
-        ldc %b
-
-        rda &eax
-        rda %i
-        rda %f
-        rda %b
-
-        mov &eax
-        mov &eax &ebx
-        mov 15 &eax
-        mov 15.0 &eax
+    and %i
 .end

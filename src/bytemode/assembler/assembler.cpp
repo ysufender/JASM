@@ -35,7 +35,6 @@ namespace ByteAssembler
         {"adds", &Instructions::AddSafe},
         {"hcp", &Instructions::HeapCopy},
         {"scp", &Instructions::StackCopy},
-        //{"rcp", &Instructions::RomCopy},
         {"inc", &Instructions::Increment},
         {"incs", &Instructions::IncrementSafe},
         {"dcr", &Instructions::Decrement},
@@ -43,6 +42,9 @@ namespace ByteAssembler
         {"and", &Instructions::And},
         {"or", &Instructions::Or},
         {"nor", &Instructions::Nor},
+        {"swp", &Instructions::Swap},
+        {"dup", &Instructions::Duplicate},
+        {"raw", &Instructions::RawData},
     };
 
     //
@@ -85,6 +87,12 @@ namespace ByteAssembler
             {
                 // Letting the VM know that we need the particular shd file.
                 token = Stream::Tokenize(sourceFile);
+
+                if (!token.starts_with('"') && !token.ends_with('"'))
+                    LOGE(System::LogLevel::High, "Unrecognized Token '", token, "' at import directive.");
+
+                token.pop_back();
+                token.erase(0, 1);
                 assemblyInfo.runtimeImports.push_back(token);
             }
             else
@@ -111,7 +119,9 @@ namespace ByteAssembler
             }
             else if (instructionMap.contains(token))
                 token = instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
-            else if (token == "EOF")
+            else if (token == "__JASM__ENDL__")
+                token = Stream::Tokenize(sourceFile);
+            else if (token == "__JASM__EOF__")
                 LOGE(System::LogLevel::High, "Expected '.end' at the end of the file.");
             else
                 LOGE(System::LogLevel::High, "Couldn't find '", token, "' on instruction map.");

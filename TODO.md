@@ -5,10 +5,10 @@
 - [x] I made a bunch of instructions available to user. Might just reduce it and use modeflags
 instead. Also might just reduce function count (the implementations in instructions.cpp)
 But for now it's also good for unit tests.
-- [ ] stc/ldc et cetera... doesn't need the type specifiers. They just need to know if type
+- [x] stc/ldc et cetera... doesn't need the type specifiers. They just need to know if type
 is 32 or 8 bits
 
-### The ISA
+### The Instruction Set Standards 
 
 - [x] Stack Manipulation
     - [x] Constant to stack
@@ -16,6 +16,11 @@ is 32 or 8 bits
     - [x] Heap to stack
     - [x] Stack to stack (copy)
     - [x] ROM to stack
+    - [x] Duplicate the top 4-bytes 
+    - [x] Duplicate the top byte 
+    - [x] Swap the top 2 4-bytes
+    - [x] Swap the top 2 byte
+    - [x] Push a range of raw data
 
 - [x] Heap Manipulation
     - [x] Constant to heap (workaround by stc)
@@ -30,6 +35,7 @@ is 32 or 8 bits
     - [x] Stack to register
     - [x] Heap to register (workaround by rda)
     - [x] ROM to register (workaround by stc)
+    - [x] Swap two registers
 
 - [ ] Arithmetic and Logic Operations 
     - [x] Add
@@ -53,7 +59,7 @@ is 32 or 8 bits
     - [x] Nor 
         - [x] On stack, push the result
         - [x] On registers, set the second
-    - [ ] Negation
+    - [ ] Not 
         - [ ] On stack
         - [ ] On stack, push the result
         - [ ] On register
