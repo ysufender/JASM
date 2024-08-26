@@ -24,6 +24,7 @@ namespace Instructions
 
     namespace Reg = ModeFlags::RegisterModeFlags;
     namespace Numo = ModeFlags::NumericModeFlags;
+    namespace Memo = ModeFlags::MemoryModeFlags;
 
     //
     // Util
@@ -474,23 +475,20 @@ namespace Instructions
         return Stream::Tokenize(in);
     }
 
-    std::string HeapCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
-    {
-        // hcp
-        Serialization::SerializeInteger(OpCodes::hcp, out);
-        return Stream::Tokenize(in);
-    }
-
     std::string MemCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // mcp <from> <to>
-        return Stream::Tokenize(in);
-    }
+        // Serialize the <from> and <to> to one byte.
+        // First 4 bits are <from>, second 4 bits are <to> 
+        char fromMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Memo::Stack, Memo::Heap, true) }; 
+        char toMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Memo::Stack, Memo::Heap, true) };
 
-    std::string StackCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
-    {
-        // scp
-        Serialization::SerializeInteger(OpCodes::scp, out);
+        fromMode = fromMode << 4;
+        const char final { static_cast<const char>(fromMode|toMode) };
+
+        Serialization::SerializeInteger(OpCodes::mcp, out);
+        Serialization::SerializeInteger(final, out);
+        
         return Stream::Tokenize(in);
     }
 

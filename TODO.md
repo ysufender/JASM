@@ -13,7 +13,7 @@ is 32 or 8 bits
 - [x] ROM manipulation
     - [x] Store raw sequence of data in ROM
 
-- [ ] Stack Manipulation
+- [x] Stack Manipulation
     - [x] Constant to stack
     - [x] Register to stack
     - [x] Heap to stack
@@ -25,15 +25,15 @@ is 32 or 8 bits
     - [x] Swap the top 2 byte
     - [x] Push a range of raw data
     - [x] Read a range of raw data from symbol
-    - [ ] Read a range from heap
+    - [x] Read a range from heap
 
-- [ ] Heap Manipulation
+- [x] Heap Manipulation
     - [x] Constant to heap (workaround by stc)
     - [x] Register to heap (workaround by rda)
     - [x] Stack to heap
     - [x] Heap to heap (copy)
     - [x] ROM to heap (workaround by stc)
-    - [ ] Read a range from stack
+    - [x] Read a range from stack
 
 - [x] Register Manipulation
     - [x] Constant to register

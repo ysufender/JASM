@@ -37,66 +37,64 @@ Note: words inside paranthesis "()" are optional
 [x] addsf;  0x14;   pop and add two floats from stack. DO NOT POP. push the result. 
 [x] addsb;  0x15;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[x] hcp;    0x16;   copy the heap starting at &eax to heap starting at &ebx with the size of &ecx
-[x] scp;    0x17;   copy the stack starting at &eax to stack starting at &ebx with the size of &ecx 
+[x] mcp;    0x16;   copy the heap/stack starting at &eax to heap/stack starting at &ebx with the size of &ecx
 
 % The increments are not by one but by a given constant. Must be known at compile time.
 [x] inc;    ----;
-[x] inci;   0x18;   increment the (u)int at the top of the stack
-[x] incf;   0x19;   increment the float at the top of the stack
-[x] incb;   0x1A;   increment the (u)byte at the top of the stack
+[x] inci;   0x17;   increment the (u)int at the top of the stack
+[x] incf;   0x18;   increment the float at the top of the stack
+[x] incb;   0x19;   increment the (u)byte at the top of the stack
 
 [x] incr;   ----;
-[x] incri;  0x1B;   increment the (u)int at the given register 
-[x] incrf;  0x1C;   increment the float at the given register 
-[x] incrb;  0x1D;   increment the (u)byte at the given register 
+[x] incri;  0x1A;   increment the (u)int at the given register 
+[x] incrf;  0x1B;   increment the float at the given register 
+[x] incrb;  0x1C;   increment the (u)byte at the given register 
 
 [x] incs;   ----;
-[x] incsi;  0x1E;   increment the (u)int at the top of the stack, don't modify but push
-[x] incsf;  0x1F;   increment the float at the top of the stack, don't modify but push
-[x] incsb;  0x20;   increment the (u)byte at the top of the stack, don't modify but push
+[x] incsi;  0x1D;   increment the (u)int at the top of the stack, don't modify but push
+[x] incsf;  0x1E;   increment the float at the top of the stack, don't modify but push
+[x] incsb;  0x1F;   increment the (u)byte at the top of the stack, don't modify but push
 
 % The decrements are not by one but by a given constant. Must be known at compile time.
 [x] dcr;    ----;
-[x] dcri;   0x21;   decrement the (u)int at the top of the stack
-[x] dcrf;   0x22;   decrement the float at the top of the stack
-[x] dcrb;   0x23;   decrement the (u)byte at the top of the stack
+[x] dcri;   0x20;   decrement the (u)int at the top of the stack
+[x] dcrf;   0x21;   decrement the float at the top of the stack
+[x] dcrb;   0x22;   decrement the (u)byte at the top of the stack
 
 [x] dcrr;   ----;
-[x] dcrri;  0x24;   decrement the (u)int at the given register 
-[x] dcrrf;  0x25;   decrement the float at the given register 
-[x] dcrrb;  0x26;   decrement the (u)byte at the given register 
+[x] dcrri;  0x23;   decrement the (u)int at the given register 
+[x] dcrrf;  0x24;   decrement the float at the given register 
+[x] dcrrb;  0x25;   decrement the (u)byte at the given register 
 
 [x] dcrs;   ----;
-[x] dcrsi;  0x27;   decrement the (u)int at the top of the stack, don't modify but push
-[x] dcrsf;  0x28;   decrement the float at the top of the stack, don't modify but push
-[x] dcrsb;  0x29;   decrement the (u)byte at the top of the stack, don't modify but push
+[x] dcrsi;  0x26;   decrement the (u)int at the top of the stack, don't modify but push
+[x] dcrsf;  0x27;   decrement the float at the top of the stack, don't modify but push
+[x] dcrsb;  0x28;   decrement the (u)byte at the top of the stack, don't modify but push
 
 [x] and;    ----;
-[x] andst;  0x2A;   apply and operation on top 2 32-bits on stack
-[x] andse;  0x2B;   apply and operation on top 2 8-bits on stack
-[x] andr;   0x2C;   apply and operation on given two registers 
+[x] andst;  0x29;   apply and operation on top 2 32-bits on stack
+[x] andse;  0x2A;   apply and operation on top 2 8-bits on stack
+[x] andr;   0x2B;   apply and operation on given two registers 
 
 [x] or;     ----;
-[x] orst;   0x2D;   apply or operation on top 2 32-bits on stack
-[x] orse;   0x2E;   apply or operation on top 2 8-bits on stack
-[x] orr;    0x2F;   apply or operation on given two registers
+[x] orst;   0x2C;   apply or operation on top 2 32-bits on stack
+[x] orse;   0x2D;   apply or operation on top 2 8-bits on stack
+[x] orr;    0x2E;   apply or operation on given two registers
 
 [x] nor;    ----;
-[x] norst;  0x30;   apply nor operation on top 2 32-bits on stack
-[x] norse;  0x31;   apply nor operation on top 2 8-bits on stack
-[x] norr;   0x32;   apply nor operation on given two registers
+[x] norst;  0x2F;   apply nor operation on top 2 32-bits on stack
+[x] norse;  0x30;   apply nor operation on top 2 8-bits on stack
+[x] norr;   0x31;   apply nor operation on given two registers
 
 [x] swp;    ----;
-[x] swpt;   0x33;   swap the top 2 32-bits on stack
-[x] swpe;   0x34;   swap the top 2 8-bits on stack
-[x] swpe;   0x34;   swap the top 2 8-bits on stack
-[x] swpr;   0x35;   swap the given registers 
+[x] swpt;   0x32;   swap the top 2 32-bits on stack
+[x] swpe;   0x33;   swap the top 2 8-bits on stack
+[x] swpr;   0x34;   swap the given registers 
 
-[x] dupt;   0x36;   duplicate the top 32-bits on stack 
-[x] dupe;   0x37;   duplicate the top 8-bits on stack 
+[x] dupt;   0x35;   duplicate the top 32-bits on stack 
+[x] dupe;   0x36;   duplicate the top 8-bits on stack 
 
 [x] rom;    ----;   store given series of bytes on ROM
 
-[x] raw;    0x38;   store given series of bytes on stack
-[x] raws;   0x39;   store the given number of bytes residing at given symbol 
+[x] raw;    0x37;   store given series of bytes on stack
+[x] raws;   0x38;   store the given number of bytes residing at given symbol 

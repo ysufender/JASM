@@ -58,12 +58,15 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
         add %b &bl &cl          #add two bytes in bl and cl set al to result#
         adds %i                 #adds the two integer at the top of stack, DO NOT POP, push the result#
 
-        hcp                     #copy the heap starting at &eax to &ebx with the size of &ecx#
-        scp                     #copy the stack starting at &eax to &ebx with the size of &ecx#
-        #rcp someSymbol#  #deprecated#          #copy the stack starting at &eax to given symbol with the size of &ebx#
+        mcp %s %h               # stack to heap copy. Stack &eax to heap &ebx with the size of &ecx#
+        mcp %h %s               # heap to stack copy. Stack &eax to heap &ebx with the size of &ecx# 
+        mcp %h %h               # heap to heap copy. Stack &eax to heap &ebx with the size of &ecx# 
+        mcp %s %s               # stack to stack copy. Stack &eax to heap &ebx with the size of &ecx# 
 
         inc %f 5.4 #increment the float at the top of the stack by 5.4#
         inc %f &edx 5.4
+
+        incs
 .end
 
 This place is completely discarded, no matter what. The assembler stops reading at .end

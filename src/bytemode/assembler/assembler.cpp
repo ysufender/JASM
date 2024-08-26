@@ -35,8 +35,6 @@ namespace ByteAssembler
         {"add", &Instructions::Add},
         {"adds", &Instructions::AddSafe},
         {"mcp", &Instructions::MemCopy},
-        {"hcp", &Instructions::HeapCopy},
-        {"scp", &Instructions::StackCopy},
         {"inc", &Instructions::Increment},
         {"incs", &Instructions::IncrementSafe},
         {"dcr", &Instructions::Decrement},

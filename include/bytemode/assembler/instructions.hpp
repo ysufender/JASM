@@ -48,63 +48,62 @@ namespace Instructions
         ENUMERC addsf   = 0x14;
         ENUMERC addsb   = 0x15;
 
-        // hcp - scp - rcp
-        ENUMERC hcp     = 0x16;
-        ENUMERC scp     = 0x17;
+        // mcp 
+        ENUMERC mcp     = 0x16;
 
         // inc
-        ENUMERC inci    = 0x18;
-        ENUMERC incf    = 0x19;
-        ENUMERC incb    = 0x1A;
-        ENUMERC incri   = 0x1B;
-        ENUMERC incrf   = 0x1C;
-        ENUMERC incrb   = 0x1D;
+        ENUMERC inci    = 0x17;
+        ENUMERC incf    = 0x18;
+        ENUMERC incb    = 0x19;
+        ENUMERC incri   = 0x1A;
+        ENUMERC incrf   = 0x1B;
+        ENUMERC incrb   = 0x1C;
 
         // incs
-        ENUMERC incsi   = 0x1E;
-        ENUMERC incsf   = 0x1F;
-        ENUMERC incsb   = 0x20;
+        ENUMERC incsi   = 0x1D;
+        ENUMERC incsf   = 0x1E;
+        ENUMERC incsb   = 0x1F;
 
         // dcr
-        ENUMERC dcri    = 0x21;
-        ENUMERC dcrf    = 0x22;
-        ENUMERC dcrb    = 0x23;
-        ENUMERC dcrri   = 0x24;
-        ENUMERC dcrrf   = 0x25;
-        ENUMERC dcrrb   = 0x26;
+        ENUMERC dcri    = 0x20;
+        ENUMERC dcrf    = 0x21;
+        ENUMERC dcrb    = 0x22;
+        ENUMERC dcrri   = 0x23;
+        ENUMERC dcrrf   = 0x24;
+        ENUMERC dcrrb   = 0x25;
 
         // dcrs
-        ENUMERC dcrsi   = 0x27;
-        ENUMERC dcrsf   = 0x28;
-        ENUMERC dcrsb   = 0x29;
+        ENUMERC dcrsi   = 0x26;
+        ENUMERC dcrsf   = 0x27;
+        ENUMERC dcrsb   = 0x28;
 
         // and
-        ENUMERC andst   = 0x2A;
-        ENUMERC andse   = 0x2B;
-        ENUMERC andr    = 0x2C;
+        ENUMERC andst   = 0x29;
+        ENUMERC andse   = 0x2A;
+        ENUMERC andr    = 0x2B;
 
         // or 
-        ENUMERC orst    = 0x2D;
-        ENUMERC orse    = 0x2E;
-        ENUMERC orr     = 0x2F;
+        ENUMERC orst    = 0x2C;
+        ENUMERC orse    = 0x2D;
+        ENUMERC orr     = 0x2E;
 
         // nor 
-        ENUMERC norst   = 0x30;
-        ENUMERC norse   = 0x31;
-        ENUMERC norr    = 0x32;
+        ENUMERC norst   = 0x2F;
+        ENUMERC norse   = 0x30;
+        ENUMERC norr    = 0x31;
 
         // swp
-        ENUMERC swpt    = 0x33;
-        ENUMERC swpe    = 0x34;
-        ENUMERC swpr    = 0x35;
+        ENUMERC swpt    = 0x32;
+        ENUMERC swpe    = 0x33;
+        ENUMERC swpr    = 0x34;
 
         // dup
-        ENUMERC dupt    = 0x36;
-        ENUMERC dupe    = 0x37;
+        ENUMERC dupt    = 0x35;
+        ENUMERC dupe    = 0x36;
 
         // raw
-        ENUMERC raw     = 0x38; 
-        ENUMERC raws    = 0x39;
+        ENUMERC raw     = 0x37; 
+        ENUMERC raws    = 0x38;
 
         // 
     }
@@ -117,8 +116,6 @@ namespace Instructions
     std::string Add(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string AddSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string MemCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string HeapCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
-    std::string StackCopy(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Increment(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string IncrementSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Decrement(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);

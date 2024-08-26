@@ -21,6 +21,8 @@ namespace ModeFlags
     {
         ENUMERC Stack       = 0x06;
         ENUMERC Heap        = 0x07;
+        // 01100000
+        // 00000111
     }
 
     namespace RegisterModeFlags
@@ -48,6 +50,4 @@ namespace ModeFlags
     }
 
     char GetModeFlag(const std::string& identifier, char start, char end, bool throws = false);
-    //char GetModeFlag(const std::string& identifier, bool throws = false); 
-    //char GetRegisterModeFlag(const std::string& identifier, bool throws = false);
 }
