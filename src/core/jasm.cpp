@@ -114,15 +114,15 @@ CLIParser::Flags SetUpCLI(char** args, int argc)
     Parser parser{args, argc, "--", "-"};
     parser.AddFlag<FlagType::Bool>("help", "Print this help text.");
     parser.AddFlag<FlagType::Bool>("version", "Print version.");
-    parser.Seperator();
+    parser.Separator();
     parser.AddFlag<FlagType::Bool>("silent", "Disables SOME outputs. So it's less painful to look at the screen.", false);
     parser.AddFlag<FlagType::Bool>("single", "Assemble each file provided by '--in' flag but do NOT link.", false);
     parser.AddFlag<FlagType::String>("out", "Place the output file to specified path if flag '--single' is not set.");
     parser.AddFlag<FlagType::String>("lib-type", "If desired output is a library, specify the type. (either shared 'shd' or static 'stc')");
-    parser.Seperator();
+    parser.Separator();
     parser.AddFlag<FlagType::StringList>("in", "Files to assemble and (optionally) link. The first entry must contain the entry point, if output is executable.");
     parser.AddFlag<FlagType::StringList>("libs", "Libraries used and to be linked.");
-    parser.Seperator();
+    parser.Separator();
     parser.AddFlag<FlagType::Bool>("pipelines", "Use pipeline-streams instead of intermediate files.", false);
     parser.AddFlag<FlagType::String>("working-dir", "Set the working directory of the assembler.", std::filesystem::current_path().generic_string());
     parser.AddFlag<FlagType::StringList>("redirect-stdout", "Redirect stdout and stderr to given files. If only one is provided, both get redirected to it.");
