@@ -10,6 +10,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDART_REQUIRED TRUE)
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    #add_compile_options("-O0")
+endif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+
 #
 # CLI Arguments 
 # 

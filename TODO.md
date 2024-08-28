@@ -13,7 +13,7 @@ is 32 or 8 bits
 - [x] ROM manipulation
     - [x] Store raw sequence of data in ROM
 
-- [x] Stack Manipulation
+- [ ] Stack Manipulation
     - [x] Constant to stack
     - [x] Register to stack
     - [x] Heap to stack
@@ -21,11 +21,16 @@ is 32 or 8 bits
     - [x] ROM to stack
     - [x] Duplicate the top 4-bytes 
     - [x] Duplicate the top byte 
+    - [ ] Duplicate the top range of bytes 
     - [x] Swap the top 2 4-bytes
     - [x] Swap the top 2 byte
+    - [ ] Swap the top range of bytes
     - [x] Push a range of raw data
     - [x] Read a range of raw data from symbol
     - [x] Read a range from heap
+    - [x] Pop 4-bytes from stack
+    - [x] Pop 2-bytes from stack
+    - [ ] Pop range of bytes from stack
 
 - [x] Heap Manipulation
     - [x] Constant to heap (workaround by stc)
@@ -65,14 +70,13 @@ is 32 or 8 bits
     - [x] Nor 
         - [x] On stack, push the result
         - [x] On registers, set the second
-    - [ ] Not 
-        - [ ] On stack
-        - [ ] On stack, push the result
-        - [ ] On register
-    - [ ] Compare (lesser, greater, equal, lesser-equal, greater-equal, not-equal)
-        - [ ] On stack, set register
-        - [ ] On stack, push result
-        - [ ] On register, set second
+    - [x] Invert 
+        - [x] On stack
+        - [x] On stack, push the result
+        - [x] On register
+    - [x] Compare (lesser, greater, equal, lesser-equal, greater-equal, not-equal)
+        - [x] On stack, set register
+        - [x] On register, set second
     - [ ] Branching
         - [ ] Branch
         - [ ] Conditional branch
@@ -82,12 +86,13 @@ is 32 or 8 bits
     - [ ] Multithreading
         - [ ] Create and execute independent threads
         - [ ] Create and execute shared threads (registers are shared. and maybe stack. I'm not sure)
-    - [ ] Complex Instructions
-        - [ ] Dumping CPU state (dumping current execution context in our case)
-        - [ ] Loading CPU state (loading current execution context in our case)
-        - [ ] Complex integer/float arithmetic
-            - [ ] Exponents
-            - [ ] Taking roots
-            - [ ] Square root
-            - [ ] Inverse square root
-            - [ ] Transcendental functions
+
+- [ ] Complex Instructions
+    - [ ] Dumping CPU state (dumping current execution context in our case)
+    - [ ] Loading CPU state (loading current execution context in our case)
+    - [ ] Complex integer/float arithmetic
+        - [ ] Exponents
+        - [ ] Taking roots
+        - [ ] Square root
+        - [ ] Inverse square root
+        - [ ] Transcendental functions

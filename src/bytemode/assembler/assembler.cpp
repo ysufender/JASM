@@ -46,6 +46,10 @@ namespace ByteAssembler
         {"dup", &Instructions::Duplicate},
         {"raw", &Instructions::RawData},
         {"rom", &Instructions::RomData},
+        {"inv", &Instructions::Invert},
+        {"invs", &Instructions::InvertSafe},
+        {"cmp", &Instructions::Compare},
+        {"pop", &Instructions::Pop},
     };
 
     //

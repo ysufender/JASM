@@ -105,7 +105,21 @@ namespace Instructions
         ENUMERC raw     = 0x37; 
         ENUMERC raws    = 0x38;
 
-        // 
+        // inv
+        ENUMERC invt    = 0x39;
+        ENUMERC inve    = 0x3A;
+        ENUMERC invr    = 0x3B;
+        // invs
+        ENUMERC invst   = 0x3C;
+        ENUMERC invse   = 0x3D;
+
+        // cmp
+        ENUMERC cmp     = 0x3E;
+        ENUMERC cmpr    = 0x3F;
+
+        // pop
+        ENUMERC popt    = 0x40;
+        ENUMERC pope    = 0x41;
     }
     
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -127,4 +141,8 @@ namespace Instructions
     std::string Duplicate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string RawData(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string RomData(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Invert(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string InvertSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Compare(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Pop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

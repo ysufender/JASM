@@ -34,17 +34,19 @@ namespace ModeFlags
 
         {"&pc", RegisterModeFlags::pc},
         {"&sp", RegisterModeFlags::sp},
-    };
 
-    void _ErrCall(const std::string& identifier)
-    {
-        LOGE(System::LogLevel::High, "Couldn't find mode flag for '", identifier, "'.");
+        {"%les", CompareModeFlags::les},
+        {"%gre", CompareModeFlags::gre},
+        {"%equ", CompareModeFlags::equ},
+        {"%leq", CompareModeFlags::leq},
+        {"%geq", CompareModeFlags::geq},
+        {"%neq", CompareModeFlags::neq},
     };
 
     char GetModeFlag(const std::string &identifier, char start, char end, bool throws)
     {
             if (!modeMap.contains(identifier) && throws)
-                _ErrCall(identifier);
+                LOGE(System::LogLevel::High, "Couldn't fin mode flag for '", identifier, "'.");
             else if (!modeMap.contains(identifier))
                 return NoMode;
 
@@ -52,7 +54,7 @@ namespace ModeFlags
             bool isInRange { start <= mode && mode <= end };
 
             if (throws && !isInRange)
-                _ErrCall(identifier);
+                LOGE(System::LogLevel::High, "'", identifier, "' is not a suitable mode flag for this scenario.");
             else if (isInRange)
                 return mode;
 

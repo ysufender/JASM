@@ -1,4 +1,7 @@
 .prep
 .body
-    mcp %h %s
+    pop %ui
+    pop %ub
 .end
+
+4140
