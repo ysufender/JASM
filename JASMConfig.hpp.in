@@ -9,16 +9,10 @@
 #define JASM_DESCRIPTION "@JASM_DESCRIPTION@"
 
 #cmakedefine TOOLCHAIN_MODE
-#cmakedefine TEST_MODE
 #cmakedefine USE_PIPELINES_OPT
 
-#ifdef TEST_MODE
-    #define TESTCONST extern const
-#else
-    #define TESTCONST const
-#endif
-
-#define ENUMER inline constexpr
-#define ENUMERC ENUMER char 
 
 using systembit_t = uint32_t;
+using uchar_t = uint8_t;
+
+#define Enumc(enum) static_cast<uchar_t>(enum)

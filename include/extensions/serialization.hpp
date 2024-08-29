@@ -8,10 +8,16 @@
 #include <string>
 #include <type_traits>
 
+namespace Instructions { enum class OpCodes : char; }
+
 namespace Extensions::Serialization
 {
     template<typename T>
-    concept integer = std::integral<T>;
+    concept integer = requires(T& t)
+    {
+        std::is_integral_v<T>;
+        std::is_same_v<T, Instructions::OpCodes>;
+    };
 
     template<typename T>
     concept iterable = requires(T& t)
@@ -39,7 +45,7 @@ namespace Extensions::Serialization
 
             for (char i = 0; i < sizeof(UT); i++)
             {
-                uchar swapData { static_cast<uchar>(data >> i*8) };
+                uchar swapData { static_cast<uchar>(static_cast<uchar>(data) >> i*8) };
                 temp <<= 8;
                 temp |= swapData;
             }

@@ -4,58 +4,42 @@
 
 #include "JASMConfig.hpp"
 
+#define Is8Bit(reg) (reg >= Enumc(ModeFlags::RegisterModeFlags::al) && reg <= Enumc(ModeFlags::RegisterModeFlags::flg))
+
 namespace ModeFlags
 {
-    ENUMERC NoMode = 0x00;
+    inline constexpr uchar_t NoMode = 0x00;
 
-    namespace NumericModeFlags 
+    enum class NumericModeFlags : uchar_t
     {
-        ENUMERC Int         = 0x01;
-        ENUMERC Float       = 0x02;
-        ENUMERC Byte        = 0x03;
-        ENUMERC UInt        = 0x04;
-        ENUMERC UByte       = 0x05;
-    }
+        Int,
+        Float,
+        Byte,
+        UInt,
+        UByte,
+    };
 
-    namespace MemoryModeFlags
+    enum class MemoryModeFlags : uchar_t
     {
-        ENUMERC Stack       = 0x06;
-        ENUMERC Heap        = 0x07;
-    }
+        Stack,
+        Heap,
+    };
 
-    namespace RegisterModeFlags
+    enum class RegisterModeFlags : uchar_t
     {
-        // 32-bit
-        ENUMERC eax         = 0x08;
-        ENUMERC ebx         = 0x09;
-        ENUMERC ecx         = 0x0A;
-        ENUMERC edx         = 0x0B;
-        ENUMERC esi         = 0x0C;
-        ENUMERC edi         = 0x0D;
+        /* 32-bit */ eax, ebx, ecx, edx, esi, edi,
 
-        // 8-bit
-        ENUMERC al          = 0x0E;
-        ENUMERC bl          = 0x0F;
-        ENUMERC cl          = 0x10;
-        ENUMERC dl          = 0x11;
+        /* 8-bit */ al, bl, cl, dl,
 
-        // 8-bit system
-        ENUMERC flg         = 0x12;
+        /* 8-bit system */ flg,
 
-        // 32-bit system
-        ENUMERC pc          = 0x13;
-        ENUMERC sp          = 0x14;
-    }
+        /* 32-bit system */ pc, sp,
+    };
 
-    namespace CompareModeFlags
+    enum class CompareModeFlags : uchar_t
     {
-        ENUMERC les         = 0x15;
-        ENUMERC gre         = 0x16;
-        ENUMERC equ         = 0x17;
-        ENUMERC leq         = 0x18;
-        ENUMERC geq         = 0x18;
-        ENUMERC neq         = 0x19;
-    }
+        les, gre, equ, leq, geq, neq,
+    };
 
-    char GetModeFlag(const std::string& identifier, char start, char end, bool throws = false);
+    uchar_t GetModeFlag(const std::string& identifier, uchar_t start, uchar_t end, bool throws = false);
 }

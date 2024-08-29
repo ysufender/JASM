@@ -18,7 +18,6 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 # CLI Arguments 
 # 
 option(TOOLCHAIN_MODE "Enable toolchain mode" OFF)
-option(TEST_MODE "Activate the unit tests" OFF)
 option(USE_PIPELINES_OPT "Pipeline support" OFF)
 set(OUTPUT_PATH "" CACHE STRING "")
 
@@ -38,23 +37,16 @@ configure_file(
 #endforeach(JASM_FILE ${JASM_FILES})
 
 
-if(${TEST_MODE})
-    add_library(jasm
-        STATIC 
-            src/main.cpp
-    )
-else()
-    add_executable(jasm 
-        src/main.cpp
-    )
+add_executable(jasm 
+    src/main.cpp
+)
 
-    set_target_properties(jasm
-        PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
-    )
-endif(${TEST_MODE})
+set_target_properties(jasm
+    PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin//${OUTPUT_PATH}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/"
+)
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -70,7 +62,3 @@ target_link_libraries(jasm
         libs
         src
 )
-
-if(${TEST_MODE})
-    add_subdirectory(tests)
-endif(${TEST_MODE})

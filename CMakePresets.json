@@ -18,7 +18,6 @@
                 "CMAKE_CXX_STANDART_REQUIRED": true,
 
                 "TOOLCHAIN_MODE": "OFF",
-                "TEST_MODE": "OFF",
                 "USE_PIPELINES_OPT": "OFF",
                 "OUTPUT_PATH": ""
             }
@@ -31,26 +30,12 @@
 
                 "OUTPUT_PATH": "Debug"
             }
-        },
-        {
-            "name": "Test",
-            "inherits": "default",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-
-                "OUTPUT_PATH": "Test",
-                "TEST_MODE": "ON"
-            }
         }
     ],
     "buildPresets": [
         {
             "name": "Debug",
             "configurePreset": "Debug"
-        },
-        {
-            "name": "Test",
-            "configurePreset": "Test"
         }
     ]
 }

@@ -143,7 +143,7 @@ namespace ByteAssembler
         // Setup
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        char outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
+        uchar_t outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
@@ -218,7 +218,7 @@ namespace ByteAssembler
     {
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        char outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo };
+        uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo };
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
@@ -251,7 +251,7 @@ namespace ByteAssembler
     //
     // AssemblyInfo Implementation 
     //
-    AssemblyInfo::AssemblyInfo(const std::string& path, char flags) : symbolMap(), path(path), flags(flags)
+    AssemblyInfo::AssemblyInfo(const std::string& path, uchar_t flags) : symbolMap(), path(path), flags(flags)
     {
     }
 
@@ -294,10 +294,10 @@ namespace ByteAssembler
 
         // Name
         if (flags & AssemblyFlags::StoreName)
-            Serialization::SerializeContainer<std::string, size_t, char>(
+            Serialization::SerializeContainer<std::string, size_t, uchar_t>(
                 path, 
                 outFile,
-                &Serialization::SerializeInteger<char> 
+                &Serialization::SerializeInteger<uchar_t> 
             );
 
         // Imports
@@ -305,10 +305,10 @@ namespace ByteAssembler
             runtimeImports,
             outFile,
             [](const std::string& data, std::ostream& stream){
-            Serialization::SerializeContainer<std::string, uint16_t, char>(
+            Serialization::SerializeContainer<std::string, uint16_t, uchar_t>(
                     data,
                     stream,
-                    &Serialization::SerializeInteger<char>
+                    &Serialization::SerializeInteger<uchar_t>
                 );
             }
         );
@@ -350,10 +350,10 @@ namespace ByteAssembler
 
         //Name
         if (flags & AssemblyFlags::StoreName)
-            Serialization::DeserializeContainer<std::string, size_t, char>(
+            Serialization::DeserializeContainer<std::string, size_t, uchar_t>(
                 path, 
                 inFile,
-                Serialization::DeserializeInteger<char>
+                Serialization::DeserializeInteger<uchar_t>
             );
 
         // Imports
@@ -361,10 +361,10 @@ namespace ByteAssembler
             runtimeImports, 
             inFile,
             [](std::string& data, std::istream& stream){
-            Serialization::DeserializeContainer<std::string, uint16_t, char>(
+            Serialization::DeserializeContainer<std::string, uint16_t, uchar_t>(
                 data, 
                 stream,
-                &Serialization::DeserializeInteger<char>
+                &Serialization::DeserializeInteger<uchar_t>
             );} 
         );
 

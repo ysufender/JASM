@@ -39,21 +39,6 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
     std::cerr.rdbuf(cerr.rdbuf());
 }
 
-#ifdef TEST_MODE
-void System::Setup(const AssemblyContext&& context, std::ostream& cout, std::ostream& cerr)
-{
-    Setup(context, cout, cerr);
-}
-
-void System::Setup(const AssemblyContext& context, std::ostream& cout, std::ostream& cerr)
-{
-    Context = context;
-    std::filesystem::current_path(Context.WorkingDir());
-    std::cout.rdbuf(cout.rdbuf());
-    std::cerr.rdbuf(cerr.rdbuf());
-}
-#endif
-
 void System::Log(std::string_view message)
 {
     if (Context.IsSilent())

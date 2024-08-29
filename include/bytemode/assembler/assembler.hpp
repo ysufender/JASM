@@ -21,11 +21,11 @@ namespace ByteAssembler
     // create enums so just plain ol' namespaces and constexprs
     namespace AssemblyFlags
     {
-        ENUMER char Shared       = 1;
-        ENUMER char Static       = 2;
-        ENUMER char Executable   = 4;
-        ENUMER char SymbolInfo   = 8;
-        ENUMER char StoreName    = 16; // For possible future debugging
+        inline constexpr uchar_t Shared       = 1;
+        inline constexpr uchar_t Static       = 2;
+        inline constexpr uchar_t Executable   = 4;
+        inline constexpr uchar_t SymbolInfo   = 8;
+        inline constexpr uchar_t StoreName    = 16; // For possible future debugging
     };
 
     struct SymbolInfo 
@@ -45,7 +45,7 @@ namespace ByteAssembler
             using SymbolMap = std::unordered_map<size_t, systembit_t>;
 
             std::string path;
-            char flags;
+            uchar_t flags;
             DefinedSymbolCollection definedSymbols;
             UnknownSymbolCollection unknownSymbols;
             ImportCollection runtimeImports;
@@ -56,7 +56,7 @@ namespace ByteAssembler
 
         public:
             AssemblyInfo() = delete;
-            AssemblyInfo(const std::string& path, char flags);
+            AssemblyInfo(const std::string& path, uchar_t flags);
             void Serialize(std::ostream& outFile);
             void Deserialize(std::istream& inFile);
             void PrintAssemblyInfo() const;

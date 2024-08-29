@@ -8,12 +8,12 @@
 #include <iostream>
 
 #include "bytemode/assembler/instructions.hpp"
-#include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
 #include "bytemode/assembler/modeflags.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
 #include "extensions/stringextensions.hpp"
+#include "JASMConfig.hpp"
 #include "system.hpp"
 
 
@@ -22,10 +22,10 @@ namespace Instructions
     using namespace ByteAssembler;
     using namespace Extensions;
 
-    namespace Reg = ModeFlags::RegisterModeFlags;
-    namespace Numo = ModeFlags::NumericModeFlags;
-    namespace Memo = ModeFlags::MemoryModeFlags;
-    namespace Comp = ModeFlags::CompareModeFlags;
+    using Reg = ModeFlags::RegisterModeFlags;
+    using Numo = ModeFlags::NumericModeFlags;
+    using Memo = ModeFlags::MemoryModeFlags;
+    using Comp = ModeFlags::CompareModeFlags;
 
     //
     // Util
@@ -58,23 +58,23 @@ namespace Instructions
     //  0: (u)int 
     //  1: float 
     //  2: (u)byte
-    void _BoringModeSwitch(const char mode, std::ostream& out, std::array<char, 3> op, std::array<std::function<void()>, 3> callbacks = {})
+    void _BoringModeSwitch(const uchar_t mode, std::ostream& out, std::array<OpCodes, 3> op, std::array<std::function<void()>, 3> callbacks = {})
     {
         switch (mode)
         {
-            case Numo::UInt: 
-            case Numo::Int: 
+            case Enumc(Numo::UInt): 
+            case Enumc(Numo::Int): 
                 Serialization::SerializeInteger(op.at(0), out);
                 if (callbacks.at(0)) callbacks.at(0)();
                 break;
 
-            case Numo::Float:
+            case Enumc(Numo::Float):
                 Serialization::SerializeInteger(op.at(1), out);
                 if (callbacks.at(1)) callbacks.at(1)();
                 break;
 
-            case Numo::UByte:
-            case Numo::Byte:
+            case Enumc(Numo::UByte):
+            case Enumc(Numo::Byte):
                 Serialization::SerializeInteger(op.at(2), out); 
                 if (callbacks.at(2)) callbacks.at(2)();
                 break;
@@ -89,20 +89,20 @@ namespace Instructions
     //  0: stack 32-bit
     //  1: stack 8-bit
     //  2: register
-    std::string _BoringLogicHandle(std::istream& in, std::ostream& out, std::array<char, 3> stackAndReg)
+    std::string _BoringLogicHandle(std::istream& in, std::ostream& out, std::array<OpCodes, 3> stackAndReg)
     {
         // [op] <mode> 
         // [op] <register> <register> 
 
         std::string possibleReg1 { Stream::Tokenize(in) };
-        //const char possibleReg1Mode { ModeFlags::GetRegisterModeFlag(possibleReg1) };
-        const char possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Reg::eax, Reg::sp) };
+        //const uchar_t possibleReg1Mode { ModeFlags::GetRegisterModeFlag(possibleReg1) };
+        const uchar_t possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Reg::eax), Enumc(Reg::sp)) };
 
         // [op] <register> <register> 
         if (possibleReg1Mode != ModeFlags::NoMode)
         {
-            //const char reg2Mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
-            const char reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Reg::eax, Reg::sp, true) };
+            //const uchar_t reg2Mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+            const uchar_t reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::sp), true) };
 
             Serialization::SerializeInteger(stackAndReg.at(1), out);
             Serialization::SerializeInteger(possibleReg1Mode, out);
@@ -112,8 +112,8 @@ namespace Instructions
         }
 
         // [op] <mode>
-        //const char mode { ModeFlags::GetModeFlag(possibleReg1, true) };
-        const char mode { ModeFlags::GetModeFlag(possibleReg1, Numo::Int, Numo::UByte, true) };
+        //const uchar_t mode { ModeFlags::GetModeFlag(possibleReg1, true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         _BoringModeSwitch(mode, out, {stackAndReg.at(0), stackAndReg.at(0), stackAndReg.at(1)});
 
         return Stream::Tokenize(in);
@@ -132,13 +132,13 @@ namespace Instructions
     //  0: safe (u)int
     //  1: safe float
     //  2: safe (u)byte
-    std::string _BoringArithmeticCheck(std::istream& in, std::ostream& out, std::array<char, 6> ops, bool safe = false)
+    std::string _BoringArithmeticCheck(std::istream& in, std::ostream& out, std::array<OpCodes, 6> ops, bool safe = false)
     {
         if (safe) 
         {
             // [op]s <mode>
-            //const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-            const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+            //const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+            const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
             _BoringModeSwitch(mode, out, {ops.at(0), ops.at(1), ops.at(2)});
 
             return Stream::Tokenize(in); 
@@ -147,17 +147,17 @@ namespace Instructions
         // [op] <mode>
         // [op] <mode> <register> <register>
 
-        //const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+        //const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         std::string possibleReg1 { Stream::Tokenize(in) };
-        //const char possibleReg1Mode { ModeFlags::GetRegisterModeFlag(possibleReg1) };
-        const char possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Reg::eax, Reg::sp) };
+        //const uchar_t possibleReg1Mode { ModeFlags::GetRegisterModeFlag(possibleReg1) };
+        const uchar_t possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Reg::eax), Enumc(Reg::sp)) };
 
         // [op] <mode> <register> <register>
         if (possibleReg1Mode != ModeFlags::NoMode)
         {
-            //const char reg2Mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
-            const char reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Reg::eax, Reg::sp, true) };
+            //const uchar_t reg2Mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+            const uchar_t reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::sp), true) };
 
             _BoringModeSwitch(mode, out, {ops.at(3), ops.at(4), ops.at(5)});
             Serialization::SerializeInteger(possibleReg1Mode, out);
@@ -184,17 +184,17 @@ namespace Instructions
     //  0: safe (u)int
     //  1: safe float
     //  2: safe (u)byte
-    std::string _BoringIncDcr(std::istream& in, std::ostream& out, std::array<char, 6> ops, bool safe = false)
+    std::string _BoringIncDcr(std::istream& in, std::ostream& out, std::array<OpCodes, 6> ops, bool safe = false)
     {
         if (safe) 
         {
             // [op]s <mode> <value>
-            //const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-            const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+            //const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+            const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
             _BoringModeSwitch(mode, out, {ops.at(0), ops.at(1), ops.at(2)}, {
                 [&in, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);},
                 [&in, &out](){Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);},
-                [&in, &out](){Serialization::SerializeInteger(_TokenToInt<char>(Stream::Tokenize(in)), out);}
+                [&in, &out](){Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);}
             });
 
             return Stream::Tokenize(in);
@@ -202,20 +202,18 @@ namespace Instructions
 
         // [op] <mode> <value>
         // [op] <mode> <register> <value>
-        //const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+        //const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         std::string possibleReg { Stream::Tokenize(in) };
-        //const char possibleRegMode { ModeFlags::GetRegisterModeFlag(possibleReg) };
-        const char possibleRegMode { ModeFlags::GetModeFlag(possibleReg, Reg::eax, Reg::sp) };
+        //const uchar_t possibleRegMode { ModeFlags::GetRegisterModeFlag(possibleReg) };
+        const uchar_t possibleRegMode { ModeFlags::GetModeFlag(possibleReg, Enumc(Reg::eax), Enumc(Reg::sp)) };
 
         // [op] <mode> <register> <value>
         if (possibleRegMode != ModeFlags::NoMode)
         {
-            namespace Regs = ModeFlags::RegisterModeFlags;
-            namespace Numo = ModeFlags::NumericModeFlags;
-            bool regIs8Bit { possibleRegMode >= Regs::al && possibleRegMode <= Regs::flg };
+            bool regIs8Bit { Is8Bit(possibleRegMode) }; 
 
-            if (regIs8Bit && (mode != Numo::Byte || mode != Numo::UByte))
+            if (regIs8Bit && (mode != Enumc(Numo::Byte) || mode != Enumc(Numo::UByte)))
                 LOGE(System::LogLevel::High, "Can't use a 32-bit mode with 8-bit register ", possibleReg, ".");
 
             _BoringModeSwitch(mode, out, {ops.at(3), ops.at(4), ops.at(5)}, {
@@ -229,7 +227,7 @@ namespace Instructions
                 },
                 [&possibleRegMode, &out, &in](){
                     Serialization::SerializeInteger(possibleRegMode, out);
-                    Serialization::SerializeInteger(_TokenToInt<char>(Stream::Tokenize(in)), out);
+                    Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);
                 }
             });
 
@@ -247,7 +245,7 @@ namespace Instructions
                 Serialization::SerializeFloat(std::stof(possibleReg), out);
             },
             [&possibleReg, &in, &out]() {
-                Serialization::SerializeInteger(_TokenToInt<char>(possibleReg), out);
+                Serialization::SerializeInteger(_TokenToInt<uchar_t>(possibleReg), out);
             },
         });
 
@@ -275,7 +273,7 @@ namespace Instructions
             if (token.find_first_of('.') != std::string::npos)
                 Serialization::SerializeFloat(std::stof(token), out);
             else if ((token.find_first_of('x') != std::string::npos) && (token.size() >= 3 && token.size() <= 4))
-                Serialization::SerializeInteger(_TokenToInt<char>(token), out);
+                Serialization::SerializeInteger(_TokenToInt<uchar_t>(token), out);
             else
                 Serialization::SerializeInteger(_TokenToInt<systembit_t>(token), out);
 
@@ -302,13 +300,13 @@ namespace Instructions
         // stc <integer>
 
         const std::string next { Stream::Tokenize(in) };
-        //const char mode { ModeFlags::GetModeFlag(next) };
-        const char mode { ModeFlags::GetModeFlag(next, Numo::Int, Numo::UByte) };
+        //const uchar_t mode { ModeFlags::GetModeFlag(next) };
+        const uchar_t mode { ModeFlags::GetModeFlag(next, Enumc(Numo::Int), Enumc(Numo::UByte)) };
 
         // Store integer or float
         if (mode == ModeFlags::NoMode)
         {
-            const char fakeFlag { (next.find_first_of('.') == std::string::npos) ? Numo::Int : Numo::Float };
+            const uchar_t fakeFlag { (next.find_first_of('.') == std::string::npos) ? Enumc(Numo::Int) : Enumc(Numo::Float) };
 
             _BoringModeSwitch(fakeFlag, out, {OpCodes::stt, OpCodes::stt}, {
                 [&next, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(next), out);},
@@ -327,7 +325,7 @@ namespace Instructions
             _BoringModeSwitch(mode, out, {OpCodes::stt, OpCodes::stt, OpCodes::ste}, {
                 [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(symOrVal), out); },
                 [&symOrVal, &out](){Serialization::SerializeFloat(std::stof(symOrVal), out); },
-                [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<char>(symOrVal), out); },
+                [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<uchar_t>(symOrVal), out); },
             });
             return Stream::Tokenize(in);
         }
@@ -352,8 +350,8 @@ namespace Instructions
     {
         // ldc <mode>
         const std::string next { Stream::Tokenize(in) };
-        //const char fromReg { ModeFlags::GetModeFlag(next) };
-        const char mode { ModeFlags::GetModeFlag(next, Numo::Int, Numo::UByte, true) };
+        //const uchar_t fromReg { ModeFlags::GetModeFlag(next) };
+        const uchar_t mode { ModeFlags::GetModeFlag(next, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
 
         _BoringModeSwitch(mode, out, {OpCodes::ldt, OpCodes::ldt, OpCodes::lde});
 
@@ -366,23 +364,23 @@ namespace Instructions
         // rda <mode>
 
         const std::string next { Stream::Tokenize(in) };
-        //char fromReg { ModeFlags::GetRegisterModeFlag(next) };
-        const char possibleRegMode { ModeFlags::GetModeFlag(next, Reg::eax, Reg::sp) };
+        //uchar_t fromReg { ModeFlags::GetRegisterModeFlag(next) };
+        const uchar_t possibleRegMode { ModeFlags::GetModeFlag(next, Enumc(Reg::eax), Enumc(Reg::sp)) };
         
         // rda <mode> [read the address &ebx]
         if (possibleRegMode == ModeFlags::NoMode)
         {
-            //const char mode = ModeFlags::GetModeFlag(next);
-            const char mode { ModeFlags::GetModeFlag(next, Numo::Int, Numo::UByte, true) };
+            //const uchar_t mode = ModeFlags::GetModeFlag(next);
+            const uchar_t mode { ModeFlags::GetModeFlag(next, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
             _BoringModeSwitch(mode, out, {OpCodes::rdt, OpCodes::rdt, OpCodes::rde});
             return Stream::Tokenize(in);
         }
 
         // rda <register> [read the given register]
-        //const char regMode { ModeFlags::GetRegisterModeFlag(next) };
+        //const uchar_t regMode { ModeFlags::GetRegisterModeFlag(next) };
         
         // To enforce ModeFlag
-        const char regMode { ModeFlags::GetModeFlag(next, Reg::eax, Reg::sp, true) };
+        const uchar_t regMode { ModeFlags::GetModeFlag(next, Enumc(Reg::eax), Enumc(Reg::sp), true) };
 
         Serialization::SerializeInteger(OpCodes::rdr, out);
         Serialization::SerializeInteger(regMode, out);
@@ -398,15 +396,15 @@ namespace Instructions
 
         const std::string firstParam { Stream::Tokenize(in) };
         const std::string secondParam { Stream::Tokenize(in) };
-        //const char firstReg { ModeFlags::GetRegisterModeFlag(firstParam) };
-        //const char secondReg { ModeFlags::GetRegisterModeFlag(secondParam) };
-        const char firstReg { ModeFlags::GetModeFlag(firstParam, Reg::eax, Reg::sp) };
-        const char secondReg { ModeFlags::GetModeFlag(secondParam, Reg::eax, Reg::sp) };
+        //const uchar_t firstReg { ModeFlags::GetRegisterModeFlag(firstParam) };
+        //const uchar_t secondReg { ModeFlags::GetRegisterModeFlag(secondParam) };
+        const uchar_t firstReg { ModeFlags::GetModeFlag(firstParam, Enumc(Reg::eax), Enumc(Reg::sp)) };
+        const uchar_t secondReg { ModeFlags::GetModeFlag(secondParam, Enumc(Reg::eax), Enumc(Reg::sp)) };
 
         // move from stack
         if (secondReg == ModeFlags::NoMode)
         {
-            //const char regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
+            //const uchar_t regMode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
             //_BoringModeSwitch(fromReg, out, {OpCodes::movi, OpCodes::movf, OpCodes::movb});
             Serialization::SerializeInteger(OpCodes::movs, out);
             Serialization::SerializeInteger(firstReg, out);
@@ -417,8 +415,8 @@ namespace Instructions
         if (firstReg != ModeFlags::NoMode)
         {
             // Enforcing modes
-            const char firstReg { ModeFlags::GetModeFlag(firstParam, Reg::eax, Reg::sp, true) };
-            const char secondReg { ModeFlags::GetModeFlag(secondParam, Reg::eax, Reg::sp, true) };
+            const uchar_t firstReg { ModeFlags::GetModeFlag(firstParam, Enumc(Reg::eax), Enumc(Reg::sp), true) };
+            const uchar_t secondReg { ModeFlags::GetModeFlag(secondParam, Enumc(Reg::eax), Enumc(Reg::sp), true) };
             Serialization::SerializeInteger(OpCodes::movr, out); 
             Serialization::SerializeInteger(firstReg, out);
             Serialization::SerializeInteger(secondReg, out);
@@ -429,16 +427,16 @@ namespace Instructions
         // constant size check
         // next = value token here
         //namespace Regs = ModeFlags::RegisterModeFlags;
-        //const char regMode { ModeFlags::GetRegisterModeFlag(secondParam, true) };
-        const char regMode { ModeFlags::GetModeFlag(secondParam, Reg::eax, Reg::sp, true) };
-        bool regIs8Bit { regMode >= Reg::al && regMode <= Reg::flg };
+        //const uchar_t regMode { ModeFlags::GetRegisterModeFlag(secondParam, true) };
+        const uchar_t regMode { ModeFlags::GetModeFlag(secondParam, Enumc(Reg::eax), Enumc(Reg::sp), true) };
+        bool regIs8Bit { Is8Bit(regMode) }; 
 
         Serialization::SerializeInteger(OpCodes::movc, out);
 
         if (firstParam.find_first_of('.') == std::string::npos)
         {
             if (regIs8Bit)
-                Serialization::SerializeInteger(_TokenToInt<char>(firstParam), out); 
+                Serialization::SerializeInteger(_TokenToInt<uchar_t>(firstParam), out); 
             else
                 Serialization::SerializeInteger(_TokenToInt<systembit_t>(firstParam), out); 
         }
@@ -481,11 +479,11 @@ namespace Instructions
         // mcp <from> <to>
         // Serialize the <from> and <to> to one byte.
         // First 4 bits are <from>, second 4 bits are <to> 
-        char fromMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Memo::Stack, Memo::Heap, true) }; 
-        char toMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Memo::Stack, Memo::Heap, true) };
+        uchar_t fromMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Memo::Stack), Enumc(Memo::Heap), true) }; 
+        uchar_t toMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Memo::Stack), Enumc(Memo::Heap), true) };
 
         fromMode = fromMode << 4;
-        const char final { static_cast<const char>(fromMode|toMode) };
+        const uchar_t final { static_cast<const uchar_t>(fromMode|toMode) };
 
         Serialization::SerializeInteger(OpCodes::mcp, out);
         Serialization::SerializeInteger(final, out);
@@ -566,7 +564,7 @@ namespace Instructions
     std::string Duplicate(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // dup <mode>
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         _BoringModeSwitch(mode, out, {OpCodes::dupt, OpCodes::dupt, OpCodes::dupe});
 
         return Stream::Tokenize(in);
@@ -622,7 +620,7 @@ namespace Instructions
         // inv <register>
         
         const std::string next { Stream::Tokenize(in) };
-        const char possibleMode { ModeFlags::GetModeFlag(next, Numo::Int, Numo::UByte) };
+        const uchar_t possibleMode { ModeFlags::GetModeFlag(next, Enumc(Numo::Int), Enumc(Numo::UByte)) };
 
         // inv <mode>
         if (possibleMode != ModeFlags::NoMode)
@@ -632,7 +630,7 @@ namespace Instructions
         }
 
         // inv <register>
-        const char regMode { ModeFlags::GetModeFlag(next, Reg::eax, Reg::sp, true) };
+        const uchar_t regMode { ModeFlags::GetModeFlag(next, Enumc(Reg::eax), Enumc(Reg::sp), true) };
         Serialization::SerializeInteger(OpCodes::invr, out);
         Serialization::SerializeInteger(regMode, out);
         return Stream::Tokenize(in);
@@ -641,7 +639,7 @@ namespace Instructions
     std::string InvertSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // invs <mode>
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         _BoringModeSwitch(mode, out, {OpCodes::invst, OpCodes::invst, OpCodes::invse});
         return Stream::Tokenize(in);
     }
@@ -654,13 +652,13 @@ namespace Instructions
         // Serialize the <mode> and <compare_mode> to one byte
         // first 3 bits are <mode>, 5 bits are <compare_mode>
 
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
-        const char cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Comp::les, Comp::neq, true) };
-        const char firstThree { static_cast<const char>(mode << 5) };    
-        const char compressedModes { static_cast<const char>(firstThree|cmpMode) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
+        const uchar_t cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Comp::les), Enumc(Comp::neq), true) };
+        const uchar_t firstThree { static_cast<const uchar_t>(mode << 5) };    
+        const uchar_t compressedModes { static_cast<const uchar_t>(firstThree|cmpMode) };
 
         std::string possibleReg { Stream::Tokenize(in) }; 
-        const char possibleReg1 { ModeFlags::GetModeFlag(possibleReg, Reg::eax, Reg::sp) };
+        const uchar_t possibleReg1 { ModeFlags::GetModeFlag(possibleReg, Enumc(Reg::eax), Enumc(Reg::sp)) };
 
         // cmp <mode> <compare_mode>
         if (possibleReg1 == ModeFlags::NoMode)
@@ -671,7 +669,7 @@ namespace Instructions
         }
 
         // cmp <mode> <compare_mode> <register> <register>
-        const char reg2 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Reg::eax, Reg::sp, true) };
+        const uchar_t reg2 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::sp), true) };
         Serialization::SerializeInteger(OpCodes::cmpr, out);
         Serialization::SerializeInteger(compressedModes, out);
         Serialization::SerializeInteger(possibleReg1, out);
@@ -683,7 +681,7 @@ namespace Instructions
     std::string Pop(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // pop <mode> 
-        const char mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Numo::Int, Numo::UByte, true) };
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         _BoringModeSwitch(mode, out, {OpCodes::popt, OpCodes::popt, OpCodes::pope});
         return Stream::Tokenize(in);
     }

@@ -1,20 +1,11 @@
-#!/bin/bash
-
 set -e
 
-refresh=false
-generate=false
-args=("$@")
-pStart=0
+run=false
 
 while test $# -gt 0; do
     case "$1" in
-        -r|--refresh)
-            refresh=true
-            shift
-            ;;
-        -g|--generate)
-            generate=true
+        -r|--run)
+            run=true
             shift
             ;;
         *)
@@ -24,28 +15,18 @@ while test $# -gt 0; do
     esac
 done
 
-if [[ $refresh == true && -d build ]]; then
-    echo "[TEST_SCRIPT] Cleaning the build directory..."
-    rm -rf build
+if [ $run == false ]; then
+    ./build.sh
+    echo
 fi
-
-if [ -d build/Test ]; then
-    echo "[TEST_SCRIPT] Already generated."
-else
-    echo "[TEST_SCRIPT] Generating build files."
-    cmake --preset Test
-fi
-
-if [ $generate == true ]; then
-    echo "[TEST_SCRIPT] Generate-only mode"
-    exit
-fi
-
-cmake --build --preset Test 
-
-if [ $refresh == true ]; then
-    pStart=$(pStart + 1)
-fi
-
-clear
-build/bin/Test/tests "${args[@]:pStart}"
+echo "-----------------------------------------"
+echo "                RUNNING                  "
+echo "-----------------------------------------"
+echo
+build/bin/Debug/jasm -w asm -S -I test.jasm
+echo
+echo "-----------------------------------------"
+echo "                OUTPUT                   "
+echo "-----------------------------------------"
+echo
+hexdump asm/test.jasm.jo

@@ -11,117 +11,29 @@
 
 namespace Instructions
 {
-    namespace OpCodes
+    enum class OpCodes : char 
     {
-        ENUMERC nop     = 0x00;
+        nop, 
+        stt, ste, 
+        stts, stes, 
+        ldt, lde, 
+        rdt, rde, rdr, 
+        movc, movs, movr, 
+        addi,addf,addb,addri, addrf, addrb, addsi, addsf, addsb, 
+        mcp, 
+        inci, incf, incb, incri, incrf, incrb, incsi, incsf, incsb, 
+        dcri, dcrf, dcrb, dcrri, dcrrf, dcrrb, dcrsi, dcrsf, dcrsb, 
+        andst, andse, andr, 
+        orst, orse, orr, 
+        norst, norse, norr, 
+        swpt, swpe, swpr, 
+        dupt, dupe, 
+        raw , raws, 
+        invt, inve, invr, invst, invse, 
+        cmp, cmpr, 
+        popt, pope, 
+    };
 
-        // stc
-        ENUMERC stt     = 0x01;
-        ENUMERC ste     = 0x02;
-        ENUMERC stts    = 0x03;
-        ENUMERC stes    = 0x04;
-
-        // ldc
-        ENUMERC ldt     = 0x05;
-        ENUMERC lde     = 0x06;
-
-        // rda
-        ENUMERC rdt     = 0x07;
-        ENUMERC rde     = 0x08;
-        ENUMERC rdr     = 0x09;
-        
-        // mov
-        ENUMERC movc    = 0x0A;
-        ENUMERC movs    = 0x0B;
-        ENUMERC movr    = 0x0C;
-
-        // add
-        ENUMERC addi    = 0x0D; 
-        ENUMERC addf    = 0x0E; 
-        ENUMERC addb    = 0x0F; 
-        ENUMERC addri   = 0x10;
-        ENUMERC addrf   = 0x11;
-        ENUMERC addrb   = 0x12;
-
-        // adds
-        ENUMERC addsi   = 0x13;
-        ENUMERC addsf   = 0x14;
-        ENUMERC addsb   = 0x15;
-
-        // mcp 
-        ENUMERC mcp     = 0x16;
-
-        // inc
-        ENUMERC inci    = 0x17;
-        ENUMERC incf    = 0x18;
-        ENUMERC incb    = 0x19;
-        ENUMERC incri   = 0x1A;
-        ENUMERC incrf   = 0x1B;
-        ENUMERC incrb   = 0x1C;
-
-        // incs
-        ENUMERC incsi   = 0x1D;
-        ENUMERC incsf   = 0x1E;
-        ENUMERC incsb   = 0x1F;
-
-        // dcr
-        ENUMERC dcri    = 0x20;
-        ENUMERC dcrf    = 0x21;
-        ENUMERC dcrb    = 0x22;
-        ENUMERC dcrri   = 0x23;
-        ENUMERC dcrrf   = 0x24;
-        ENUMERC dcrrb   = 0x25;
-
-        // dcrs
-        ENUMERC dcrsi   = 0x26;
-        ENUMERC dcrsf   = 0x27;
-        ENUMERC dcrsb   = 0x28;
-
-        // and
-        ENUMERC andst   = 0x29;
-        ENUMERC andse   = 0x2A;
-        ENUMERC andr    = 0x2B;
-
-        // or 
-        ENUMERC orst    = 0x2C;
-        ENUMERC orse    = 0x2D;
-        ENUMERC orr     = 0x2E;
-
-        // nor 
-        ENUMERC norst   = 0x2F;
-        ENUMERC norse   = 0x30;
-        ENUMERC norr    = 0x31;
-
-        // swp
-        ENUMERC swpt    = 0x32;
-        ENUMERC swpe    = 0x33;
-        ENUMERC swpr    = 0x34;
-
-        // dup
-        ENUMERC dupt    = 0x35;
-        ENUMERC dupe    = 0x36;
-
-        // raw
-        ENUMERC raw     = 0x37; 
-        ENUMERC raws    = 0x38;
-
-        // inv
-        ENUMERC invt    = 0x39;
-        ENUMERC inve    = 0x3A;
-        ENUMERC invr    = 0x3B;
-        // invs
-        ENUMERC invst   = 0x3C;
-        ENUMERC invse   = 0x3D;
-
-        // cmp
-        ENUMERC cmp     = 0x3E;
-        ENUMERC cmpr    = 0x3F;
-
-        // pop
-        ENUMERC popt    = 0x40;
-        ENUMERC pope    = 0x41;
-    }
-    
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string StoreConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string LoadConstant(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);

@@ -8,49 +8,49 @@
 
 namespace ModeFlags
 {
-    TESTCONST std::unordered_map<std::string, char> modeMap {
-        {"%i", NumericModeFlags::Int},
-        {"%f", NumericModeFlags::Float},
-        {"%b", NumericModeFlags::Byte},
-        {"%ui", NumericModeFlags::UInt},
-        {"%ub", NumericModeFlags::UByte},
+    std::unordered_map<std::string, uchar_t> modeMap {
+        {"%i", Enumc(NumericModeFlags::Int)},
+        {"%f", Enumc(NumericModeFlags::Float)},
+        {"%b", Enumc(NumericModeFlags::Byte)},
+        {"%ui", Enumc(NumericModeFlags::UInt)},
+        {"%ub", Enumc(NumericModeFlags::UByte)},
 
-        {"%s", MemoryModeFlags::Stack},
-        {"%h", MemoryModeFlags::Heap},
+        {"%s", Enumc(MemoryModeFlags::Stack)},
+        {"%h", Enumc(MemoryModeFlags::Heap)},
 
-        {"&eax", RegisterModeFlags::eax},
-        {"&ebx", RegisterModeFlags::ebx},
-        {"&ecx", RegisterModeFlags::ecx},
-        {"&edx", RegisterModeFlags::edx},
-        {"&esi", RegisterModeFlags::esi},
-        {"&edi", RegisterModeFlags::edi},
+        {"&eax", Enumc(RegisterModeFlags::eax)},
+        {"&ebx", Enumc(RegisterModeFlags::ebx)},
+        {"&ecx", Enumc(RegisterModeFlags::ecx)},
+        {"&edx", Enumc(RegisterModeFlags::edx)},
+        {"&esi", Enumc(RegisterModeFlags::esi)},
+        {"&edi", Enumc(RegisterModeFlags::edi)},
 
-        {"&al", RegisterModeFlags::al},
-        {"&bl", RegisterModeFlags::bl},
-        {"&cl", RegisterModeFlags::cl},
-        {"&dl", RegisterModeFlags::dl},
+        {"&al", Enumc(RegisterModeFlags::al)},
+        {"&bl", Enumc(RegisterModeFlags::bl)},
+        {"&cl", Enumc(RegisterModeFlags::cl)},
+        {"&dl", Enumc(RegisterModeFlags::dl)},
 
-        {"&flg", RegisterModeFlags::flg},
+        {"&flg", Enumc(RegisterModeFlags::flg)},
 
-        {"&pc", RegisterModeFlags::pc},
-        {"&sp", RegisterModeFlags::sp},
+        {"&pc", Enumc(RegisterModeFlags::pc)},
+        {"&sp", Enumc(RegisterModeFlags::sp)},
 
-        {"%les", CompareModeFlags::les},
-        {"%gre", CompareModeFlags::gre},
-        {"%equ", CompareModeFlags::equ},
-        {"%leq", CompareModeFlags::leq},
-        {"%geq", CompareModeFlags::geq},
-        {"%neq", CompareModeFlags::neq},
+        {"%les", Enumc(CompareModeFlags::les)},
+        {"%gre", Enumc(CompareModeFlags::gre)},
+        {"%equ", Enumc(CompareModeFlags::equ)},
+        {"%leq", Enumc(CompareModeFlags::leq)},
+        {"%geq", Enumc(CompareModeFlags::geq)},
+        {"%neq", Enumc(CompareModeFlags::neq)},
     };
 
-    char GetModeFlag(const std::string &identifier, char start, char end, bool throws)
+    uchar_t GetModeFlag(const std::string &identifier, uchar_t start, uchar_t end, bool throws)
     {
             if (!modeMap.contains(identifier) && throws)
                 LOGE(System::LogLevel::High, "Couldn't fin mode flag for '", identifier, "'.");
             else if (!modeMap.contains(identifier))
                 return NoMode;
 
-            char mode { modeMap.at(identifier) };
+            uchar_t mode { modeMap.at(identifier) };
             bool isInRange { start <= mode && mode <= end };
 
             if (throws && !isInRange)
