@@ -53,7 +53,8 @@ namespace ByteAssembler
         {"jmp", &Instructions::Jump},
         {"swr", &Instructions::SwapRange},
         {"dur", &Instructions::DuplicateRange},
-        {"popr", &Instructions::PopRange},
+        {"rep", &Instructions::Repeat},
+        {"alc", &Instructions::Allocate},
     };
 
     //

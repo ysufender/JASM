@@ -85,7 +85,8 @@ namespace Instructions
                 break;
 
             default:
-                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "'");
+                StreamPos(out, errPos);
+                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "' at position ", std::to_string(errPos), ".");
                 break;
         }
     }
@@ -752,6 +753,58 @@ namespace Instructions
         const systembit_t size { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
         Serialization::SerializeInteger(OpCodes::dur, out);
         Serialization::SerializeInteger(size, out);
+        return Stream::Tokenize(in);
+    }
+
+    std::string Repeat(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // rep <mode> <count> <mode> <value>
+        //
+        // for heap repetitions, the address must be stored in &ebx
+        
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Memo::Stack), Enumc(Memo::Heap), true) };
+        const systembit_t count { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
+        const uchar_t valueMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte)) };
+
+        Serialization::SerializeInteger(OpCodes::rep, out);
+        Serialization::SerializeInteger(mode, out);
+        Serialization::SerializeInteger(count, out);
+        Serialization::SerializeInteger(valueMode, out);
+
+        switch (valueMode)
+        {
+            case Enumc(Numo::UInt): 
+            case Enumc(Numo::Int): 
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+                break;
+
+            case Enumc(Numo::Float):
+                Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);
+                break;
+
+            case Enumc(Numo::UByte):
+            case Enumc(Numo::Byte):
+                Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);
+                break;
+
+            default:
+                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "'");
+                break;
+        }
+
+        return Stream::Tokenize(in);
+    }
+
+    std::string Allocate(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // alc <size>        
+        //
+        // sets &ebx to suitable address 
+
+        const systembit_t size { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
+        Serialization::SerializeInteger(OpCodes::alc, out);
+        Serialization::SerializeInteger(size, out);
+
         return Stream::Tokenize(in);
     }
 }

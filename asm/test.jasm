@@ -1,4 +1,6 @@
 .prep
 .body
-     
+    alc 15
 .end
+
+0f47 0000 0000

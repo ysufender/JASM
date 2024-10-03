@@ -35,6 +35,8 @@ namespace Instructions
         jmp, jmpr,
         swr,
         dur,
+        rep,
+        alc,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -64,4 +66,6 @@ namespace Instructions
     std::string SwapRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string DuplicateRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string DuplicateRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Repeat(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Allocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }
