@@ -49,10 +49,10 @@ namespace ModeFlags
                 LOGE(System::LogLevel::High, "Couldn't fin mode flag for '", identifier, "'.");
             else if (!modeMap.contains(identifier))
                 return NoMode;
+           
 
             uchar_t mode { modeMap.at(identifier) };
             bool isInRange { start <= mode && mode <= end };
-
             if (throws && !isInRange)
                 LOGE(System::LogLevel::High, "'", identifier, "' is not a suitable mode flag for this scenario.");
             else if (isInRange)

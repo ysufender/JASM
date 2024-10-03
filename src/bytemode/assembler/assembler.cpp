@@ -50,6 +50,10 @@ namespace ByteAssembler
         {"invs", &Instructions::InvertSafe},
         {"cmp", &Instructions::Compare},
         {"pop", &Instructions::Pop},
+        {"jmp", &Instructions::Jump},
+        {"swr", &Instructions::SwapRange},
+        {"dur", &Instructions::DuplicateRange},
+        {"popr", &Instructions::PopRange},
     };
 
     //

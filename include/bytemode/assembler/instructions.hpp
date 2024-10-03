@@ -32,6 +32,9 @@ namespace Instructions
         invt, inve, invr, invst, invse, 
         cmp, cmpr, 
         popt, pope, 
+        jmp, jmpr,
+        swr,
+        dur,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -57,4 +60,8 @@ namespace Instructions
     std::string InvertSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Compare(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Pop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Jump(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string SwapRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string DuplicateRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string DuplicateRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

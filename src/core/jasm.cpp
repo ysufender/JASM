@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
@@ -5,9 +6,11 @@
 #include "CLIParser.hpp"
 
 #include "jasm.hpp"
+#include "bytemode/assembler/modeflags.hpp"
 #include "system.hpp"
 #include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
+#include "bytemode/assembler/modeflags.hpp"
 
 int jasmmain(int argc, char** args)
 {

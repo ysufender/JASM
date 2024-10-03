@@ -1,7 +1,4 @@
 .prep
 .body
-    pop %ui
-    pop %ub
+     
 .end
-
-4140

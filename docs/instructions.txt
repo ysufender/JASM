@@ -98,3 +98,27 @@ Note: words inside paranthesis "()" are optional
 
 [x] raw;    0x37;   store given series of bytes on stack
 [x] raws;   0x38;   store the given number of bytes residing at given symbol 
+
+[x] inv;    ----;   
+[x] invt;   0x39;   invert the top 32-bits on stack
+[x] inve;   0x3A;   invert the top 8-bits on stack
+[x] invr;   0x3B;   invert the given register
+
+[x] invs;   ----;   
+[x] invst;  0x3C;
+[x] invse;  0x3D;
+
+[x] cmp;    0x3E;   compare the top #-bits by given mode
+[x] cmpr;   0x3F;   compare given two registers by given mode 
+
+[x] pop;    ----;
+[x] popt;   0x40;   pop the top 32-bits from stack
+[x] pope;   0x41;   pop the top 8-bits from stack
+
+[x] jmp;    0x42;   jump to given address
+[x] jmpr;   0x43;   jump to given address at the given register
+
+[x] swr;    0x44;   swap the top n bytes
+
+[x] dur;    0x45;   duplicate the top n bytes
+

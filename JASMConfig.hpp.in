@@ -11,8 +11,5 @@
 #cmakedefine TOOLCHAIN_MODE
 #cmakedefine USE_PIPELINES_OPT
 
-
 using systembit_t = uint32_t;
 using uchar_t = uint8_t;
-
-#define Enumc(enum) static_cast<uchar_t>(enum)
