@@ -273,7 +273,7 @@ namespace Instructions
                 continue;
             }
 
-            if (!std::isdigit(token.at(0)))
+            if (!String::TokenIsNumber(token))
                 LOGE(System::LogLevel::High, "Expected a numeric constant. {", token, "}");
 
             if (token.find_first_of('.') != std::string::npos)
@@ -326,7 +326,7 @@ namespace Instructions
 
         // Store constant by mode
         // stc $<i/f/b> <value>
-        if (std::isdigit(symOrVal.at(0)))
+        if (String::TokenIsNumber(symOrVal))
         {
             _BoringModeSwitch(mode, out, {OpCodes::stt, OpCodes::stt, OpCodes::ste}, {
                 [&symOrVal, &out](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(symOrVal), out); },
@@ -714,7 +714,7 @@ namespace Instructions
 
         // jmp <address_decimal>
         // jmp <address_hex>
-        if (isdigit(symbolOrAddr.at(0))) 
+        if (String::TokenIsNumber(symbolOrAddr))
         {
             if (symbolOrAddr.find_first_of('.') != std::string::npos)
                 LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
@@ -806,5 +806,47 @@ namespace Instructions
         Serialization::SerializeInteger(size, out);
 
         return Stream::Tokenize(in);
+    }
+
+    std::string Power(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // pow <mode>
+        // pow <mode> <reg> <reg> 
+        // pow <mode> <constant> <constant> 
+
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::Byte)) };
+        if (mode != ModeFlags::NoMode)
+        {
+            // signed pow here
+            const std::string regConstNone { Stream::Tokenize(in) };
+
+            const uchar_t reg1 { ModeFlags::GetModeFlag(regConstNone, Enumc(Reg::eax), Enumc(Reg::dl)) };
+
+            // pow <mode> <reg> <reg>
+            if (reg1 != ModeFlags::NoMode)
+            {
+                const std::string reg2Str { Stream::Tokenize(in) };
+                const uchar_t reg2 { ModeFlags::GetModeFlag(reg2Str, Enumc(Reg::eax), Enumc(Reg::dl)) };
+                const bool cond { (Is8Bit(reg1) && Is8Bit(reg2)) || (!Is8Bit(reg1) && !Is8Bit(reg2)) && (!IsSysReg(reg1) && !IsSysReg(reg2)) };
+
+                if (!cond)
+                    LOGE(System::LogLevel::High, "Given registers ", regConstNone, " and ", reg2Str, " are not suitable for pow instruction.");
+
+                if ((Is8Bit(reg1) && mode != Enumc(Numo::Byte)) || (!Is8Bit(reg1) && mode == Enumc(Numo::Byte)))
+                    LOGE(System::LogLevel::High, "Size missmatch between mode and registers [", reg2Str, "].");
+
+                _BoringModeSwitch(mode, out, {OpCodes::powri, OpCodes::powrf, OpCodes::powrb});
+                Serialization::SerializeInteger(reg1, out);
+                Serialization::SerializeInteger(reg2, out);
+
+                return Stream::Tokenize(in);
+            }
+
+            // pow <mode> <constant> <constant>
+            if (String::TokenIsNumber(regConstNone))
+            {
+                                
+            }
+        }
     }
 }

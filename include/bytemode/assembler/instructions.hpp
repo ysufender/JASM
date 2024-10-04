@@ -37,6 +37,8 @@ namespace Instructions
         dur,
         rep,
         alc,
+        powri, powrf, powrb, powsi, powsf, powsb, powi, powf, powb,
+        powrui, powrub, powsui, powsub, powui, powub,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -68,4 +70,5 @@ namespace Instructions
     std::string DuplicateRange(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Repeat(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Allocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Power(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

@@ -20,4 +20,13 @@ namespace Extensions::String
     }
 
     size_t Hash(const std::string_view str);
+
+    inline bool TokenIsNumber(const std::string& token)
+    {
+        return 
+            !token.empty() &&
+            isdigit(token.at(0)) ||
+            token.starts_with('-') ||
+            token.starts_with('.');
+    }
 }
