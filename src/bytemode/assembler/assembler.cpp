@@ -26,7 +26,7 @@ namespace ByteAssembler
     // It's better than a bunch of if-else statements
     // I think
     //
-    static const std::unordered_map<std::string, std::function<std::string(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
+    const std::unordered_map<std::string, std::function<std::string(AssemblyInfo&, std::istream&, std::ostream&)>> instructionMap {
         {"nop", &Instructions::Nop},
         {"stc", &Instructions::StoreConstant},
         {"ldc", &Instructions::LoadConstant}, 
@@ -55,6 +55,7 @@ namespace ByteAssembler
         {"dur", &Instructions::DuplicateRange},
         {"rep", &Instructions::Repeat},
         {"alc", &Instructions::Allocate},
+        {"pow", &Instructions::Power},
     };
 
     //
@@ -119,6 +120,9 @@ namespace ByteAssembler
 
         while (token != ".end")
         {
+            if (token.empty())
+                continue;
+
             if (token.back() == ':')
             {
                 token.pop_back();

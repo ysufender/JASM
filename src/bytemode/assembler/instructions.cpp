@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstdlib>
 #include <exception>
+#include <functional>
 #include <istream>
 #include <ostream>
 #include <string>
@@ -814,8 +815,9 @@ namespace Instructions
         // pow <mode> <reg> <reg> 
         // pow <mode> <constant> <constant> 
 
-        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::Byte)) };
-        if (mode != ModeFlags::NoMode)
+        const std::string modeString { Stream::Tokenize(in) };
+        const uchar_t signedMode { ModeFlags::GetModeFlag(modeString, Enumc(Numo::Int), Enumc(Numo::Byte)) };
+        if (signedMode != ModeFlags::NoMode)
         {
             // signed pow here
             const std::string regConstNone { Stream::Tokenize(in) };
@@ -823,19 +825,20 @@ namespace Instructions
             const uchar_t reg1 { ModeFlags::GetModeFlag(regConstNone, Enumc(Reg::eax), Enumc(Reg::dl)) };
 
             // pow <mode> <reg> <reg>
+            // reg
             if (reg1 != ModeFlags::NoMode)
             {
                 const std::string reg2Str { Stream::Tokenize(in) };
-                const uchar_t reg2 { ModeFlags::GetModeFlag(reg2Str, Enumc(Reg::eax), Enumc(Reg::dl)) };
+                const uchar_t reg2 { ModeFlags::GetModeFlag(reg2Str, Enumc(Reg::eax), Enumc(Reg::dl), true) };
                 const bool cond { (Is8Bit(reg1) && Is8Bit(reg2)) || (!Is8Bit(reg1) && !Is8Bit(reg2)) && (!IsSysReg(reg1) && !IsSysReg(reg2)) };
 
                 if (!cond)
                     LOGE(System::LogLevel::High, "Given registers ", regConstNone, " and ", reg2Str, " are not suitable for pow instruction.");
 
-                if ((Is8Bit(reg1) && mode != Enumc(Numo::Byte)) || (!Is8Bit(reg1) && mode == Enumc(Numo::Byte)))
+                if ((Is8Bit(reg1) && signedMode != Enumc(Numo::Byte)) || (!Is8Bit(reg1) && signedMode == Enumc(Numo::Byte)))
                     LOGE(System::LogLevel::High, "Size missmatch between mode and registers [", reg2Str, "].");
 
-                _BoringModeSwitch(mode, out, {OpCodes::powri, OpCodes::powrf, OpCodes::powrb});
+                _BoringModeSwitch(signedMode, out, {OpCodes::powri, OpCodes::powrf, OpCodes::powrb});
                 Serialization::SerializeInteger(reg1, out);
                 Serialization::SerializeInteger(reg2, out);
 
@@ -843,10 +846,96 @@ namespace Instructions
             }
 
             // pow <mode> <constant> <constant>
+            // constant 
             if (String::TokenIsNumber(regConstNone))
             {
-                                
+                const std::string const2 { Stream::Tokenize(in) };
+
+                _BoringModeSwitch(signedMode, out, {OpCodes::powi, OpCodes::powf, OpCodes::powb}, {
+                    [&in, &out, regConstNone, const2](){
+                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(regConstNone), out);
+                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(const2), out);
+                    },
+                    [&in, &out, regConstNone, const2](){
+                        Serialization::SerializeFloat(std::stof(regConstNone), out);
+                        Serialization::SerializeFloat(std::stof(const2), out);
+                    },
+                    [&in, &out, regConstNone, const2](){
+                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(regConstNone), out);
+                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(const2), out);
+                    }
+                });
+
+                return Stream::Tokenize(in);
             }
+
+            // pow <mode>
+            // stack
+            _BoringModeSwitch(signedMode, out, {OpCodes::powsi, OpCodes::powsf, OpCodes::powsb});
+            return regConstNone;
+        }
+
+        const uchar_t unsignedMode { ModeFlags::GetModeFlag(modeString, Enumc(Numo::UInt), Enumc(Numo::UByte))};
+
+        // unsigned pow here
+        {
+            if (unsignedMode == ModeFlags::NoMode)
+                LOGE(System::LogLevel::High, "Expected mode <pow>");
+
+            // pow <unsigned_mode>
+            // pow <unsigned_mode> <reg> <reg> 
+            // pow <unsigned_mode> <constant> <constant> 
+
+            const std::string regConstNone { Stream::Tokenize(in) };
+
+            const uchar_t reg1 { ModeFlags::GetModeFlag(regConstNone, Enumc(Reg::eax), Enumc(Reg::dl)) };
+
+            // pow <mode> <reg> <reg>
+            // reg
+            if (reg1 != ModeFlags::NoMode)
+            {
+                const std::string reg2Str { Stream::Tokenize(in) };
+                const uchar_t reg2 { ModeFlags::GetModeFlag(reg2Str, Enumc(Reg::eax), Enumc(Reg::dl), true) };
+                const bool cond { (Is8Bit(reg1) && Is8Bit(reg2)) || (!Is8Bit(reg1) && !Is8Bit(reg2)) && (!IsSysReg(reg1) && !IsSysReg(reg2)) };
+
+                if (!cond)
+                    LOGE(System::LogLevel::High, "Given registers ", regConstNone, " and ", reg2Str, " are not suitable for pow instruction.");
+
+                if ((Is8Bit(reg1) && unsignedMode != Enumc(Numo::Byte)) || (!Is8Bit(reg1) && unsignedMode == Enumc(Numo::Byte)))
+                    LOGE(System::LogLevel::High, "Size missmatch between mode and registers [", reg2Str, "].");
+
+                _BoringModeSwitch(unsignedMode , out, {OpCodes::powrui, OpCodes::nop, OpCodes::powrub});
+                Serialization::SerializeInteger(reg1, out);
+                Serialization::SerializeInteger(reg2, out);
+
+                return Stream::Tokenize(in);
+            }
+
+            // pow <mode> <constant> <constant>
+            // constant 
+            if (String::TokenIsNumber(regConstNone))
+            {
+                const std::string const2 { Stream::Tokenize(in) };
+
+                _BoringModeSwitch(unsignedMode , out, {OpCodes::powui, OpCodes::nop, OpCodes::powub}, {
+                        [&in, &out, regConstNone, const2](){
+                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(regConstNone), out);
+                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(const2), out);
+                        },
+                        nullptr,
+                        [&in, &out, regConstNone, const2](){
+                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(regConstNone), out);
+                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(const2), out);
+                        }
+                        });
+
+                return Stream::Tokenize(in);
+            }
+
+            // pow <mode>
+            // stack
+            _BoringModeSwitch(unsignedMode , out, {OpCodes::powsui, OpCodes::nop, OpCodes::powsub});
+            return regConstNone; 
         }
     }
 }

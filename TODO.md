@@ -94,7 +94,7 @@ is 32 or 8 bits
     - [ ] Dumping CPU state (dumping current execution context in our case)
     - [ ] Loading CPU state (loading current execution context in our case)
     - [ ] Complex integer/float arithmetic
-        - [ ] Exponents
+        - [x] Exponents
         - [ ] Taking roots
         - [ ] Square root
         - [ ] Inverse square root

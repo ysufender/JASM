@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cctype>
 #include <concepts>
 #include <string>
 #include <vector>
@@ -23,10 +24,32 @@ namespace Extensions::String
 
     inline bool TokenIsNumber(const std::string& token)
     {
-        return 
-            !token.empty() &&
-            isdigit(token.at(0)) ||
-            token.starts_with('-') ||
-            token.starts_with('.');
+        if (token.empty())
+            return false;
+
+        bool fracted = false;
+        bool hex;
+
+        for (size_t i = 0; i < token.size(); i++)
+        {
+            const char ch { token.at(i) };
+
+            if (isdigit(ch))
+                continue;
+            if (ch == '-' && i != 0)
+                return false;
+            if (ch == '.')
+            {
+                if (fracted || hex)
+                    return false;
+                fracted = true;
+            }
+            if (ch == 'x' && i == 1)
+                hex = true;
+            if (isalpha(ch) && !hex)
+                return false;
+        }
+
+        return true;
     }
 }
