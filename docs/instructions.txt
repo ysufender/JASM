@@ -122,3 +122,23 @@ Note: words inside paranthesis "()" are optional
 
 [x] dur;    0x45;   duplicate the top n bytes
 
+[x] rep;    0x46;   repeats the given value given times on heap or stack
+
+[x] alc;    0x47;   sets &ebx to the address of heap that is capable of holding given size of data
+
+[x] pow;    ----;
+[x] powri;  0x48;   pow on register with integers
+[x] powrf;  0x49;   pow on register with floats 
+[x] powrb;  0x4A;   pow on register with bytes 
+[x] powsi;  0x4B;   pow on stack with integers
+[x] powsf;  0x4C;   pow on stack with floats 
+[x] powsb;  0x4D;   pow on stack with bytes 
+[x] powi;   0x4E;   pow with constants with integers
+[x] powf;   0x4F;   pow with constants with floats 
+[x] powb;   0x50;   pow with constants with bytes 
+[x] powrui; 0x51;   pow on register with unsigned integers
+[x] powrub; 0x52;   pow on register with unsigned bytes 
+[x] powsui; 0x53;   pow on stack with unsigned integers
+[x] powsub; 0x54;   pow on stack with unsigned bytes 
+[x] powui;  0x55;   pow with constants with unsigned integers
+[x] powub;  0x56;   pow with constants with unsigned bytes 

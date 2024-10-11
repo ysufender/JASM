@@ -759,18 +759,20 @@ namespace Instructions
 
     std::string Repeat(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // rep <mode> <count> <mode> <value>
+        // rep <memory_mode> <mode> <count> <value>
         //
         // for heap repetitions, the address must be stored in &ebx
         
         const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Memo::Stack), Enumc(Memo::Heap), true) };
-        const systembit_t count { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
         const uchar_t valueMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte)) };
+        const systembit_t count { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
+
+        // first 4-bits is memory mode, second 4-bits is value mode 
+        const uchar_t compressedModes = (mode << 4) | valueMode; 
 
         Serialization::SerializeInteger(OpCodes::rep, out);
-        Serialization::SerializeInteger(mode, out);
+        Serialization::SerializeInteger(compressedModes, out);
         Serialization::SerializeInteger(count, out);
-        Serialization::SerializeInteger(valueMode, out);
 
         switch (valueMode)
         {
@@ -918,16 +920,15 @@ namespace Instructions
                 const std::string const2 { Stream::Tokenize(in) };
 
                 _BoringModeSwitch(unsignedMode , out, {OpCodes::powui, OpCodes::nop, OpCodes::powub}, {
-                        [&in, &out, regConstNone, const2](){
-                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(regConstNone), out);
-                        Serialization::SerializeInteger(_TokenToInt<systembit_t>(const2), out);
-                        },
-                        nullptr,
-                        [&in, &out, regConstNone, const2](){
-                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(regConstNone), out);
-                        Serialization::SerializeInteger(_TokenToInt<uchar_t>(const2), out);
-                        }
-                        });
+                    [&in, &out, regConstNone, const2](){
+                    Serialization::SerializeInteger(_TokenToInt<systembit_t>(regConstNone), out);
+                    Serialization::SerializeInteger(_TokenToInt<systembit_t>(const2), out);
+                },
+                nullptr,
+                    [&in, &out, regConstNone, const2](){
+                    Serialization::SerializeInteger(_TokenToInt<uchar_t>(regConstNone), out);
+                    Serialization::SerializeInteger(_TokenToInt<uchar_t>(const2), out);
+                }});
 
                 return Stream::Tokenize(in);
             }
