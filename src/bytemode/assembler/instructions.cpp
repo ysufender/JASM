@@ -1018,4 +1018,59 @@ namespace Instructions
 
         return Stream::Tokenize(in);
     }
+
+    std::string Call(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // cal <address> <size>
+        // cal <symbol> <size>
+        // cal <register> <size>
+
+        const std::string symbolOrAddr { Stream::Tokenize(in) };
+        const uchar_t possibleRegMode { ModeFlags::GetModeFlag(symbolOrAddr, Enumc(Reg::eax), Enumc(Reg::edi)) };
+
+        if (possibleRegMode != ModeFlags::NoMode)
+        {
+            // cal <register> <size>
+            Serialization::SerializeInteger(OpCodes::calr, out); 
+            Serialization::SerializeInteger(possibleRegMode, out);
+        }
+        else if (String::TokenIsNumber(symbolOrAddr))
+        {
+            // cal <address_decimal> <size>
+            // cal <address_hex> <size>
+            Serialization::SerializeInteger(OpCodes::cal, out);
+            if (symbolOrAddr.find_first_of('.') != std::string::npos)
+                LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
+
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(symbolOrAddr), out);
+        }
+        else
+        {
+            // cal <symbol> <size>
+            const size_t symbolHash { String::Hash(symbolOrAddr) };
+            if (info.symbolMap.contains(symbolHash))
+                Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+            else
+            {
+                StreamPos(out, pos); 
+                info.AddUnknownSymbol(symbolHash, pos);
+                Serialization::SerializeInteger<systembit_t>(0, out);
+            }
+        }
+
+        const std::string sizeOrNext { Stream::Tokenize(in) };
+        
+        if (String::TokenIsNumber(sizeOrNext))
+        {
+            if (symbolOrAddr.find_first_of('.') != std::string::npos)
+                LOGE(System::LogLevel::High, "Can't use floating point numbers for size values");
+
+            Serialization::SerializeInteger(_TokenToInt<uchar_t>(sizeOrNext), out);
+
+            return Stream::Tokenize(in);
+        }
+
+        Serialization::SerializeInteger<uchar_t>(0, out);
+        return sizeOrNext;
+    }
 }

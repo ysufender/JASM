@@ -58,6 +58,7 @@ namespace ByteAssembler
         {"pow", &Instructions::Power},
         {"sqr", &Instructions::SquareRoot},
         {"cnd", &Instructions::Conditional},
+        {"cal", &Instructions::Call},
     };
 
     //

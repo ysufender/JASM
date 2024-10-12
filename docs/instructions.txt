@@ -156,3 +156,6 @@ Note: words inside paranthesis "()" are optional
 
 [x] cnd;    0x60;   jump to given address if &bl is non-zero
 [x] cndr;   0x61;   jump to the address at given register if &bl is non-zero
+
+[ ] cal;    0x62;
+[ ] calr;   0x63;

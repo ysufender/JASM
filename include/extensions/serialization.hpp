@@ -1,5 +1,6 @@
 #pragma once
 
+#include "system.hpp"
 #include <bit>
 #include <cmath>
 #include <fstream>

@@ -41,6 +41,7 @@ namespace Instructions
         powrui, powrub, powsui, powsub, powui, powub,
         sqri, sqrf, sqrb, sqrri, sqrrf, sqrrb, sqrsi, sqrsf, sqrsb,
         cnd, cndr,
+        cal, calr,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -75,4 +76,5 @@ namespace Instructions
     std::string Power(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string SquareRoot(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Conditional(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Call(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

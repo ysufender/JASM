@@ -100,3 +100,7 @@ is 32 or 8 bits
         - [x] Square root
         - [ ] Inverse square root
         - [ ] Transcendental functions
+
+## Notes to Myself
+
+Use hashmaps with addresses as keys and sizes as values for memory allocations
