@@ -1,11 +1,11 @@
 #pragma once
 
-#include <fstream>
 #include <istream>
 #include <ostream>
 #include <string>
 
-#include "JASMConfig.hpp"
+#include <cmath>
+
 #include "extensions/serialization.hpp"
 #include "bytemode/assembler/assembler.hpp"
 
@@ -39,6 +39,8 @@ namespace Instructions
         alc,
         powri, powrf, powrb, powsi, powsf, powsb, powi, powf, powb,
         powrui, powrub, powsui, powsub, powui, powub,
+        sqri, sqrf, sqrb, sqrri, sqrrf, sqrrb, sqrsi, sqrsf, sqrsb,
+        cnd, cndr,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -71,4 +73,6 @@ namespace Instructions
     std::string Repeat(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Allocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Power(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string SquareRoot(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Conditional(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

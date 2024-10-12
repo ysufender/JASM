@@ -1,6 +1,7 @@
 #include <array>
 #include <cassert>
 #include <cctype>
+#include <cmath>
 #include <concepts>
 #include <cstdlib>
 #include <exception>
@@ -770,30 +771,22 @@ namespace Instructions
         // first 4-bits is memory mode, second 4-bits is value mode 
         const uchar_t compressedModes = (mode << 4) | valueMode; 
 
-        Serialization::SerializeInteger(OpCodes::rep, out);
-        Serialization::SerializeInteger(compressedModes, out);
-        Serialization::SerializeInteger(count, out);
-
-        switch (valueMode)
-        {
-            case Enumc(Numo::UInt): 
-            case Enumc(Numo::Int): 
+        _BoringModeSwitch(valueMode, out, {OpCodes::rep, OpCodes::rep, OpCodes::rep}, {
+            [&in, &out, compressedModes](){
+                Serialization::SerializeInteger(compressedModes, out);
                 Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
-                break;
-
-            case Enumc(Numo::Float):
+            }, 
+            [&in, &out, compressedModes](){
+                Serialization::SerializeInteger(compressedModes, out);
                 Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);
-                break;
-
-            case Enumc(Numo::UByte):
-            case Enumc(Numo::Byte):
+            },
+            [&in, &out, compressedModes](){
+                Serialization::SerializeInteger(compressedModes, out);
                 Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);
-                break;
+            }
+        });
 
-            default:
-                LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "'");
-                break;
-        }
+        Serialization::SerializeInteger(count, out);
 
         return Stream::Tokenize(in);
     }
@@ -938,5 +931,91 @@ namespace Instructions
             _BoringModeSwitch(unsignedMode , out, {OpCodes::powsui, OpCodes::nop, OpCodes::powsub});
             return regConstNone; 
         }
+    }
+
+    std::string SquareRoot(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // sqr <mode> <value> 
+        // sqr <mode>
+        // sqr <mode> <register>
+
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::Byte), true) };
+        const std::string constRegNone { Stream::Tokenize(in) };
+
+        // sqr <mode> <number>
+        if (String::TokenIsNumber(constRegNone)) 
+        {
+            _BoringModeSwitch(mode, out, {OpCodes::sqri, OpCodes::sqrf, OpCodes::sqrb}, {
+                [&in, &out, constRegNone](){Serialization::SerializeInteger(_TokenToInt<systembit_t>(constRegNone), out);},
+                [&in, &out, constRegNone](){Serialization::SerializeFloat(std::stof(constRegNone), out);},
+                [&in, &out, constRegNone](){Serialization::SerializeInteger(_TokenToInt<uchar_t>(constRegNone), out);},
+            });
+            
+            return Stream::Tokenize(in);
+        }
+
+        const uchar_t regMode { ModeFlags::GetModeFlag(constRegNone, Enumc(Reg::eax), Enumc(Reg::flg)) };
+
+        // sqr <mode> <register>
+        if (regMode != ModeFlags::NoMode)
+        {
+            _BoringModeSwitch(mode, out, {OpCodes::sqrri, OpCodes::sqrrf, OpCodes::sqrrb});
+            Serialization::SerializeInteger(regMode, out);
+
+            return Stream::Tokenize(in);
+        }
+
+        // sqr <mode>
+        _BoringModeSwitch(mode, out, {OpCodes::sqrsi, OpCodes::sqrsf, OpCodes::sqrsb});
+
+        return constRegNone;
+    }
+
+    std::string Conditional(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // cnd <address>
+        // cnd <symbol>
+        // cnd <register>
+
+        const std::string symbolOrAddr { Stream::Tokenize(in) };
+        const uchar_t possibleRegMode { ModeFlags::GetModeFlag(symbolOrAddr, Enumc(Reg::eax), Enumc(Reg::edi)) };
+
+        // cnd <register>
+        if (possibleRegMode != ModeFlags::NoMode)
+        {
+            Serialization::SerializeInteger(OpCodes::cndr, out); 
+            Serialization::SerializeInteger(possibleRegMode, out);
+
+            return Stream::Tokenize(in);
+        }
+
+        Serialization::SerializeInteger(OpCodes::cnd, out);
+
+        // cnd <address_decimal>
+        // cnd <address_hex>
+        if (String::TokenIsNumber(symbolOrAddr))
+        {
+            if (symbolOrAddr.find_first_of('.') != std::string::npos)
+                LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
+
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(symbolOrAddr), out);
+
+            LOGD(std::to_string(Enumc(OpCodes::cnd)), " ", symbolOrAddr);
+
+            return Stream::Tokenize(in);
+        }
+        
+        // cnd <symbol>
+        const size_t symbolHash { String::Hash(symbolOrAddr) };
+        if (info.symbolMap.contains(symbolHash))
+            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+        else
+        {
+            StreamPos(out, pos); 
+            info.AddUnknownSymbol(symbolHash, pos);
+            Serialization::SerializeInteger<systembit_t>(0, out);
+        }
+
+        return Stream::Tokenize(in);
     }
 }

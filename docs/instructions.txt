@@ -108,15 +108,15 @@ Note: words inside paranthesis "()" are optional
 [x] invst;  0x3C;
 [x] invse;  0x3D;
 
-[x] cmp;    0x3E;   compare the top #-bits by given mode
-[x] cmpr;   0x3F;   compare given two registers by given mode 
+[x] cmp;    0x3E;   compare the top #-bits by given mode, set &bl to result
+[x] cmpr;   0x3F;   compare given two registers by given mode, set &bl to result
 
 [x] pop;    ----;
 [x] popt;   0x40;   pop the top 32-bits from stack
 [x] pope;   0x41;   pop the top 8-bits from stack
 
-[x] jmp;    0x42;   jump to given address
-[x] jmpr;   0x43;   jump to given address at the given register
+[x] jmp;    0x42;   jump to given address, without creating a callstack 
+[x] jmpr;   0x43;   jump to given address at the given register, without creating a callstack
 
 [x] swr;    0x44;   swap the top n bytes
 
@@ -142,3 +142,17 @@ Note: words inside paranthesis "()" are optional
 [x] powsub; 0x54;   pow on stack with unsigned bytes 
 [x] powui;  0x55;   pow with constants with unsigned integers
 [x] powub;  0x56;   pow with constants with unsigned bytes 
+
+[x] sqr;    ----;
+[x] sqri;   0x57;   find the square root of given integer constant and store it on stack
+[x] sqrf;   0x58;   find the square root of given float constant and store it on stack
+[x] sqrb;   0x59;   find the square root of given byte constant and store it on stack
+[x] sqrri;  0x5A;   find the square root of given integer in given register and set &eax to it
+[x] sqrrf;  0x5B;   find the square root of given float in given register and set &eax to it
+[x] sqrrb;  0x5C;   find the square root of given byte in given register and set &al to it
+[x] sqrsi;  0x5D;   find the square root of given integer on stack and store it on stack
+[x] sqrsf;  0x5E;   find the square root of given float on stack and store it on stack
+[x] sqrsb;  0x5F;   find the square root of given byte on stack and store it on stack
+
+[x] cnd;    0x60;   jump to given address if &bl is non-zero
+[x] cndr;   0x61;   jump to the address at given register if &bl is non-zero

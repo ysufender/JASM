@@ -56,6 +56,8 @@ namespace ByteAssembler
         {"rep", &Instructions::Repeat},
         {"alc", &Instructions::Allocate},
         {"pow", &Instructions::Power},
+        {"sqr", &Instructions::SquareRoot},
+        {"cnd", &Instructions::Conditional},
     };
 
     //

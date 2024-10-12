@@ -84,8 +84,9 @@ is 32 or 8 bits
 - [ ] Complex Instructions
     - [ ] Branching
         - [x] Branch
-        - [ ] Conditional branch
-        - [ ] Indirect branch
+            - [x] Indirect branch
+        - [x] Conditional branch
+            - [x] Conditional indirect branch
         - [ ] Call
         - [ ] System Calls (calling to c/c++ in our case)
     - [ ] Multithreading
@@ -95,7 +96,7 @@ is 32 or 8 bits
     - [ ] Loading CPU state (loading current execution context in our case)
     - [ ] Complex integer/float arithmetic
         - [x] Exponents
-        - [ ] Taking roots
-        - [ ] Square root
+        - [x] Taking roots
+        - [x] Square root
         - [ ] Inverse square root
         - [ ] Transcendental functions
