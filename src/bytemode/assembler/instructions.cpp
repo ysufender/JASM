@@ -1024,6 +1024,9 @@ namespace Instructions
         // cal <address> <size>
         // cal <symbol> <size>
         // cal <register> <size>
+        // cal <address>
+        // cal <symbol>
+        // cal <register>
 
         const std::string symbolOrAddr { Stream::Tokenize(in) };
         const uchar_t possibleRegMode { ModeFlags::GetModeFlag(symbolOrAddr, Enumc(Reg::eax), Enumc(Reg::edi)) };
@@ -1031,6 +1034,7 @@ namespace Instructions
         if (possibleRegMode != ModeFlags::NoMode)
         {
             // cal <register> <size>
+            // cal <register>
             Serialization::SerializeInteger(OpCodes::calr, out); 
             Serialization::SerializeInteger(possibleRegMode, out);
         }
@@ -1038,6 +1042,8 @@ namespace Instructions
         {
             // cal <address_decimal> <size>
             // cal <address_hex> <size>
+            // cal <address_decimal>
+            // cal <address_hex>
             Serialization::SerializeInteger(OpCodes::cal, out);
             if (symbolOrAddr.find_first_of('.') != std::string::npos)
                 LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
@@ -1047,6 +1053,7 @@ namespace Instructions
         else
         {
             // cal <symbol> <size>
+            // cal <symbol>
             const size_t symbolHash { String::Hash(symbolOrAddr) };
             if (info.symbolMap.contains(symbolHash))
                 Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);

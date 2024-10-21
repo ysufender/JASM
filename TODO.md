@@ -80,6 +80,8 @@ is 32 or 8 bits
     - [x] Compare (lesser, greater, equal, lesser-equal, greater-equal, not-equal)
         - [x] On stack, set register
         - [x] On register, set second
+    - [ ] Multiply
+    - [ ] Divide
         
 - [ ] Complex Instructions
     - [ ] Branching
@@ -87,7 +89,8 @@ is 32 or 8 bits
             - [x] Indirect branch
         - [x] Conditional branch
             - [x] Conditional indirect branch
-        - [ ] Call
+        - [x] Call
+            - [ ] Return
         - [ ] System Calls (calling to c/c++ in our case)
     - [ ] Multithreading
         - [ ] Create and execute independent threads
