@@ -56,6 +56,14 @@ is 32 or 8 bits
         - [x] Add two values from stack
         - [x] Add two values from stack, but don't pop
         - [x] Add two registers, set the second
+    - [x] Multiply
+        - [x] Multiply two values from stack
+        - [x] Multiply two values from stack, but don't pop
+        - [x] Multiply two registers, set the second
+    - [x] Divide
+        - [x] Divide two values from stack
+        - [x] Divide two values from stack, but don't pop
+        - [x] Divide two registers, set the second
     - [x] Increment
         - [x] Increment the value on stack
         - [x] Increment the value on stack, and push it
@@ -80,8 +88,6 @@ is 32 or 8 bits
     - [x] Compare (lesser, greater, equal, lesser-equal, greater-equal, not-equal)
         - [x] On stack, set register
         - [x] On register, set second
-    - [ ] Multiply
-    - [ ] Divide
         
 - [ ] Complex Instructions
     - [ ] Branching
@@ -90,7 +96,8 @@ is 32 or 8 bits
         - [x] Conditional branch
             - [x] Conditional indirect branch
         - [x] Call
-            - [ ] Return
+            - [ ] Change the way cal works. Instead of passing size, store it on an 8-bit register
+            - [x] Return
         - [ ] System Calls (calling to c/c++ in our case)
     - [ ] Multithreading
         - [ ] Create and execute independent threads

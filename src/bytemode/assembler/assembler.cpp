@@ -59,6 +59,11 @@ namespace ByteAssembler
         {"sqr", &Instructions::SquareRoot},
         {"cnd", &Instructions::Conditional},
         {"cal", &Instructions::Call},
+        {"mul", &Instructions::Multiply},
+        {"muls", &Instructions::MultiplySafe},
+        {"div", &Instructions::Divide},
+        {"divs", &Instructions::DivideSafe},
+        {"ret", &Instructions::Return},
     };
 
     //

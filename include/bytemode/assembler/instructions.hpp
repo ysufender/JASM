@@ -19,7 +19,7 @@ namespace Instructions
         ldt, lde, 
         rdt, rde, rdr, 
         movc, movs, movr, 
-        addi,addf,addb,addri, addrf, addrb, addsi, addsf, addsb, 
+        addi, addf, addb, addri, addrf, addrb, addsi, addsf, addsb, 
         mcp, 
         inci, incf, incb, incri, incrf, incrb, incsi, incsf, incsb, 
         dcri, dcrf, dcrb, dcrri, dcrrf, dcrrb, dcrsi, dcrsf, dcrsb, 
@@ -42,6 +42,9 @@ namespace Instructions
         sqri, sqrf, sqrb, sqrri, sqrrf, sqrrb, sqrsi, sqrsf, sqrsb,
         cnd, cndr,
         cal, calr,
+        muli, mulf, mulb, mulri, mulrf, mulrb, mulsi, mulsf, mulsb, 
+        divi, divf, divb, divri, divrf, divrb, divsi, divsf, divsb, 
+        ret,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -77,4 +80,9 @@ namespace Instructions
     std::string SquareRoot(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Conditional(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Call(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Multiply(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string MultiplySafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Divide(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string DivideSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Return(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

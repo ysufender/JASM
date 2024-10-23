@@ -1054,6 +1054,7 @@ namespace Instructions
         {
             // cal <symbol> <size>
             // cal <symbol>
+            Serialization::SerializeInteger(OpCodes::cal, out);
             const size_t symbolHash { String::Hash(symbolOrAddr) };
             if (info.symbolMap.contains(symbolHash))
                 Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
@@ -1079,5 +1080,59 @@ namespace Instructions
 
         Serialization::SerializeInteger<uchar_t>(0, out);
         return sizeOrNext;
+    }
+
+    std::string Multiply(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+            OpCodes::muli, 
+            OpCodes::mulf, 
+            OpCodes::mulb, 
+            OpCodes::mulri, 
+            OpCodes::mulrf, 
+            OpCodes::mulrb
+        });
+    }
+
+    std::string MultiplySafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+                OpCodes::mulsi, 
+                OpCodes::mulsf, 
+                OpCodes::mulsb, 
+            },
+            true
+        );
+        return Stream::Tokenize(in);
+    }
+
+    std::string Divide(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+            OpCodes::divi, 
+            OpCodes::divf, 
+            OpCodes::divb, 
+            OpCodes::divri, 
+            OpCodes::divrf, 
+            OpCodes::divrb
+        });
+    }
+
+    std::string DivideSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+                OpCodes::divsi, 
+                OpCodes::divsf, 
+                OpCodes::divsb, 
+            },
+            true
+        );
+        return Stream::Tokenize(in);
+    }
+
+    std::string Return(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        Serialization::SerializeInteger(OpCodes::ret, out);
+        return Stream::Tokenize(in);
     }
 }

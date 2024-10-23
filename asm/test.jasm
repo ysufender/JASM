@@ -1,7 +1,5 @@
 .prep
 .body
-    cal 0x15 2
-    symbol:
-        cal &eax
-    cal symbol
+    ret
 .end
+

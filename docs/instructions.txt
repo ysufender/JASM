@@ -157,5 +157,37 @@ Note: words inside paranthesis "()" are optional
 [x] cnd;    0x60;   jump to given address if &bl is non-zero
 [x] cndr;   0x61;   jump to the address at given register if &bl is non-zero
 
-[ ] cal;    0x62;
-[ ] calr;   0x63;
+[x] cal;    0x62;   create a callstack and jump to given address, a byte as parameter size is given
+[x] calr;   0x63;   create a callstack and jump to the address at given register, a byte as parameter size is given
+
+[x] mul;    ----;
+[x] muli;   0x64;   pop and multiply two (u)ints from stack. push the result. 
+[x] mulf;   0x65;   pop and multiply two floats from stack. push the result. 
+[x] mulb;   0x66;   pop and multiply two (u)bytes from stack. push the result. 
+
+[x] mulr;   ----;
+[x] mulri;  0x67;   multiply the two (u)ints stored in given two registers and set the second one to result
+[x] mulrf;  0x68;   multiply the two floats stored in given two registers and set the second to result
+[x] mulrb;  0x69;   multiply the two (u)bytes stored in given two registers and set the second one to result
+
+[x] muls;   ----;
+[x] mulsi;  0x6A;   pop and multiply two (u)ints from stack. DO NOT POP. push the result. 
+[x] mulsf;  0x6B;   pop and multiply two floats from stack. DO NOT POP. push the result. 
+[x] mulsb;  0x6C;   multiply two (u)bytes on top of the stack. DO NOT POP. push the result. 
+
+[x] div;    ----;
+[x] divi;   0x6D;   pop and divide two (u)ints from stack. push the result. 
+[x] divf;   0x6E;   pop and divide two floats from stack. push the result. 
+[x] divb;   0x6F;   pop and divide two (u)bytes from stack. push the result. 
+
+[x] divr;   ----;
+[x] divri;  0x70;   divide the two (u)ints stored in given two registers and set the second one to result
+[x] divrf;  0x71;   divide the two floats stored in given two registers and set the second to result
+[x] divrb;  0x72;   divide the two (u)bytes stored in given two registers and set the second one to result
+
+[x] divs;   ----;
+[x] divsi;  0x73;   pop and divide two (u)ints from stack. DO NOT POP. push the result. 
+[x] divsf;  0x74;   pop and divide two floats from stack. DO NOT POP. push the result. 
+[x] divsb;  0x75;   divide two (u)bytes on top of the stack. DO NOT POP. push the result. 
+
+[x] ret;    0x76;   return from the current callstack to 
