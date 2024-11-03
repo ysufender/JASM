@@ -1021,9 +1021,8 @@ namespace Instructions
 
     std::string Call(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // cal <address> <size>
-        // cal <symbol> <size>
-        // cal <register> <size>
+        // TODO: Rewrite cal. Size should be stored on &bl
+
         // cal <address>
         // cal <symbol>
         // cal <register>
@@ -1033,15 +1032,12 @@ namespace Instructions
 
         if (possibleRegMode != ModeFlags::NoMode)
         {
-            // cal <register> <size>
             // cal <register>
             Serialization::SerializeInteger(OpCodes::calr, out); 
             Serialization::SerializeInteger(possibleRegMode, out);
         }
         else if (String::TokenIsNumber(symbolOrAddr))
         {
-            // cal <address_decimal> <size>
-            // cal <address_hex> <size>
             // cal <address_decimal>
             // cal <address_hex>
             Serialization::SerializeInteger(OpCodes::cal, out);
@@ -1052,7 +1048,6 @@ namespace Instructions
         }
         else
         {
-            // cal <symbol> <size>
             // cal <symbol>
             Serialization::SerializeInteger(OpCodes::cal, out);
             const size_t symbolHash { String::Hash(symbolOrAddr) };
@@ -1066,20 +1061,21 @@ namespace Instructions
             }
         }
 
-        const std::string sizeOrNext { Stream::Tokenize(in) };
+        //const std::string sizeOrNext { Stream::Tokenize(in) };
         
-        if (String::TokenIsNumber(sizeOrNext))
-        {
-            if (symbolOrAddr.find_first_of('.') != std::string::npos)
-                LOGE(System::LogLevel::High, "Can't use floating point numbers for size values");
+        //if (String::TokenIsNumber(sizeOrNext))
+        //{
+            //if (symbolOrAddr.find_first_of('.') != std::string::npos)
+                //LOGE(System::LogLevel::High, "Can't use floating point numbers for size values");
 
-            Serialization::SerializeInteger(_TokenToInt<uchar_t>(sizeOrNext), out);
+            //Serialization::SerializeInteger(_TokenToInt<uchar_t>(sizeOrNext), out);
 
-            return Stream::Tokenize(in);
-        }
+            //return Stream::Tokenize(in);
+        //}
 
-        Serialization::SerializeInteger<uchar_t>(0, out);
-        return sizeOrNext;
+        //Serialization::SerializeInteger<uchar_t>(0, out);
+        //return sizeOrNext;
+        return Stream::Tokenize(in);
     }
 
     std::string Multiply(AssemblyInfo& info, std::istream& in, std::ostream& out)
