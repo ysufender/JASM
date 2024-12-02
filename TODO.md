@@ -96,7 +96,7 @@ is 32 or 8 bits
         - [x] Conditional branch
             - [x] Conditional indirect branch
         - [x] Call
-            - [ ] Change the way cal works. Instead of passing size, store it on an 8-bit register
+            - [x] Change the way cal works. Instead of passing size, store it on an 8-bit register
             - [x] Return
         - [ ] System Calls (calling to c/c++ in our case)
     - [ ] Multithreading

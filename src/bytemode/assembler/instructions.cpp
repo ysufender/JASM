@@ -1061,20 +1061,6 @@ namespace Instructions
             }
         }
 
-        //const std::string sizeOrNext { Stream::Tokenize(in) };
-        
-        //if (String::TokenIsNumber(sizeOrNext))
-        //{
-            //if (symbolOrAddr.find_first_of('.') != std::string::npos)
-                //LOGE(System::LogLevel::High, "Can't use floating point numbers for size values");
-
-            //Serialization::SerializeInteger(_TokenToInt<uchar_t>(sizeOrNext), out);
-
-            //return Stream::Tokenize(in);
-        //}
-
-        //Serialization::SerializeInteger<uchar_t>(0, out);
-        //return sizeOrNext;
         return Stream::Tokenize(in);
     }
 

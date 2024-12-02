@@ -7,6 +7,7 @@
 
 #include "jasm.hpp"
 #include "bytemode/assembler/modeflags.hpp"
+#include "bytemode/linker/linker.hpp"
 #include "system.hpp"
 #include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
@@ -53,9 +54,13 @@ int jasmmain(int argc, char** args)
                 System::Setup(flags, std::cout, std::cerr);
 
             using BAsm = typename ByteAssembler::ByteAssembler;
+            using BLink = typename ByteLinker::ByteLinker;
 
             BAsm assembler;
-            BAsm::AssemblyInfoCollection collection = assembler.Assemble();
+            ByteAssembler::AssemblyInfoCollection collection { assembler.Assemble() };
+
+            BLink linker;
+            ByteAssembler::AssemblyInfo final { linker.Link(collection) };
 
             for (const auto& inf : collection)
                 inf.PrintAssemblyInfo();

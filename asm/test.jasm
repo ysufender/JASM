@@ -1,5 +1,6 @@
 .prep
 .body
-    ret
+    mov 6 &al
+    mov 5 &bl
+    add %b &al &bl
 .end
-

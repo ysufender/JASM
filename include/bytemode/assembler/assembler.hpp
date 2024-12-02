@@ -14,6 +14,9 @@ namespace ByteAssembler
      * but with the existence of a shared state (AssemblyContext 
      * and AssemblyInfo) I thought it would be easier to design
      * the program with it. So here it is.
+     *
+     * Plus I might have a pure-virtual base assembler class
+     * and have different kinds of assemblers (for machine code etc.)
      */
 
 
@@ -65,11 +68,11 @@ namespace ByteAssembler
             void AddUnknownSymbol(size_t symbolName, systembit_t address);
     };
 
+    using AssemblyInfoCollection = std::vector<AssemblyInfo>;
+
     class ByteAssembler
     {
         public:
-            using AssemblyInfoCollection = std::vector<AssemblyInfo>;
-
             ByteAssembler() = default; 
             AssemblyInfoCollection Assemble();
 

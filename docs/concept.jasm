@@ -19,7 +19,7 @@ Everything before prep is discarded UNLESS its ".prep". Without the quotes of co
     #Saying that we need the following shared libraries in this code#
     imp "SomeSharedLibWithExtension.shd"
     imp "path/to shared lib/lib.shd"
-    imp "this also can be a/staticFile.stc" #because everything is an illusion#
+    imp "this also can be a/staticFile.stc" #because everything is an illusion (I won't go into details)#
 .body
     #Contains the actual program instructions.#
 
