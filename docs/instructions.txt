@@ -157,8 +157,8 @@ Note: words inside paranthesis "()" are optional
 [x] cnd;    0x60;   jump to given address if &bl is non-zero
 [x] cndr;   0x61;   jump to the address at given register if &bl is non-zero
 
-[x] cal;    0x62;   create a callstack and jump to given address, a byte as parameter size is given
-[x] calr;   0x63;   create a callstack and jump to the address at given register, a byte as parameter size is given
+[x] cal;    0x62;   create a callstack and jump to given address, parameter size is stored on &bl
+[x] calr;   0x63;   create a callstack and jump to the address at given register, parameter size is stored on &bl 
 
 [x] mul;    ----;
 [x] muli;   0x64;   pop and multiply two (u)ints from stack. push the result. 

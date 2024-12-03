@@ -2,5 +2,7 @@
 .body
     mov 6 &al
     mov 5 &bl
-    add %b &al &bl
+    add %b &bl &al 
+    mov 0 &bl
+    cal fn
 .end

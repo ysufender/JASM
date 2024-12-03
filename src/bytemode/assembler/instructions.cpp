@@ -87,7 +87,7 @@ namespace Instructions
                 break;
 
             default:
-                StreamPos(out, errPos);
+                OStreamPos(out, errPos);
                 LOGE(System::LogLevel::High, "Unexpected mode flag '", std::to_string(mode), "' at position ", std::to_string(errPos), ".");
                 break;
         }
@@ -344,7 +344,7 @@ namespace Instructions
         size_t symbolHash { String::Hash(symOrVal) };
         if (!info.symbolMap.contains(symbolHash)) 
         {
-            StreamPos(out, pos);
+            OStreamPos(out, pos);
             info.AddUnknownSymbol(symbolHash, pos);
             Serialization::SerializeInteger<systembit_t>(0, out);
         }
@@ -440,6 +440,8 @@ namespace Instructions
         bool regIs8Bit { Is8Bit(regMode) }; 
 
         Serialization::SerializeInteger(OpCodes::movc, out);
+        // first serialize regMode so at runtime we can determine if its 8 or 32 bits
+        Serialization::SerializeInteger(regMode, out);
 
         if (firstParam.find_first_of('.') == std::string::npos)
         {
@@ -452,8 +454,6 @@ namespace Instructions
             Serialization::SerializeFloat(std::stof(firstParam), out);
         else
             LOGE(System::LogLevel::High, "Register '", secondParam, "' is too small for float value '", firstParam, "'");
-
-        Serialization::SerializeInteger(regMode, out);
 
         return Stream::Tokenize(in);
     }
@@ -596,7 +596,7 @@ namespace Instructions
                 Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
             else
             {
-                StreamPos(out, pos)
+                OStreamPos(out, pos)
                 info.AddUnknownSymbol(symbolHash, pos);
                 Serialization::SerializeInteger<systembit_t>(0, out);
             }
@@ -732,7 +732,7 @@ namespace Instructions
             Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
         else
         {
-            StreamPos(out, pos); 
+            OStreamPos(out, pos); 
             info.AddUnknownSymbol(symbolHash, pos);
             Serialization::SerializeInteger<systembit_t>(0, out);
         }
@@ -1011,7 +1011,7 @@ namespace Instructions
             Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
         else
         {
-            StreamPos(out, pos); 
+            OStreamPos(out, pos); 
             info.AddUnknownSymbol(symbolHash, pos);
             Serialization::SerializeInteger<systembit_t>(0, out);
         }
@@ -1021,8 +1021,7 @@ namespace Instructions
 
     std::string Call(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // TODO: Rewrite cal. Size should be stored on &bl
-
+        // Size should be stored on &bl
         // cal <address>
         // cal <symbol>
         // cal <register>
@@ -1055,7 +1054,7 @@ namespace Instructions
                 Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
             else
             {
-                StreamPos(out, pos); 
+                OStreamPos(out, pos); 
                 info.AddUnknownSymbol(symbolHash, pos);
                 Serialization::SerializeInteger<systembit_t>(0, out);
             }

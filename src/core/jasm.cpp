@@ -59,11 +59,12 @@ int jasmmain(int argc, char** args)
             BAsm assembler;
             ByteAssembler::AssemblyInfoCollection collection { assembler.Assemble() };
 
-            BLink linker;
-            ByteAssembler::AssemblyInfo final { linker.Link(collection) };
-
-            for (const auto& inf : collection)
-                inf.PrintAssemblyInfo();
+            if (!System::Context.IsSingle())
+            {
+                BLink linker;
+                ByteAssembler::AssemblyInfo final { linker.Link(collection) };
+                final.PrintAssemblyInfo();
+            }
         }
     }
     catch (const JASMException& exc)

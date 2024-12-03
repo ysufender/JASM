@@ -8,7 +8,7 @@ But for now it's also good for unit tests.
 - [x] stc/ldc et cetera... doesn't need the type specifiers. They just need to know if type
 is 32 or 8 bits
 
-### The Instruction Set Standards 
+### Assembler 
 
 - [x] ROM manipulation
     - [x] Store raw sequence of data in ROM
@@ -110,6 +110,11 @@ is 32 or 8 bits
         - [x] Square root
         - [ ] Inverse square root
         - [ ] Transcendental functions
+
+### Linker
+
+- [x] Basic backtracking
+- [ ] Shared libraries
 
 ## Notes to Myself
 

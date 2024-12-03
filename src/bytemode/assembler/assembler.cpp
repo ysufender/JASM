@@ -134,7 +134,7 @@ namespace ByteAssembler
             if (token.back() == ':')
             {
                 token.pop_back();
-                StreamPos(outFile, index); 
+                OStreamPos(outFile, index); 
                 assemblyInfo.AddSymbol(token, index);
 
                 token = Stream::Tokenize(sourceFile);
@@ -415,6 +415,9 @@ namespace ByteAssembler
 
     void AssemblyInfo::PrintAssemblyInfo() const
     {
+        if (System::Context.IsSilent())
+            return;
+
         if (_infStr.empty())
         {
             std::stringstream ss;

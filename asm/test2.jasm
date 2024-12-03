@@ -1,0 +1,5 @@
+.prep
+.body
+    #at offset 17# fn:
+        mov 17 &eax
+.end
