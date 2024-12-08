@@ -1,14 +1,16 @@
 # JASM -- (J)ust an (AS)se(M)bly 
 
-JASM is a bytecode assembly backend for creating scripting languages that will compile to JABL (Just a Byte Language). The
+JASM is a bytecode assembly backend for creating scripting languages that will compile to JASM bytecode. The
 purpose of this project is to create a backend for easily creating scripting languages that'll be embedded into C++ code,
 or will be used as a regular lanugage. With this way, anyone that wants to create a scripting language will be 
-free of performance and execution based headaches, thus being able to focus on their language desing and leave the rest
-to JASM and JABL. In addition, the future plans for this project includes adding support for converting JASM and JABL to
-real assembly languages. Maybe a utopic plan for now, but who knows?
+free of performance and execution based headaches, thus being able to focus on their language design and leave the rest
+to JASM. In addition, the future plans for this project includes adding support for converting JASM and its bytecode to
+GNU or LLVM ILs. Maybe a utopic plan for now, but who knows?
 
-> Note: JASM is just a part of JAVM (Just A Virtual Machine) project and JAVM is still in progress, so don't let questions
-like "What am I going to do with a bytecode when I can't execute it?"
+JASM is a part of CSLB project. The CSLB project (which stands for Common Scripting Language Backend, pronunced as SeezleBee)
+consists of three parts: Assembler, Linker and Runtime. The assembler and linker parts are what this repo covers. JASM is
+the name of the IL, bytecode, assembler and linker altogether. The runtime is CSR (Common Script Runtime, pronunced as Caesar),
+it has its own repo.
 
 ## Quickstart
 
@@ -18,21 +20,61 @@ You can either grab the compiled binaries from the release section, or build JAS
 
 #### Building From The Source
 
---Link To Build.md--
+See [BUILD.md](docs/BUILD.md)
 
-### Basic Usage
+### Basic CLI Usage
 
-### JASM Introduction
+Here is the helper text from the current version of JASM:
 
---Link To Docs--
+```
 
-## Contributing
+Just an Assembler (JASM)
+        Description: Assembler and linker for JASM
+        Version: 1.0.0
+        Use Pipelines: Unavailable
+        Build Mode: CLI
 
-Since I don't really have **any** kind of experience in open source and development in general, I'll probably be satisfied
-with the state of JASM and move on. That doesn't mean I won't maintain it but new features might not be implemented quickly
-as the time passes. So every inch of help is much greatly appreciated, just don't forget to add your name to CONTRIBUTORS.md
-and also don't forget to update necessary documents in the repository when you add/remove a dependency/feature/bug. If you
-are new around here like me, take a look at --Contributing.md link here--!
+Available Flags:
+        --help , -h : Print this help text.
+        --version , -v : Print version.
+
+        --silent , -s : Disables SOME outputs. So it's less painful to look at the screen.
+        --single , -S : Assemble each file provided by '--in' flag but do NOT link.
+        --out <value>, -o : Place the output file to specified path if flag '--single' is not set.
+        --lib-type <value> : If desired output is a library, specify the type. (either shared 'shd' or static 'stc')
+
+        --in <..params..>, -I : Files to assemble and (optionally) link. The first entry must contain the entry point, if output is executable.
+        --libs <..params..>, -L : Libraries used and to be linked.
+
+        --pipelines , -p : Use pipeline-streams instead of intermediate files.
+        --working-dir <value>, -w : Set the working directory of the assembler.
+        --redirect-stdout <..params..>, -r : Redirect stdout and stderr to given files. If only one is provided, both get redirected to it.
+
+
+        WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.
+
+```
+
+Assuming you have a project structure that looks like this:
+
+./
+|_ src/
+| |_ main.jasm
+| |_ second.jasm
+|_ lib/
+| |_ randomlib.jasm
+|_ out/
+
+You can generate an `out.jef` file in the `out` directory using: 
+
+`jasm -o "out/out.jef" -I src/main.jasm src/second.jasm lib/randomlib.jasm`
+
+Be aware that if the extension you provided for the output does not match the build type, JASM will append the correct
+extension at the end of the name you've provided.
+
+### JASM Documentation 
+
+If you want to know more about how JASM works you can check the `.txt` files under the `docs` directory, or you can start reading the [docs](docs/DOCUMENTATION.md)
 
 ## Footnotes
 

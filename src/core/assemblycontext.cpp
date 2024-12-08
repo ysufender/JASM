@@ -32,6 +32,9 @@ AssemblyContext::AssemblyContext(
     _libType = (_isLib ? (libT == "shd" ? LibTypeEnum::Shared : LibTypeEnum::Static) : LibTypeEnum::Executable);
     _libraries = libs;
 
+    if (!libT.empty() && _isLib)
+        LOGW("An unsupported library type has been provided. The assembler will proceed with executable format.");
+
     _workingDir = (workingDir.empty() ? std::filesystem::current_path() : workingDir);
 
     std::stringstream ss;
@@ -45,7 +48,9 @@ AssemblyContext::AssemblyContext(
     else
         ss << out;
 
-    ss << "." << (_isLib ? libT : "jef");
+    std::string extension { _isLib ? '.'+libT : ".jef" };
+    if (std::filesystem::path(ss.str()).extension() != extension)
+        ss << extension;
     _outFile = ss.str();
 }
 
