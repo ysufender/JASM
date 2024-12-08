@@ -57,6 +57,7 @@ Available Flags:
 
 Assuming you have a project structure that looks like this:
 
+```
 ./
 |_ src/
 | |_ main.jasm
@@ -64,6 +65,7 @@ Assuming you have a project structure that looks like this:
 |_ lib/
 | |_ randomlib.jasm
 |_ out/
+```
 
 You can generate an `out.jef` file in the `out` directory using: 
 

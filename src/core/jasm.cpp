@@ -39,13 +39,14 @@ int jasmmain(int argc, char** args)
                     out = System::OpenOutFile(rdout[0]);
                     err = System::OpenOutFile(rdout[0]);
                 }
-                else if (rdout.size() == 2)
+                else
                 {
                     out = System::OpenOutFile(rdout[0]);
                     err = System::OpenOutFile(rdout[1]);
                 }
-                else
-                    LOGE(System::LogLevel::High, "--redirect-stdout cannot take more than 2 arguments.");
+                
+                if (rdout.size() > 2)
+                    LOGE(System::LogLevel::Low, "--redirect-stdout cannot take more than 2 arguments.");
             }
 
             if (out.is_open() && err.is_open())

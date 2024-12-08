@@ -49,6 +49,7 @@ See [BUILD.md](./BUILD.md) for building from source.
 
 The JASM project includes the assembler(s) and the linker(s) for the JASM IL.
 
+```
 ./
 |_ docs/ -----------------------> contains documentation `.md`s, concept `.jasm`s and various descriptive `.txt` files.
 |_ include/
@@ -63,6 +64,7 @@ The JASM project includes the assembler(s) and the linker(s) for the JASM IL.
   | |_ linker/  
   |_ core/ ---------------------> the core functions that doesn't change depending on the target mode
   |_ extensions/
+```
 
 ### The CLI
 
@@ -105,3 +107,45 @@ For example if you provide `out.jef` for a target static library, the output wil
 By default, JASM will assume that the target output format is executable unless you specify otherwise via `lib-type` flag.
 The flag accepts two possible values, one being `stc` for `STatiC` and the other `shd` for `SHareD`. If a `lib-type` is provided
 but is not `stc` or `shd`, JASM will proceed by assuming it as an executable.
+
+#### in
+
+`jasm --in <..values..>` or `jasm -I <..values..>`
+
+Source files to assemble and (optionally) link. If the target output format is an executable, the first file must contain
+the program entry point.
+
+#### libs
+
+`jasm --libs <..values..>` or `jasm -L <..values..>`
+
+Libraries to be used and to be linked. Must contain the shared libraries as well if any used in the project.
+
+#### pipelines
+
+`jasm --pipelines` or `jasm -p`
+
+By default, JASM will use intermediary files to store the object files. If the flag `pipelines` is set, pipeline
+streams are used instead.
+
+#### working-dir
+
+`jasm --working-dir <value>` or `jasm -w`
+
+By default, JASM will use the directory that it's been executed from as working directory unless you specify otherwise via
+the `working-dir` flag. The value of the flag `working-dir` must be an existing directory. Otherwise an error will be thrown.
+
+#### redirect-stdout
+
+`jasm --redirect-stdout <..values..>` or `jasm -r <..values..>`
+
+By default, JASM will use the stdout/stderr streams for logging unless you specify otherwise via `redirect-stdout` flag.
+The flag accepts two values at max; if only one is given, it'll be used as both stdout and stderr; if two is given, they'll be
+used as stdout and stderr respectively. If more that two values has been given, the program will silently log an error but
+continue the process.
+
+### The Assembler
+
+Although not yet implemented, JASM is designed to allow modular assemblers. Every assembler lies within a `<identifier>mode`
+directory under `src`. Currently only available assembler is `bytemode` assembler. It assembles the JASM IL into JASM
+bytecode which is meant to be executed by the `Common Script Runtime (CSR)`.

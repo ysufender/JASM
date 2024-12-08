@@ -23,13 +23,14 @@ The flags work the same as the shell script.
 
 I advise you to use this file structure while building:
 
-= build
-|_ <cmake build files> 
-|_ bin
+```
+./
+|_build
+ |_ <cmake build files> 
+ |_ bin
   |_ Debug
-    |_ <debug files>
   |_ Release
-    |_ <release files>
+```
 
 As for now the `CMakePresets.json` only contains presets for debug build but I'll add presets for release builds too. So
 you'll be able to use the presets.

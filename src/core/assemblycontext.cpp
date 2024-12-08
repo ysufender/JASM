@@ -37,6 +37,9 @@ AssemblyContext::AssemblyContext(
 
     _workingDir = (workingDir.empty() ? std::filesystem::current_path() : workingDir);
 
+    if (!std::filesystem::exists(_workingDir) || !std::filesystem::is_directory(_workingDir))
+        LOGE(System::LogLevel::High, "Given directory '", _workingDir, "' does not exists. It can't be used as working directory.");
+
     std::stringstream ss;
 
     // Input file extensions are '.jasm' for files
