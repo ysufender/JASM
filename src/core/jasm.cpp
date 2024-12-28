@@ -2,16 +2,15 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "CLIParser.hpp"
 
 #include "jasm.hpp"
-#include "bytemode/assembler/modeflags.hpp"
 #include "bytemode/linker/linker.hpp"
 #include "system.hpp"
 #include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
-#include "bytemode/assembler/modeflags.hpp"
 
 int jasmmain(int argc, char** args)
 {
@@ -22,37 +21,10 @@ int jasmmain(int argc, char** args)
         if (argc == 1 || flags.GetFlag<CLIParser::FlagType::Bool>("help"))
             PrintHelp(flags);
         else if (flags.GetFlag<CLIParser::FlagType::Bool>("version"))
-            std::cout << "JASM Version " << JASM_VERSION << '\n';
+            LOG("JASM Version ", JASM_VERSION);
         else
         {
-            std::vector<std::string> rdout { flags.GetFlag<CLIParser::FlagType::StringList>("redirect-stdout") };
-
-            std::ofstream out;
-            std::ofstream err;
-
-            if (!rdout.empty())
-            {
-                if (rdout.size() == 0)
-                    LOGW("At least one path must be given after flag `--redirect-output (-r)`. Using default settings.");
-                else if (rdout.size() == 1)
-                {
-                    out = System::OpenOutFile(rdout[0]);
-                    err = System::OpenOutFile(rdout[0]);
-                }
-                else
-                {
-                    out = System::OpenOutFile(rdout[0]);
-                    err = System::OpenOutFile(rdout[1]);
-                }
-                
-                if (rdout.size() > 2)
-                    LOGE(System::LogLevel::Low, "--redirect-stdout cannot take more than 2 arguments.");
-            }
-
-            if (out.is_open() && err.is_open())
-                System::Setup(flags, out, err);
-            else
-                System::Setup(flags, std::cout, std::cerr);
+            SetStdout(flags);
 
             using BAsm = typename ByteAssembler::ByteAssembler;
             using BLink = typename ByteLinker::ByteLinker;
@@ -75,8 +47,8 @@ int jasmmain(int argc, char** args)
     }
     catch (const std::exception& exc)
     {
-        std::cerr << "An unexpected error occured during process."
-                  << "\n\tProvided information: " << exc.what() << std::endl;
+        std::cerr << "An unexpected error occured during process.\n\tProvided information: " 
+                  << exc.what() << std::endl;
         return 1;
     }
 
@@ -106,8 +78,40 @@ void PrintHeader() noexcept
 void PrintHelp(const CLIParser::Flags& flags) noexcept
 {
     PrintHeader();
-    std::cout << flags.GetHelpText() << '\n'
-              << "\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.\n\n";
+    std::cout << flags.GetHelpText()
+              << "\n\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.\n\n";
+}
+
+void SetStdout(const CLIParser::Flags& flags)
+{
+    std::vector<std::string> rdout { flags.GetFlag<CLIParser::FlagType::StringList>("redirect-stdout") };
+
+    std::ofstream out;
+    std::ofstream err;
+
+    if (!rdout.empty())
+    {
+        if (rdout.size() == 0)
+            LOGW("At least one path must be given after flag `--redirect-output (-r)`. Using default settings.");
+        else if (rdout.size() == 1)
+        {
+            out = System::OpenOutFile(rdout[0]);
+            err = System::OpenOutFile(rdout[0]);
+        }
+        else
+        {
+            out = System::OpenOutFile(rdout[0]);
+            err = System::OpenOutFile(rdout[1]);
+        }
+
+        if (rdout.size() > 2)
+            LOGE(System::LogLevel::Low, "--redirect-stdout cannot take more than 2 arguments.");
+    }
+
+    if (out.is_open() && err.is_open())
+        System::Setup(flags, out, err);
+    else
+        System::Setup(flags, std::cout, std::cerr);
 }
 
 CLIParser::Flags SetUpCLI(char** args, int argc)

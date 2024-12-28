@@ -7,17 +7,17 @@
 
 namespace Extensions::String
 {
-    std::vector<std::string> Split(const std::string& string, char delimiter, bool removeTrailing)
+    std::vector<std::string> Split(const std::string& str, char delimiter, bool removeTrailing)
     {
         std::stringstream ss;
         std::vector<std::string> vec;
 
-        if (string.find_first_of(delimiter) == std::string::npos)
-            return { string };
+        if (str.find_first_of(delimiter) == std::string::npos)
+            return { str };
   
-        for (size_t i = 0; i < string.size(); i++)
+        for (size_t i = 0; i < str.size(); i++)
         {
-            const char& character { string.at(i) };
+            const char& character { str.at(i) };
 
             if (character == delimiter)
             {
@@ -26,7 +26,7 @@ namespace Extensions::String
                 continue;
             }
 
-            if (removeTrailing && character == ' ' && i != string.size()-1 && string.at(i+1) == ' ')
+            if (removeTrailing && character == ' ' && i != str.size()-1 && str.at(i+1) == ' ')
                 continue;
 
             ss << character;

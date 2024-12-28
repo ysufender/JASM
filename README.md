@@ -1,4 +1,4 @@
-# JASM -- (J)ust an (AS)se(M)bly 
+# JASM - Just an Assembly 
 
 JASM is a bytecode assembly backend for creating scripting languages that will compile to JASM bytecode. The
 purpose of this project is to create a backend for easily creating scripting languages that'll be embedded into C++ code,
