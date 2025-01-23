@@ -38,7 +38,7 @@ namespace Extensions::Serialization
         using uchar = std::make_unsigned_t<char>;
         using UT = std::make_unsigned_t<T>;
 
-        if (std::endian::native == std::endian::little)
+        if (std::endian::native == std::endian::big)
             stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
         else
         {
@@ -85,7 +85,7 @@ namespace Extensions::Serialization
         UT temp;
         stream.read(reinterpret_cast<char*>(&temp), sizeof(UT));
 
-        if (std::endian::native == std::endian::little)
+        if (std::endian::native == std::endian::big)
             data = temp;
         else
         {

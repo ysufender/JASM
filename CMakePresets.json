@@ -17,6 +17,7 @@
                 "CMAKE_CXX_STANDART": "20",
                 "CMAKE_CXX_STANDART_REQUIRED": true,
 
+                "CXX_COMPILER_NAME":"",
                 "TOOLCHAIN_MODE": "OFF",
                 "USE_PIPELINES_OPT": "OFF",
                 "OUTPUT_PATH": ""
@@ -26,8 +27,18 @@
             "name": "Debug",
             "inherits": "default",
             "cacheVariables": {
+                "CXX_COMPILER_NAME":"g++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "OUTPUT_PATH": "Debug"
+            }
+        },
+        {
+            "name": "Debug-MinGW",
+            "inherits": "default",
+            "cacheVariables": {
+                "CXX_COMPILER_NAME":"x86_64-w64-mingw32-g++",
+                "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-g++",
+                "OUTPUT_PATH": "Debug-MinGW"
             }
         }
     ],
@@ -35,6 +46,10 @@
         {
             "name": "Debug",
             "configurePreset": "Debug"
+        },
+        {
+            "name": "Debug-MinGW",
+            "configurePreset": "Debug-MinGW"
         }
     ]
 }

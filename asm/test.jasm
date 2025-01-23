@@ -1,8 +1,7 @@
 .prep
+    org main
+    sts 15
+    sth 15
 .body
-    mov 6 &al
-    mov 5 &bl
-    add %b &bl &al 
-    mov 0 &bl
-    cal fn
+    main:
 .end

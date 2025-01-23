@@ -16,14 +16,14 @@ while test $# -gt 0; do
 done
 
 if [ $run == false ]; then
-    ./build.sh
+    ./build.sh "$@"
     echo
 fi
 echo "-----------------------------------------"
 echo "                RUNNING                  "
 echo "-----------------------------------------"
 echo
-build/bin/Debug/jasm -w asm -S -I test.jasm
+build/bin/Debug/jasm -w asm -S -I test.jasm 
 echo
 echo "-----------------------------------------"
 echo "                OUTPUT                   "

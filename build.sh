@@ -4,6 +4,7 @@ set -e
 
 refresh=false
 generate=false
+windows=false
 
 while test $# -gt 0; do
     case "$1" in
@@ -15,6 +16,10 @@ while test $# -gt 0; do
             generate=true
             shift
             ;;
+        -w|--windows)
+            windows=true
+            shift
+            ;;
         *)
             shift
             break
@@ -22,16 +27,22 @@ while test $# -gt 0; do
     esac
 done
 
+preset="Debug"
+
 if [[ $refresh == true && -d build ]]; then
     echo "[BUILD_SCRIPT] Cleaning the build directory..."
     rm -rf build
+fi
+
+if [ $windows == true ]; then
+    preset="Debug-MinGW"
 fi
 
 if [ -d build/Debug ]; then
     echo "[BUILD_SCRIPT] Already generated."
 else
     echo "[BUILD_SCRIPT] Generating build files."
-    cmake --preset Debug
+    cmake --preset $preset 
 fi
 
 if [ $generate == true ]; then
@@ -39,4 +50,4 @@ if [ $generate == true ]; then
     exit
 fi
 
-cmake --build build --preset Debug
+cmake --build build --preset $preset "$@"

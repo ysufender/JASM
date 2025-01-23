@@ -8,7 +8,7 @@ namespace Extensions::Serialization
         float temp;
         stream.read(reinterpret_cast<char*>(&temp), sizeof(float));
 
-        if (std::endian::native == std::endian::little)
+        if (std::endian::native == std::endian::big)
             data = temp;
         else
         {
@@ -24,7 +24,7 @@ namespace Extensions::Serialization
 
     void SerializeFloat(const float& data, std::ostream& stream)
     {
-        if (std::endian::native == std::endian::little)
+        if (std::endian::native == std::endian::big)
             stream.write(reinterpret_cast<const char*>(&data), sizeof(float));
         else
         {
