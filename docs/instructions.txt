@@ -71,6 +71,8 @@ Note: words inside paranthesis "()" are optional
 [x] dcrsf;  0x27;   decrement the float at the top of the stack, don't modify but push
 [x] dcrsb;  0x28;   decrement the (u)byte at the top of the stack, don't modify but push
 
+% stack bitwise operations set the given register to result
+% register bitwise operations set the second register to result
 [x] and;    ----;
 [x] andst;  0x29;   apply and operation on top 2 32-bits on stack
 [x] andse;  0x2A;   apply and operation on top 2 8-bits on stack
@@ -186,8 +188,8 @@ Note: words inside paranthesis "()" are optional
 [x] divrb;  0x72;   divide the two (u)bytes stored in given two registers and set the second one to result
 
 [x] divs;   ----;
-[x] divsi;  0x73;   pop and divide two (u)ints from stack. DO NOT POP. push the result. 
-[x] divsf;  0x74;   pop and divide two floats from stack. DO NOT POP. push the result. 
+[x] divsi;  0x73;   divide two (u)ints from stack. DO NOT POP. push the result. 
+[x] divsf;  0x74;   divide two floats from stack. DO NOT POP. push the result. 
 [x] divsb;  0x75;   divide two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[x] ret;    0x76;   return from the current callstack to 
+[x] ret;    0x76;   return from the current callstack

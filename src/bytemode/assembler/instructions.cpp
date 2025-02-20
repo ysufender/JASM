@@ -99,30 +99,30 @@ namespace Instructions
     //  2: register
     std::string _BoringLogicHandle(std::istream& in, std::ostream& out, std::array<OpCodes, 3> stackAndReg)
     {
-        // [op] <mode> 
+        // [op] <mode> <register>
         // [op] <register> <register> 
 
         std::string possibleReg1 { Stream::Tokenize(in) };
         //const uchar_t possibleReg1Mode { ModeFlags::GetRegisterModeFlag(possibleReg1) };
         const uchar_t possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Reg::eax), Enumc(Reg::flg)) };
+        const uchar_t reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg), true) };
 
         // [op] <register> <register> 
         if (possibleReg1Mode != ModeFlags::NoMode)
         {
             //const uchar_t reg2Mode { ModeFlags::GetRegisterModeFlag(Stream::Tokenize(in), true) };
-            const uchar_t reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg), true) };
-
-            Serialization::SerializeInteger(stackAndReg.at(1), out);
+            Serialization::SerializeInteger(stackAndReg.at(2), out);
             Serialization::SerializeInteger(possibleReg1Mode, out);
             Serialization::SerializeInteger(reg2Mode, out);
 
             return Stream::Tokenize(in);
         }
 
-        // [op] <mode>
+        // [op] <mode> <register>
         //const uchar_t mode { ModeFlags::GetModeFlag(possibleReg1, true) };
         const uchar_t mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         _BoringModeSwitch(mode, out, {stackAndReg.at(0), stackAndReg.at(0), stackAndReg.at(1)});
+        Serialization::SerializeInteger(reg2Mode, out);
 
         return Stream::Tokenize(in);
     }
@@ -557,8 +557,8 @@ namespace Instructions
 
     std::string Nor(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // or <mode>
-        // or <register> <register>
+        // nor <mode>
+        // nor <register> <register>
         return _BoringLogicHandle(in, out, {OpCodes::norst, OpCodes::norse, OpCodes::norr});
     }
 
@@ -566,7 +566,27 @@ namespace Instructions
     {
         // swp <mode>
         // swp <register> <register>
-        return _BoringLogicHandle(in, out, {OpCodes::swpt, OpCodes::swpe, OpCodes::swpr});
+
+        std::string possibleReg1 { Stream::Tokenize(in) };
+        const uchar_t possibleReg1Mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Reg::eax), Enumc(Reg::flg)) };
+
+        // swp <register> <register> 
+        if (possibleReg1Mode != ModeFlags::NoMode)
+        {
+            const uchar_t reg2Mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg), true) };
+            Serialization::SerializeInteger(OpCodes::swpr, out);
+            Serialization::SerializeInteger(possibleReg1Mode, out);
+            Serialization::SerializeInteger(reg2Mode, out);
+
+            return Stream::Tokenize(in);
+        }
+
+        // swp <mode> <register>
+        const uchar_t mode { ModeFlags::GetModeFlag(possibleReg1, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
+        _BoringModeSwitch(mode, out, {OpCodes::swpt, OpCodes::swpt, OpCodes::swpe});
+
+        return Stream::Tokenize(in);
+
     }
 
     std::string Duplicate(AssemblyInfo& info, std::istream& in, std::ostream& out)
