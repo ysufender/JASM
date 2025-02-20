@@ -9,8 +9,8 @@ Note: words inside paranthesis "()" are optional
 [x] stes;   0x04;   stores an 8-bit constant on stack from given symbol
 
 [x] ldc;    ----;
-[x] ldt;    0x05;   load 32-bits from stack on heap and set &eax to address
-[x] lde;    0x06;   load 8-bits from stack on heap and set &eax to address
+[x] ldt;    0x05;   load 32-bits from stack on heap and set &ebx to address
+[x] lde;    0x06;   load 8-bits from stack on heap and set &ebx to address
 
 [x] rda;    ----;
 [x] rdt;    0x07;   read 32-bits from heap at address &ebx and store it on stack.
@@ -20,7 +20,7 @@ Note: words inside paranthesis "()" are optional
 [x] mov;    ----;
 [x] movc;   0x0A;   set register to given constant value
 [x] movs;   0x0B;   set register to the value at the top of the stack (based on register size)
-[x] movr;   0x0C;   set register to given register
+[x] movr;   0x0C;   set register to given register (mov <from> <to>)
 
 [x] add;    ----;
 [x] addi;   0x0D;   pop and add two (u)ints from stack. push the result. 

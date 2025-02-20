@@ -221,7 +221,7 @@ namespace Instructions
         {
             bool regIs8Bit { Is8Bit(possibleRegMode) }; 
 
-            if (regIs8Bit && (mode != Enumc(Numo::Byte) || mode != Enumc(Numo::UByte)))
+            if (regIs8Bit && (mode != Enumc(Numo::Byte) && mode != Enumc(Numo::UByte)))
                 LOGE(System::LogLevel::High, "Can't use a 32-bit mode with 8-bit register ", possibleReg, ".");
 
             _BoringModeSwitch(mode, out, {ops.at(3), ops.at(4), ops.at(5)}, {
