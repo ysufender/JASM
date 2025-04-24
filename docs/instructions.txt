@@ -107,8 +107,8 @@ Note: words inside paranthesis "()" are optional
 [x] invr;   0x3B;   invert the given register
 
 [x] invs;   ----;   
-[x] invst;  0x3C;
-[x] invse;  0x3D;
+[x] invst;  0x3C;   invert the top 32-bits on stack, push the result
+[x] invse;  0x3D;   invert the top 8-bits on stack, push the result
 
 [x] cmp;    0x3E;   compare the top #-bits by given mode, set &bl to result
 [x] cmpr;   0x3F;   compare given two registers by given mode, set &bl to result

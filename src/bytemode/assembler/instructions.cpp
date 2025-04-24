@@ -274,8 +274,8 @@ namespace Instructions
                 for (systembit_t i = 0; i < token.size(); i++)
                     Serialization::SerializeInteger(token.data()[i], ss);
 
-                token = Stream::Tokenize(in);
                 size += token.size();
+                token = Stream::Tokenize(in);
                 continue;
             }
 

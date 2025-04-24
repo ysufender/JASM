@@ -42,11 +42,11 @@ namespace Extensions::Serialization
             stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
         else
         {
-            UT temp;
+            UT temp { 0 };
 
-            for (char i = 0; i < sizeof(UT); i++)
+            for (uchar i = 0; i < sizeof(UT); i++)
             {
-                uchar swapData { static_cast<uchar>(static_cast<uchar>(data) >> i*8) };
+                uchar swapData { static_cast<uchar>(static_cast<UT>(data) >> i*8) };
                 temp <<= 8;
                 temp |= swapData;
             }
