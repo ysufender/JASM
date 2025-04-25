@@ -809,22 +809,24 @@ namespace Instructions
         // first 4-bits is memory mode, second 4-bits is value mode 
         const uchar_t compressedModes = (mode << 4) | valueMode; 
 
+
         _BoringModeSwitch(valueMode, out, {OpCodes::rep, OpCodes::rep, OpCodes::rep}, {
-            [&in, &out, compressedModes](){
+            [&in, &out, compressedModes, count](){
                 Serialization::SerializeInteger(compressedModes, out);
+                Serialization::SerializeInteger(count, out);
                 Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
             }, 
-            [&in, &out, compressedModes](){
+            [&in, &out, compressedModes, count](){
                 Serialization::SerializeInteger(compressedModes, out);
+                Serialization::SerializeInteger(count, out);
                 Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);
             },
-            [&in, &out, compressedModes](){
+            [&in, &out, compressedModes, count](){
                 Serialization::SerializeInteger(compressedModes, out);
+                Serialization::SerializeInteger(count, out);
                 Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);
             }
         });
-
-        Serialization::SerializeInteger(count, out);
 
         return Stream::Tokenize(in);
     }
@@ -837,7 +839,7 @@ namespace Instructions
 
         const systembit_t size { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
         Serialization::SerializeInteger(OpCodes::alc, out);
-        Serialization::SerializeInteger(size, out);
+        Serialization::SerializeInteger<systembit_t>(size, out);
 
         return Stream::Tokenize(in);
     }

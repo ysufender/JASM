@@ -11,8 +11,7 @@
 #include "bytemode/linker/linker.hpp"
 #include "bytemode/assembler/assembler.hpp"
 
-#define cont(act) { {act}; continue; }
-#define log_cont(...) { LOGW(__VA_ARGS__); cont(); }
+#define log_cont(...) { LOGW(__VA_ARGS__); continue; }
 
 namespace ByteLinker
 {
