@@ -38,7 +38,7 @@ namespace Instructions
         rep,
         alc,
         powri, powrf, powrb, powsi, powsf, powsb, powi, powf, powb,
-        powrui, powrub, powsui, powsub, powui, powub,
+        /*this line is obsolete*/powrui, powrub, powsui, powsub, powui, powub,
         sqri, sqrf, sqrb, sqrri, sqrrf, sqrrb, sqrsi, sqrsf, sqrsb,
         cnd, cndr,
         cal, calr,

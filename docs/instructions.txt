@@ -138,6 +138,9 @@ Note: words inside paranthesis "()" are optional
 [x] powi;   0x4E;   pow with constants with integers
 [x] powf;   0x4F;   pow with constants with floats 
 [x] powb;   0x50;   pow with constants with bytes 
+% unsigned pows are obsolete.
+% they persist in op codes but they'll never be
+% in the assembled output.
 [x] powrui; 0x51;   pow on register with unsigned integers
 [x] powrub; 0x52;   pow on register with unsigned bytes 
 [x] powsui; 0x53;   pow on stack with unsigned integers
