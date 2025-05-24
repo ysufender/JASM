@@ -16,7 +16,7 @@
 namespace ByteLinker
 {
     ByteAssembler::AssemblyInfo::SymbolMap definedSymbols { };
-    ByteAssembler::AssemblyInfo::SymbolMap unknownSymbols { };
+    ByteAssembler::AssemblyInfo::UnknownSymbolCollection unknownSymbols { };
     std::vector<std::string_view> runtimeAssemblies { };
 
     namespace AsmFlag = ByteAssembler::AssemblyFlags;
@@ -24,12 +24,18 @@ namespace ByteLinker
     ByteAssembler::AssemblyInfo ByteLinker::Link(const ByteAssembler::AssemblyInfoCollection& objects)
     {
         // TODO: Handle runtime assemblies
+        // Idea on How to Hande:
+        //  1- generate code in place to call runtime assemblies like syscalls, generate fake symbols
+        //  2- after sth, list all symbols and their assemblies and their positions, then jmp to org
 
         std::ofstream outFile { System::OpenOutFile(System::Context.OutFile()) };
         std::size_t currentPos { 0 };
         
         for (const auto& info : objects)
         {
+            if ((info.flags & ByteAssembler::AssemblyFlags::Executable) && outFile.tellp() != 0)
+                LOGE(System::LogLevel::High, "Multiple executable targets, aborting. (", info.path, ")");
+
             for (const std::string& import : info.runtimeImports)
                 runtimeAssemblies.push_back(import); 
 
@@ -37,9 +43,13 @@ namespace ByteLinker
                 log_cont(info.path, " does not contain symbol informations.")
 
             for (size_t symbol : info.definedSymbols) 
+            {
+                if (definedSymbols.contains(symbol))
+                    LOGE(System::LogLevel::High, "Redefinition of symbol ", std::to_string(symbol), " in ", info.path);
                 definedSymbols[symbol] = info.symbolMap.at(symbol) + currentPos;
+            }
             for (const auto& unknown : info.unknownSymbols)
-                unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos;
+                unknownSymbols.emplace_back(unknown.SymbolHash, unknown.Address + currentPos);
 
             std::ifstream inFile { System::OpenInFile(info.path) };
             inFile.seekg(0, std::ios::end);

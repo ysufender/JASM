@@ -3,5 +3,8 @@
     sts 15
     sth 15
 .body
+    
+
     main:
+        
 .end

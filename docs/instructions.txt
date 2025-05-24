@@ -9,12 +9,12 @@ Note: words inside paranthesis "()" are optional
 [x] stes;   0x04;   stores an 8-bit constant on stack from given symbol
 
 [x] ldc;    ----;
-[x] ldt;    0x05;   load 32-bits from stack on heap at address &ebx
-[x] lde;    0x06;   load 8-bits from stack on heap at address &ebx
+[x] ldt;    0x05;   load 32-bits from stack on address &ebx
+[x] lde;    0x06;   load 8-bits from stack on address &ebx
 
 [x] rda;    ----;
-[x] rdt;    0x07;   read 32-bits from heap at address &ebx and store it on stack.
-[x] rde;    0x08;   read 32-bits from heap at address &ebx and store it on stack.
+[x] rdt;    0x07;   read 32-bits from address &ebx and store it on stack.
+[x] rde;    0x08;   read 32-bits from address &ebx and store it on stack.
 [x] rdr;    0x09;   read the given register and store it on stack
 
 [x] mov;    ----;
@@ -37,6 +37,7 @@ Note: words inside paranthesis "()" are optional
 [x] addsf;  0x14;   pop and add two floats from stack. DO NOT POP. push the result. 
 [x] addsb;  0x15;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
+TODO: Rewrite this without the memory modes.
 [x] mcp;    0x16;   copy the heap/stack starting at &eax to heap/stack starting at &ebx with the size of &ecx
 
 % The increments are not by one but by a given constant. Must be known at compile time.

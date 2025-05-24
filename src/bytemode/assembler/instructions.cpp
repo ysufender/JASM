@@ -696,7 +696,7 @@ namespace Instructions
         // cmp <mode> <compare_mode> <register> <register>
         //
         // Serialize the <mode> and <compare_mode> to one byte
-        // first 3 bits are <mode>, 5 bits are <compare_mode>
+        // first 3 bits are <mode>, last 5 bits are <compare_mode>
 
         const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         const uchar_t cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Comp::les), Enumc(Comp::neq), true) };
@@ -977,8 +977,6 @@ namespace Instructions
                 LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
 
             Serialization::SerializeInteger(_TokenToInt<systembit_t>(symbolOrAddr), out);
-
-            LOGD(std::to_string(Enumc(OpCodes::cnd)), " ", symbolOrAddr);
 
             return Stream::Tokenize(in);
         }
