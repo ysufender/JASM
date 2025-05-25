@@ -45,6 +45,7 @@ namespace Instructions
         muli, mulf, mulb, mulri, mulrf, mulrb, mulsi, mulsf, mulsb, 
         divi, divf, divb, divri, divrf, divrb, divsi, divsf, divsb, 
         ret,
+        del,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -85,4 +86,5 @@ namespace Instructions
     std::string Divide(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string DivideSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Return(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Deallocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

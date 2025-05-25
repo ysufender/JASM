@@ -64,6 +64,7 @@ namespace ByteAssembler
         {"div", &Instructions::Divide},
         {"divs", &Instructions::DivideSafe},
         {"ret", &Instructions::Return},
+        {"del", &Instructions::Deallocate},
     };
 
     //

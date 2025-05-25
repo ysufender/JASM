@@ -127,7 +127,7 @@ TODO: Rewrite this without the memory modes.
 
 [x] rep;    0x46;   repeats the given value given times on heap or stack
 
-[x] alc;    0x47;   sets &ebx to the address of heap that is capable of holding given size of data
+[x] alc;    0x47;   sets &ebx to the address of heap that is capable of holding given size of data, size is in &ecx
 
 [x] pow;    ----;
 [x] powri;  0x48;   pow on register with integers
@@ -196,4 +196,6 @@ TODO: Rewrite this without the memory modes.
 [x] divsf;  0x74;   divide two floats from stack. DO NOT POP. push the result. 
 [x] divsb;  0x75;   divide two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[x] ret;    0x76;   return from the current callstack
+[x] ret;    0x76;   return from the current callstack, return size stored in &bl
+
+[x] del;    0x77;   deallocates &ecx bytes from &ebx

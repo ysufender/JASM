@@ -833,14 +833,12 @@ namespace Instructions
 
     std::string Allocate(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // alc <size>        
+        // alc
         //
-        // sets &ebx to suitable address 
+        // sets &ebx to suitable address
+        // size stored in &ebx
 
-        const systembit_t size { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
         Serialization::SerializeInteger(OpCodes::alc, out);
-        Serialization::SerializeInteger<systembit_t>(size, out);
-
         return Stream::Tokenize(in);
     }
 
@@ -1090,6 +1088,17 @@ namespace Instructions
     std::string Return(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         Serialization::SerializeInteger(OpCodes::ret, out);
+        return Stream::Tokenize(in);
+    }
+
+    std::string Deallocate(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // del <size>
+        //
+        // address is stored in &ebx
+        // size is stored in &ecx
+
+        Serialization::SerializeInteger(OpCodes::del, out);
         return Stream::Tokenize(in);
     }
 }
