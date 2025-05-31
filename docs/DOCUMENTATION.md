@@ -68,7 +68,7 @@ The JASM project includes the assembler(s) and the linker(s) for the JASM IL.
 
 ### The CLI
 
-The CLI is mostly handler by the [CLI Parser](https://github.com/The2ndSlimShady/CLIParser), so if you want to know how it works you have to check its source.
+The CLI is mostly handler by the [CLI Parser](https://github.com/ysufender/CLIParser), so if you want to know how it works you have to check its source.
 As of the CLI usage, basic CLI usage is covered in [README.md](../README.md#basic-cli-usage). If you wan't to know more about
 the CLI parameters and flags, this section covers that.
 
