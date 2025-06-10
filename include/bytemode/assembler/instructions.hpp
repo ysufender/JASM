@@ -11,7 +11,7 @@
 
 namespace Instructions
 {
-    enum class OpCodes : char 
+    enum class OpCodes : char
     {
         nop, 
         stt, ste, 
@@ -38,7 +38,6 @@ namespace Instructions
         rep,
         alc,
         powri, powrf, powrb, powsi, powsf, powsb, powi, powf, powb,
-        /*this line is obsolete*/powrui, powrub, powsui, powsub, powui, powub,
         sqri, sqrf, sqrb, sqrri, sqrrf, sqrrb, sqrsi, sqrsf, sqrsb,
         cnd, cndr,
         cal, calr,
@@ -46,6 +45,7 @@ namespace Instructions
         divi, divf, divb, divri, divrf, divrb, divsi, divsf, divsb, 
         ret,
         del,
+        subi, subf, subb, subri, subrf, subrb, subsi, subsf, subsb, 
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -87,4 +87,6 @@ namespace Instructions
     std::string DivideSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Return(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Deallocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Sub(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string SubSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

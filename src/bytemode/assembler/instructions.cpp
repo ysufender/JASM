@@ -499,6 +499,30 @@ namespace Instructions
         );
         return Stream::Tokenize(in);
     }
+    
+    std::string Sub(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+            OpCodes::subi, 
+            OpCodes::subf, 
+            OpCodes::subb, 
+            OpCodes::subri, 
+            OpCodes::subrf, 
+            OpCodes::subrb
+        });
+    }
+
+    std::string SubSafe(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringArithmeticCheck(in, out, {
+                OpCodes::subsi, 
+                OpCodes::subsf, 
+                OpCodes::subsb, 
+            },
+            true
+        );
+        return Stream::Tokenize(in);
+    }
 
     std::string MemCopy(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
