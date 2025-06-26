@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -67,7 +68,6 @@ namespace ByteAssembler
         {"del", &Instructions::Deallocate},
         {"sub", &Instructions::Sub},
         {"subs", &Instructions::SubSafe},
-
     };
 
     //
@@ -239,7 +239,7 @@ namespace ByteAssembler
     {
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo };
+        uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo | AssemblyFlags::StoreName };
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
@@ -262,7 +262,17 @@ namespace ByteAssembler
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
 
-        LOGW("TODO: Serialize Assembly Info");
+        // The linker will handle these
+        //if (System::Context.IsSingle())
+        //{
+            //OStreamPos(outFile, asmInfoStart);
+            //assemblyInfo.Serialize(outFile);
+            //OStreamPos(outFile, asmInfoEnd);
+            //Serialization::SerializeInteger(
+                //static_cast<uint64_t>(asmInfoEnd - asmInfoStart),
+                //outFile
+            //);
+        //}
 
         sourceFile.close();
         outFile.close();
@@ -292,12 +302,10 @@ namespace ByteAssembler
         unknownSymbols.push_back({symbolHash, address});
     }
 
-    void AssemblyInfo::Serialize(std::ostream& outFile)
+    void AssemblyInfo::Serialize(std::ostream& outFile) const
     {
         if (outFile.fail() || outFile.bad())
             LOGE(System::LogLevel::High, "Couldn't open file while serializing assembly info");
-
-        outFile.seekp(0, std::ios::beg); 
 
         // Format:
         //      flags
@@ -363,8 +371,6 @@ namespace ByteAssembler
     {
         if (inFile.fail() || inFile.bad())
             LOGE(System::LogLevel::High, "Couldn't open file while deserializing assembly info");
-
-        inFile.seekg(0, std::ios::beg); 
 
         // Flags
         Serialization::DeserializeInteger(flags, inFile);
@@ -443,7 +449,7 @@ namespace ByteAssembler
             for (const auto& info : runtimeImports)
                 ss << "\n\t" << info;
 
-            ss << '\n';
+            ss << "\n\n";
 
             _infStr = ss.str();
         }

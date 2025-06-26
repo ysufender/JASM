@@ -1,2 +1,3 @@
-???;    AssemblyInfo;   serialized assembly info. It's size can vary from 1 byte to a couple hundred    
 ???;    bytecode;       compiled bytecode. It's size can be maximum of which u32 can hold   
+???;    AssemblyInfo;   serialized assembly info. It's size can vary from 1 byte to a couple hundred    
+u64;    size;           size of the AssemblyInfo 

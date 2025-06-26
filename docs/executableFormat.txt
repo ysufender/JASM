@@ -1,5 +1,6 @@
 u32;    entry point;    entry point of the program decided by the org instruction
 u32;    stack size;     stack size of the program decided by the sts instruction
 u32;    max heap size;  maximum heap size of the  program decided by the sth instruction
-???;    AssemblyInfo;   serialized assembly info. It's size can vary from a few bytes to a couple hundred
 ???;    bytecode;       compiled bytecode. It's size can be maximum of which u32 can hold
+_???;    AssemblyInfo;   serialized assembly info. It's size can vary from a few bytes to a couple hundred
+_u64;    size;           size of the AssemblyInfo 

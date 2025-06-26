@@ -45,7 +45,7 @@ namespace Instructions
         divi, divf, divb, divri, divrf, divrb, divsi, divsf, divsb, 
         ret,
         del,
-        subi, subf, subb, subri, subrf, subrb, subsi, subsf, subsb, 
+        subi, subf, subb, subri, subrf, subrb, subsi, subsf, subsb
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);

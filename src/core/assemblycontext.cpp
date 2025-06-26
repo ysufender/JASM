@@ -28,12 +28,15 @@ AssemblyContext::AssemblyContext(
     }
 
     _inputFiles = in;
-    _isLib = (libT == "shd" || libT == "stc");
-    _libType = (_isLib ? (libT == "shd" ? LibTypeEnum::Shared : LibTypeEnum::Static) : LibTypeEnum::Executable);
+    _isLib = !libT.empty();
+    _libType = (_isLib ? (libT == "shd" ? LibTypeEnum::Shared : (libT == "stc" ? LibTypeEnum::Static : LibTypeEnum::Executable)) : LibTypeEnum::Executable);
     _libraries = libs;
 
-    if (!libT.empty() && _isLib)
+    if (_libType == LibTypeEnum::Executable && _isLib)
+    {
         LOGW("An unsupported library type has been provided. The assembler will proceed with executable format.");
+        _isLib = false;
+    }
 
     _workingDir = (workingDir.empty() ? std::filesystem::current_path() : workingDir);
 
@@ -95,22 +98,20 @@ void AssemblyContext::PrintContext() const
         ss << "\n\t}";
 
         if(_libraries.size() == 0)
+            ss << "\n\tLibraries: No Library Provided\n\n";
+        else
         {
-            ss << "\n\tLibraries: No Library Provided\n";
-            return;
+            ss << "\n\tLibraries: " << _libraries.size() << " total {";
+            for (const std::string& lib : _libraries) 
+            {
+                ss << "\n\t\t\"" << lib << '\"';
+
+                if (_libraries.back() != lib)
+                    ss << ',';
+            }
+            ss << "\n\t}\n\n";
         }
-
-        ss << "\n\tLibraries: " << _libraries.size() << " total {";
-        for (const std::string& lib : _libraries) 
-        {
-            ss << "\n\t\t\"" << lib << '\"';
-
-            if (_libraries.back() != lib)
-                ss << ',';
-        }
-        ss << "\n\t}\n";
-
-        _contextString = ss.str();
+        _contextString = std::move(ss.str());
     }
 
     std::cout << _contextString;

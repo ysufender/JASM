@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -60,7 +62,7 @@ namespace ByteAssembler
         public:
             AssemblyInfo() = delete;
             AssemblyInfo(const std::string& path, uchar_t flags);
-            void Serialize(std::ostream& outFile);
+            void Serialize(std::ostream& outFile) const;
             void Deserialize(std::istream& inFile);
             void PrintAssemblyInfo() const;
 

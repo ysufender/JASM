@@ -34,6 +34,7 @@ namespace ModeFlags
 
         {"&pc", Enumc(RegisterModeFlags::pc)},
         {"&sp", Enumc(RegisterModeFlags::sp)},
+        {"&bp", Enumc(RegisterModeFlags::bp)},
 
         {"%les", Enumc(CompareModeFlags::les)},
         {"%gre", Enumc(CompareModeFlags::gre)},

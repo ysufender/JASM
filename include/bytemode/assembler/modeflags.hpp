@@ -5,7 +5,7 @@
 #include "JASMConfig.hpp"
 
 #define Is8Bit(reg) (reg >= Enumc(ModeFlags::RegisterModeFlags::al) && reg <= Enumc(ModeFlags::RegisterModeFlags::flg))
-#define IsSysReg(reg) (reg >= Enumc(ModeFlags::RegisterModeFlags::pc) && reg <= Enumc(ModeFlags::RegisterModeFlags::sp))
+#define IsSysReg(reg) (reg >= Enumc(ModeFlags::RegisterModeFlags::pc) && reg <= Enumc(ModeFlags::RegisterModeFlags::bp))
 #define Enumc(enum) static_cast<uchar_t>(enum)
 
 namespace ModeFlags
@@ -31,7 +31,7 @@ namespace ModeFlags
     {
         /* 32-bit */ eax = 8, ebx, ecx, edx, esi, edi,
 
-        /* 32-bit system */ pc, sp,
+        /* 32-bit system */ pc, sp, bp,
 
         /* 8-bit */ al, bl, cl, dl,
 

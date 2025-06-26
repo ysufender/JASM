@@ -20,6 +20,6 @@ _<typename> -> conditional data
     
 .jef extension -> bytecode assembled to be executed 
 .stc extension -> bytecode assembled to be linked statically    
-.sth extension -> bytecode assembled to be linked at runtime    
+.shd extension -> bytecode assembled to be linked at runtime    
 .jasm extension -> symbolic assemmbly language for bytecode 
 .jo extension -> intermediary object file to be used by the linker

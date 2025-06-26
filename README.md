@@ -16,7 +16,8 @@ it has its own repo.
 
 ### Installation
 
-You can either grab the compiled binaries from the release section, or build JASM from source.
+You can either grab the compiled binaries from the release section (if there is any), or build JASM from source. I recommend
+building from source since it's pretty easy.
 
 #### Building From The Source
 

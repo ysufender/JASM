@@ -9,6 +9,9 @@ namespace ByteLinker
     {
         public:
             ByteLinker() = default;
-            ByteAssembler::AssemblyInfo Link(const ByteAssembler::AssemblyInfoCollection& objects);
+            void Link(const ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkSingle(const ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkLib(const ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkExe(const ByteAssembler::AssemblyInfoCollection& objects);
     };
 }

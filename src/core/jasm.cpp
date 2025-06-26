@@ -24,7 +24,8 @@ int jasmmain(int argc, char** args)
             LOG("JASM Version ", JASM_VERSION);
         else
         {
-            SetStdout(flags);
+            //SetStdout(flags);
+            System::Setup(flags, std::cout, std::cerr);
 
             using BAsm = typename ByteAssembler::ByteAssembler;
             using BLink = typename ByteLinker::ByteLinker;
@@ -32,12 +33,8 @@ int jasmmain(int argc, char** args)
             BAsm assembler;
             ByteAssembler::AssemblyInfoCollection collection { assembler.Assemble() };
 
-            if (!System::Context.IsSingle())
-            {
-                BLink linker;
-                ByteAssembler::AssemblyInfo final { linker.Link(collection) };
-                final.PrintAssemblyInfo();
-            }
+            BLink linker;
+            linker.Link(collection);
         }
     }
     catch (const JASMException& exc)
