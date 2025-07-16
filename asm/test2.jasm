@@ -1,0 +1,6 @@
+.prep
+.body
+    func:
+        cal const
+        ret
+.end

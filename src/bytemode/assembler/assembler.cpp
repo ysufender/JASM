@@ -164,7 +164,7 @@ namespace ByteAssembler
         // Setup
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        uchar_t outFlags { AssemblyFlags::Executable | AssemblyFlags::SymbolInfo };
+        uchar_t outFlags { AssemblyFlags::Executable /*| AssemblyFlags::SymbolInfo*/ };
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
@@ -224,12 +224,8 @@ namespace ByteAssembler
             Serialization::SerializeInteger(size, outFile);
         }
 
-        //LOGW("AssembleCommon is not called for ", file.generic_string());
-
         AssembleCommon(assemblyInfo, sourceFile, outFile);
         
-        LOGW("TODO: Serialize Assembly Info");
-
         sourceFile.close();
         outFile.close();
         return assemblyInfo;
@@ -244,11 +240,6 @@ namespace ByteAssembler
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
 
-        //std::string directories { outPath.substr(0, outPath.find_last_of('/') + 1) };
-        //std::filesystem::path directories { outPath.parent_path() };
-        //if (!directories.empty())
-        //std::filesystem::create_directories(directories);
-
         AssemblyInfo assemblyInfo {
             outPath.generic_string(),
             outFlags
@@ -261,18 +252,6 @@ namespace ByteAssembler
         while (Stream::Tokenize(sourceFile) != ".prep") { }
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
-
-        // The linker will handle these
-        //if (System::Context.IsSingle())
-        //{
-            //OStreamPos(outFile, asmInfoStart);
-            //assemblyInfo.Serialize(outFile);
-            //OStreamPos(outFile, asmInfoEnd);
-            //Serialization::SerializeInteger(
-                //static_cast<uint64_t>(asmInfoEnd - asmInfoStart),
-                //outFile
-            //);
-        //}
 
         sourceFile.close();
         outFile.close();

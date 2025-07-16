@@ -53,7 +53,7 @@ See [BUILD.md](./BUILD.md) for building from source.
         - [Atomic Types](#atomic-types)
         - [Splitting Code Accross Files](#splitting-code-accross-files)
             - [Referencing Unknown Symbols](#referencing-unknown-symbols)
-	- [Why This Documentation Does Not Explain How The IL Works?](#why-this-documentation-does-not-explain-how-the-il-work)
+	- [Why This Documentation Does Not Explain How The IL Works?](#why-this-documentation-does-not-explain-how-the-il-works)
 	
 ## The Project Structure
 
@@ -174,7 +174,7 @@ If target is an executable:
 
 If target is a library:
 
-1. Assemble every file as object files and store theri AssemblyInfo's in memory.
+1. Assemble every file as object files and store their AssemblyInfo's in memory.
 
 If the single mode is active:
 
@@ -487,6 +487,10 @@ read the code.
 
 ##### List of Instructions
 
+> IMPORTANT NOTE:
+>   I'm writing this part from time to time since it's way too boring to do. So if you
+>   can't find what you're looking for here, I apologize for the inconvinience.
+
 ###### nop
 
 `nop` -> `0x00`
@@ -571,14 +575,88 @@ Example:
     #so stack is now 15-21#
 ```
 
-mov
-add
-adds
+###### mov
+
+`mov <register_mode>`   -> `movs <byte>`
+
+MOVes the top n bytes depending on the given register size from the top of the stack to given register.
+
+`mov <register_mode> <register_mode>`   -> `movr <byte> <byte>`
+
+MOVes the value of the first register to second one.
+
+`mov <value> <register_mode>`
+`mov %b/%ub <register_mode>`          -> `movc <byte> <byte>`
+`mov %i/%ui/%f <register_mode>`       -> `movc <byte> <4bytes>`
+
+MOVes the given constant value to given register.
+
+###### add, sub, mul, div
+
+These arithmetic operations differ just in name, so I put them under the same title.
+Where [op] <- {add, sub, mul, div}
+
+`[op] <numeric_mode>`
+`[op] %i/%ui`           -> `[op]i`
+`[op] %b/%ub`           -> `[op]b`
+`[op] %f`               -> `[op]f`
+
+Pops and applies [op] to values from the top of the stack, then pushes the result.
+
+`[op] <numeric_mode> <register_mode> <register_mode>`
+`[op] %i/%ui`           -> `[op]ri <byte> <byte>`
+`[op] %b/%ub`           -> `[op]rb <byte> <byte>`
+`[op] %f`               -> `[op]rf <byte> <byte>`
+
+Adds the first register to second.
+
+###### adds, subs, muls, divs
+
+These arithmetic operations differ just in name, so I put them under the same title too.
+Where [op] <- {adds, subs, muls, divs}
+
+`[op] <numeric_mode>`
+`[op] %i/%ui`           -> `[op]i`
+`[op] %b/%ub`           -> `[op]b`
+`[op] %f`               -> `[op]f`
+
+Applies [op] to values from the top of the stack without popping, then pushes the result.
+
+###### inc, dcr
+
+These too differ just in name.
+Where [op] <- {inc, dcr}
+
+`[op] <numeric_mode> <value>`
+`[op] %i/%ui <value>`           -> `[op]i <4bytes>`
+`[op] %b/%ub <value>`           -> `[op]b <byte>`
+`[op] %f <value>`               -> `[op]f <4bytes>`
+
+Increments the value at the top of the stack <value> times.
+
+`[op] <numeric_mode> <register_mode> <value>`
+`[op] %i/%ui <register_mode> <value>`           -> `[op]ri <byte> <4bytes>`
+`[op] %b/%ub <register_mode> <value>`           -> `[op]rb <byte> <byte>`
+`[op] %f <register_mode> <value>`               -> `[op]rf <byte> <4bytes>`
+
+Increments the value in given register <value> times. Note that if you specify a sizewise missmatching
+mode between <numeric_mode> and <register_mode>, assembler will throw an error. You can use
+%b/%ub with 32-bit registers but you can't use %i/%ui/%f with 8-bit registers.
+
+###### incs, dcrs
+
+There too differ just in name.
+Where [op] <- {incs, dcrs}
+
+`[op] <numeric_mode> <value>`
+`[op] %i/%ui <value>`           -> `[op]i <4bytes>`
+`[op] %b/%ub <value>`           -> `[op]b <byte>`
+`[op] %f <value>`               -> `[op]f <4bytes>`
+
+Increments the value at the top of the stack <value> times and pushes the result, without modifying
+the value on top of the stack.
+
 mcp
-inc
-incs
-dcr
-dcrs
 and
 or
 nor
@@ -599,11 +677,75 @@ pow
 sqr
 cnd
 cal
-mul
-muls
-div
-divs
 ret
 del
-sub
-subs
+
+### Atomic Types
+
+Atomic types are the types that are natively supported by JASM which can be manipulated using
+instructions. Arrays, lists, maps, strings, layouts are not atomic since JASM can't directly
+manipulate them. Below are the atomic types of JASM.
+
+```
+Int32
+UInt32
+Byte
+UByte
+Float (Single Precision)
+```
+
+And that's all. All JASM instructions are built around these types. Complex types besides these
+are compiler illusions. Which are up to you to create since CSLB is only a backend.
+
+### Splitting Code Accross Files
+
+Each JASM file is independent of each other. If you want to split code accross files,
+you can directly use the symbols you wish to use since as long as the file that contains the symbol
+passes from the linker, linker will handle the rest. So no need to indicate the symbol as
+extenral, include headers or anything.
+
+Although it looks like it can lead to terrible debugging sessions and confusions when reading
+the code, remember that JASM is not designed to be used directly. The compilers will do the checks
+anyway loong before sending the generated JASM code to the assembler so why check it again?
+
+#### Referencing Unknown Symbols
+```
+main.jasm
+
+.prep
+    org main
+    sts 0
+    sth 0
+.body
+    main:
+        mov 0 &bl #bl is guaranteed to be initially zero but whatever#
+        cal test
+.end
+```
+
+```
+test.jasm
+
+.prep
+.body
+    test:
+        mov 5 &eax
+        ret
+.end
+```
+
+This is pefreclty fine as long as you include both files when assembling.
+
+It is also possible to use unknown symbols which are present in the libraries you'll link against. 
+Linker will check the symbols and resolve the issues.
+
+## Why This Documentation Does Not Explain How The IL Works?
+
+JASM (this repo) is the assembler and linker part of the CSLB. So IL is nothing but a bunch of symbols
+to be converted to bytecode format at this point. The execution and how it works part is handled
+by (CSR)[https://github.com/ysufender/CSR] (link can be down due to me not making the repo public) so
+the execution part will be explained in CSR's documentation.
+
+But if your question is "why" rather than "how", the answer is "I too don't know" 95% of the time. For
+the 5%, you can contact me and ask anything. Probably I'll learn more from you than you from me so a win/win
+situation.

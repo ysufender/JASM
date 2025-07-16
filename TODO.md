@@ -116,6 +116,8 @@ is 32 or 8 bits
 - [x] Basic backtracking
 - [ ] Shared libraries
 
-## Notes to Myself
+### Bugs
 
-Use hashmaps with addresses as keys and sizes as values for memory allocations
+- [ ] For some reason, for lib1 that calls functions from lib2 (so is linked with lib2), when the exe calls that
+        function from lib1 that calls from lib2, it results in an infinite loop off StackOverflow. This mmight be
+        a CSR problem or a JASM problem, I don't know.

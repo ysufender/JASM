@@ -33,8 +33,8 @@ Note: words inside paranthesis "()" are optional
 [x] addrb;  0x12;   add the two (u)bytes stored in given two registers and set the second one to result
 
 [x] adds;   ----;
-[x] addsi;  0x13;   pop and add two (u)ints from stack. DO NOT POP. push the result. 
-[x] addsf;  0x14;   pop and add two floats from stack. DO NOT POP. push the result. 
+[x] addsi;  0x13;   add two (u)ints from stack. DO NOT POP. push the result. 
+[x] addsf;  0x14;   add two floats from stack. DO NOT POP. push the result. 
 [x] addsb;  0x15;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
 TODO: Rewrite this without the memory modes.
@@ -139,63 +139,69 @@ TODO: Rewrite this without the memory modes.
 [x] powi;   0x4E;   pow with constants with integers
 [x] powf;   0x4F;   pow with constants with floats 
 [x] powb;   0x50;   pow with constants with bytes 
-% unsigned pows are obsolete.
-% they persist in op codes but they'll never be
-% in the assembled output.
-[x] powrui; 0x51;   pow on register with unsigned integers
-[x] powrub; 0x52;   pow on register with unsigned bytes 
-[x] powsui; 0x53;   pow on stack with unsigned integers
-[x] powsub; 0x54;   pow on stack with unsigned bytes 
-[x] powui;  0x55;   pow with constants with unsigned integers
-[x] powub;  0x56;   pow with constants with unsigned bytes 
 
 [x] sqr;    ----;
-[x] sqri;   0x57;   find the square root of given integer constant and store it on stack
-[x] sqrf;   0x58;   find the square root of given float constant and store it on stack
-[x] sqrb;   0x59;   find the square root of given byte constant and store it on stack
-[x] sqrri;  0x5A;   find the square root of given integer in given register and set &eax to it
-[x] sqrrf;  0x5B;   find the square root of given float in given register and set &eax to it
-[x] sqrrb;  0x5C;   find the square root of given byte in given register and set &al to it
-[x] sqrsi;  0x5D;   find the square root of given integer on stack and store it on stack
-[x] sqrsf;  0x5E;   find the square root of given float on stack and store it on stack
-[x] sqrsb;  0x5F;   find the square root of given byte on stack and store it on stack
+[x] sqri;   0x51;   find the square root of given integer constant and store it on stack
+[x] sqrf;   0x52;   find the square root of given float constant and store it on stack
+[x] sqrb;   0x53;   find the square root of given byte constant and store it on stack
+[x] sqrri;  0x54;   find the square root of given integer in given register and set &eax to it
+[x] sqrrf;  0x55;   find the square root of given float in given register and set &eax to it
+[x] sqrrb;  0x56;   find the square root of given byte in given register and set &al to it
+[x] sqrsi;  0x57;   find the square root of given integer on stack and store it on stack
+[x] sqrsf;  0x58;   find the square root of given float on stack and store it on stack
+[x] sqrsb;  0x59;   find the square root of given byte on stack and store it on stack
 
-[x] cnd;    0x60;   jump to given address if &bl is non-zero
-[x] cndr;   0x61;   jump to the address at given register if &bl is non-zero
+[x] cnd;    0x5A;   jump to given address if &bl is non-zero
+[x] cndr;   0x5B;   jump to the address at given register if &bl is non-zero
 
-[x] cal;    0x62;   create a callstack and jump to given address, parameter size is stored on &bl
-[x] calr;   0x63;   create a callstack and jump to the address at given register, parameter size is stored on &bl 
+[x] cal;    0x5C;   create a callstack and jump to given address, parameter size is stored on &bl
+[x] calr;   0x5D;   create a callstack and jump to the address at given register, parameter size is stored on &bl 
 
 [x] mul;    ----;
-[x] muli;   0x64;   pop and multiply two (u)ints from stack. push the result. 
-[x] mulf;   0x65;   pop and multiply two floats from stack. push the result. 
-[x] mulb;   0x66;   pop and multiply two (u)bytes from stack. push the result. 
+[x] muli;   0x5E;   pop and multiply two (u)ints from stack. push the result. 
+[x] mulf;   0x5F;   pop and multiply two floats from stack. push the result. 
+[x] mulb;   0x60;   pop and multiply two (u)bytes from stack. push the result. 
 
 [x] mulr;   ----;
-[x] mulri;  0x67;   multiply the two (u)ints stored in given two registers and set the second one to result
-[x] mulrf;  0x68;   multiply the two floats stored in given two registers and set the second to result
-[x] mulrb;  0x69;   multiply the two (u)bytes stored in given two registers and set the second one to result
+[x] mulri;  0x61;   multiply the two (u)ints stored in given two registers and set the second one to result
+[x] mulrf;  0x62;   multiply the two floats stored in given two registers and set the second to result
+[x] mulrb;  0x63;   multiply the two (u)bytes stored in given two registers and set the second one to result
 
 [x] muls;   ----;
-[x] mulsi;  0x6A;   pop and multiply two (u)ints from stack. DO NOT POP. push the result. 
-[x] mulsf;  0x6B;   pop and multiply two floats from stack. DO NOT POP. push the result. 
-[x] mulsb;  0x6C;   multiply two (u)bytes on top of the stack. DO NOT POP. push the result. 
+[x] mulsi;  0x64;   multiply two (u)ints from stack. DO NOT POP. push the result. 
+[x] mulsf;  0x65;   multiply two floats from stack. DO NOT POP. push the result. 
+[x] mulsb;  0x66;   multiply two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
 [x] div;    ----;
-[x] divi;   0x6D;   pop and divide two (u)ints from stack. push the result. 
-[x] divf;   0x6E;   pop and divide two floats from stack. push the result. 
-[x] divb;   0x6F;   pop and divide two (u)bytes from stack. push the result. 
+[x] divi;   0x67;   pop and divide two (u)ints from stack. push the result. 
+[x] divf;   0x68;   pop and divide two floats from stack. push the result. 
+[x] divb;   0x69;   pop and divide two (u)bytes from stack. push the result. 
 
 [x] divr;   ----;
-[x] divri;  0x70;   divide the two (u)ints stored in given two registers and set the second one to result
-[x] divrf;  0x71;   divide the two floats stored in given two registers and set the second to result
-[x] divrb;  0x72;   divide the two (u)bytes stored in given two registers and set the second one to result
+[x] divri;  0x6A;   divide the two (u)ints stored in given two registers and set the second one to result
+[x] divrf;  0x6B;   divide the two floats stored in given two registers and set the second to result
+[x] divrb;  0x6C;   divide the two (u)bytes stored in given two registers and set the second one to result
 
 [x] divs;   ----;
-[x] divsi;  0x73;   divide two (u)ints from stack. DO NOT POP. push the result. 
-[x] divsf;  0x74;   divide two floats from stack. DO NOT POP. push the result. 
-[x] divsb;  0x75;   divide two (u)bytes on top of the stack. DO NOT POP. push the result. 
+[x] divsi;  0x6D;   divide two (u)ints from stack. DO NOT POP. push the result. 
+[x] divsf;  0x6E;   divide two floats from stack. DO NOT POP. push the result. 
+[x] divsb;  0x6F;   divide two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-[x] ret;    0x76;   return from the current callstack, return size stored in &bl
+[x] ret;    0x70;   return from the current callstack, return size stored in &bl
 
-[x] del;    0x77;   deallocates &ecx bytes from &ebx
+[x] del;    0x71;   deallocates &ecx bytes from &ebx
+
+[x] sub;    ----;
+[x] subi;   0x72;   pop and sub two (u)ints from stack. push the result. 
+[x] subf;   0x73;   pop and sub two floats from stack. push the result. 
+[x] subb;   0x74;   pop and sub two (u)bytes from stack. push the result. 
+
+[x] subr;   ----;
+[x] subri;  0x75;   sub the two (u)ints stored in given two registers and set the second one to result
+[x] subrf;  0x76;   sub the two floats stored in given two registers and set the second to result
+[x] subrb;  0x77;   sub the two (u)bytes stored in given two registers and set the second one to result
+
+[x] subs;   ----;
+[x] subsi;  0x78;   sub two (u)ints from stack. DO NOT POP. push the result. 
+[x] subsf;  0x79;   sub two floats from stack. DO NOT POP. push the result. 
+[x] subsb;  0x7A;   sub two (u)bytes on top of the stack. DO NOT POP. push the result. 

@@ -1,10 +1,10 @@
 .prep
     org main
-    sts 8
+    sts 64
     sth 0
 .body
     main:
-        mov 8 &ebx
-        cal const
-        mov 5 &ebx
+        cal func
+        jmp fin
+    fin:
 .end

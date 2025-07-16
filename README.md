@@ -52,7 +52,7 @@ Available Flags:
         --redirect-stdout <..params..>, -r : Redirect stdout and stderr to given files. If only one is provided, both get redirected to it.
 
 
-        WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.
+        WARNING: In single mode, each file will be assembled as a static library by default. You can specify it with `--libType` flag.
 
 ```
 
@@ -70,10 +70,12 @@ Assuming you have a project structure that looks like this:
 
 You can generate an `out.jef` file in the `out` directory using: 
 
-`jasm -o "out/out.jef" -I src/main.jasm src/second.jasm lib/randomlib.jasm`
+`jasm -o "out/out.jef" -I "src/main.jasm" "src/second.jasm" "lib/randomlib.jasm"`
 
 Be aware that if the extension you provided for the output does not match the build type, JASM will append the correct
 extension at the end of the name you've provided.
+
+Also note that the quotes are optional as long as the string doesn't contain any spaces.
 
 ### JASM Documentation 
 
@@ -81,5 +83,5 @@ If you want to know more about how JASM works you can check the `.txt` files und
 
 ## Footnotes
 
-The licenses, readmes and citations for every library used lies within its own directory
+The licenses, readmes and citations for every library used in this project, lies within its own directory
 under `lib`.

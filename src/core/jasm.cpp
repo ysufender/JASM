@@ -76,7 +76,7 @@ void PrintHelp(const CLIParser::Flags& flags) noexcept
 {
     PrintHeader();
     std::cout << flags.GetHelpText()
-              << "\n\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library. Otherwise the output will be decided by `--libType` flag.\n\n";
+              << "\n\n\n\t" << "WARNING: In single mode, each file will be assembled as a static library by default. You can specify it with `--libType` flag.\n\n";
 }
 
 void SetStdout(const CLIParser::Flags& flags)

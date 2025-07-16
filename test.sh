@@ -9,21 +9,21 @@ while test $# -gt 0; do
             shift
             ;;
         *)
-            shift
             break
             ;;
     esac
 done
 
 if [ $run == false ]; then
-    ./build.sh "$@"
+    ./build.sh
     echo
 fi
 echo "-----------------------------------------"
 echo "                RUNNING                  "
 echo "-----------------------------------------"
 echo
-build/bin/Debug/jasm -w asm -S -I test.jasm 
+build/bin/Debug/jasm -w asm "$@"
+exit
 echo
 echo "-----------------------------------------"
 echo "                OUTPUT                   "

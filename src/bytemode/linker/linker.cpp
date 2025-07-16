@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <fstream>
 #include <ios>
-#include <iterator>
 #include <string>
 
 #include "JASMConfig.hpp"
@@ -16,12 +15,6 @@
 #include "bytemode/assembler/assembler.hpp"
 
 #define log_cont(...) { LOGW(__VA_ARGS__); continue; }
-#define ErrFind(expr) \
-    try { \
-        expr \
-    } catch (std::exception& e) { \
-        LOGD("Here"); \
-    }
 
 namespace ByteLinker
 {
@@ -59,9 +52,20 @@ namespace ByteLinker
             ByteAssembler::AssemblyInfo newInfo { info };
             newInfo.path.replace(newInfo.path.size()-8, 8, ".stc");
 
-            std::ofstream outFile { info.path, std::ios::binary };
-            outFile.seekp(0, std::ios::end);
+            std::ifstream inFile { System::OpenInFile(info.path) };
+            std::ofstream outFile { System::OpenOutFile(newInfo.path) };
 
+            inFile.seekg(0, std::ios::beg);
+            while (!inFile.eof())
+            {
+                char ch;
+                Extensions::Serialization::DeserializeInteger(ch, inFile);
+                if (inFile.eof())
+                    break;
+                Extensions::Serialization::SerializeInteger(ch, outFile);
+            }
+
+            outFile.seekp(0, std::ios::end);
             OStreamPos(outFile, asmInfoStart);
             newInfo.Serialize(outFile);
             OStreamPos(outFile, asmInfoEnd);
@@ -71,8 +75,6 @@ namespace ByteLinker
             );
 
             outFile.close();
-            std::filesystem::rename(info.path, newInfo.path);
-
             newInfo.PrintAssemblyInfo();
         }
     }
@@ -91,6 +93,7 @@ namespace ByteLinker
         std::ofstream outFile { System::OpenOutFile(System::Context.OutFile()) };
         std::size_t currentPos { 0 };
         
+        // Link all object files
         for (const auto& info : objects)
         {
             if ((info.flags & ByteAssembler::AssemblyFlags::Executable))
@@ -133,6 +136,7 @@ namespace ByteLinker
             inFile.close();
         } 
 
+        // Link all static libraries
         for (const auto& libPath : System::Context.Libraries())
         {
             ByteAssembler::AssemblyInfo lib {
@@ -140,10 +144,10 @@ namespace ByteLinker
                 ByteAssembler::AssemblyFlags::Static | ByteAssembler::AssemblyFlags::SymbolInfo | ByteAssembler::AssemblyFlags::StoreName
             };
             std::ifstream inFile { System::OpenInFile(libPath) };
-            inFile.seekg(8, std::ios::end);
+            inFile.seekg(-sizeof(uint64_t), std::ios::end);
             uint64_t size;
             Extensions::Serialization::DeserializeInteger(size, inFile);
-            inFile.seekg(8+size, std::ios::end);
+            inFile.seekg(-(sizeof(uint64_t)+size), std::ios::end);
             IStreamPos(inFile, bytecodeEnd);
             lib.Deserialize(inFile);
 
@@ -164,13 +168,22 @@ namespace ByteLinker
             for (const auto& unknown : lib.unknownSymbols)
                 unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos;
 
-            //currentPos = endPos;
-            //inFile.seekg(0, std::ios::beg);
-            //while ((endPos = inFile.get()) != EOF)
-            //    outFile.write(reinterpret_cast<char*>(&endPos), 1);
-
+            LOGD(std::to_string(size));
+            LOGD(std::to_string(bytecodeEnd));
+            currentPos += bytecodeEnd;
+            inFile.seekg(0, std::ios::beg);
+            for (std::streamoff pos = 0; pos != bytecodeEnd; pos++)
+            {
+                char ch;
+                Extensions::Serialization::DeserializeInteger(ch, inFile);
+                if (inFile.eof())
+                    break;
+                Extensions::Serialization::SerializeInteger(ch, outFile);
+            }
+            inFile.close();
         }
 
+        // Handle symbols
         for (const auto& [symbol, address] : unknownSymbols)
         {
             if (!definedSymbols.contains(symbol) && runtimeAssemblies.empty())
@@ -186,11 +199,12 @@ namespace ByteLinker
             if (!definedSymbols.contains(symbol))
                 final.unknownSymbols.push_back({symbol, address});
 
+        outFile.seekp(0, std::ios::end);
         OStreamPos(outFile, asmInfoStart);
         final.Serialize(outFile);
         OStreamPos(outFile, asmInfoEnd);
-        Extensions::Serialization::SerializeInteger(
-            static_cast<uint64_t>(asmInfoEnd-asmInfoStart),
+        Extensions::Serialization::SerializeInteger<uint64_t>(
+            asmInfoEnd-asmInfoStart,
             outFile
         );
         outFile.close();
@@ -216,6 +230,7 @@ namespace ByteLinker
         std::size_t currentPos { 12 };
         outFile.seekp(12, std::ios::beg);
         
+        // Link all object files
         for (const auto& info : objects)
         {
             if (&info == &objects[0])
@@ -258,6 +273,53 @@ namespace ByteLinker
             inFile.close();
         }
 
+        // Link static libraries
+        for (const std::string& libPath : System::Context.Libraries()) 
+        {
+            ByteAssembler::AssemblyInfo lib {
+                libPath,
+                ByteAssembler::AssemblyFlags::Static | ByteAssembler::AssemblyFlags::SymbolInfo | ByteAssembler::AssemblyFlags::StoreName
+            };
+            std::ifstream inFile { System::OpenInFile(libPath) };
+            inFile.seekg(-sizeof(uint64_t), std::ios::end);
+            uint64_t size;
+            Extensions::Serialization::DeserializeInteger(size, inFile);
+            inFile.seekg(-(sizeof(uint64_t)+size), std::ios::end);
+            IStreamPos(inFile, bytecodeEnd);
+            lib.Deserialize(inFile);
+
+            for (const std::string& import : lib.runtimeImports)
+            {
+                runtimeAssemblies.push_back(import); 
+                final.runtimeImports.push_back(import);
+            }
+
+            for (ByteAssembler::AssemblyInfo::KeyType symbol : lib.definedSymbols)
+            {
+                if (definedSymbols.contains(symbol))
+                    LOGE(System::LogLevel::High, "Redefinition of symbol ", std::to_string(symbol), " in ", lib.path);
+                definedSymbols[symbol] = lib.symbolMap.at(symbol) + currentPos;
+                final.definedSymbols.push_back(symbol);
+                final.symbolMap[symbol] = definedSymbols.at(symbol);
+            }
+            for (const auto& unknown : lib.unknownSymbols)
+                unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos;
+
+            LOGD(std::to_string(bytecodeEnd));
+            currentPos += bytecodeEnd;
+            inFile.seekg(0, std::ios::beg);
+            for (std::streamoff pos = 0; pos != bytecodeEnd; pos++)
+            {
+                char ch;
+                Extensions::Serialization::DeserializeInteger(ch, inFile);
+                if (inFile.eof())
+                    break;
+                Extensions::Serialization::SerializeInteger(ch, outFile);
+            }
+            inFile.close();
+        }
+        
+        // Link the first file lastly, to keep the entry point at the bottom, and ensure the program exits.
         {
             outFile.seekp(0, std::ios::beg);
             std::ifstream inFile { System::OpenInFile(objects[0].path) };
@@ -283,8 +345,7 @@ namespace ByteLinker
                 final.symbolMap[symbol] = definedSymbols.at(symbol);
             }
             for (const auto& unknown : objects[0].unknownSymbols)
-                if (&unknown != &objects[0].unknownSymbols[0])
-                    unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos - 12;
+                unknownSymbols[unknown.SymbolHash] = unknown.Address + ((&unknown != &objects[0].unknownSymbols[0]) ? currentPos - 12 : 0);
 
             inFile.seekg(0, std::ios::end);
             IStreamPos(inFile, endPos);
@@ -303,6 +364,7 @@ namespace ByteLinker
             inFile.close();
         }
 
+        // Handle symbols
         for (const auto& [symbol, address] : unknownSymbols)
         {
             if (!definedSymbols.contains(symbol) && runtimeAssemblies.empty())
@@ -318,6 +380,18 @@ namespace ByteLinker
             if (!definedSymbols.contains(symbol))
                 final.unknownSymbols.emplace_back(symbol, address);
 
+        if (final.flags & ByteAssembler::AssemblyFlags::SymbolInfo)
+        {
+            OStreamPos(outFile, asmInfoStart);
+            final.Serialize(outFile);
+            OStreamPos(outFile, asmInfoEnd);
+            Extensions::Serialization::SerializeInteger<uint64_t>(
+                asmInfoEnd-asmInfoStart,
+                outFile
+            );
+        }
+        outFile.close();
+
         final.PrintAssemblyInfo();
 
         if (final.unknownSymbols.empty())
@@ -326,20 +400,5 @@ namespace ByteLinker
         // TODO: Get the AssemblyInfo's of runtimeAssemblies and check
         // if the unknown symbols exist in them or not.
         LOGW("TODO: Symbol check with runtime assemblies.");
-
-        if (!(final.flags & ByteAssembler::AssemblyFlags::SymbolInfo))
-            return;
-
-        LOGW("TODO: Proper final assemblyInfo for executables.");
-        OStreamPos(outFile, asmInfoStart);
-        final.Serialize(outFile);
-        OStreamPos(outFile, asmInfoEnd);
-        Extensions::Serialization::SerializeInteger(
-            static_cast<uint64_t>(asmInfoEnd-asmInfoStart),
-            outFile
-        );
-
-        outFile.close();
     }
-
 }
