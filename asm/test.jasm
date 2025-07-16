@@ -5,6 +5,4 @@
 .body
     main:
         cal func
-        jmp fin
-    fin:
 .end
