@@ -72,14 +72,15 @@ You can generate an `out.jef` file in the `out` directory using:
 
 `jasm -o "out/out.jef" -I "src/main.jasm" "src/second.jasm" "lib/randomlib.jasm"`
 
-Be aware that if the extension you provided for the output does not match the build type, JASM will append the correct
-extension at the end of the name you've provided.
+Be aware that if the extension you provided for the output does not match the build type, JASM will append the 
+correct extension at the end of the name you've provided.
 
 Also note that the quotes are optional as long as the string doesn't contain any spaces.
 
 ### JASM Documentation 
 
-If you want to know more about how JASM works you can check the `.txt` files under the `docs` directory, or you can start reading the [docs](docs/DOCUMENTATION.md)
+If you want to know more about how JASM works you can check the `.txt` files under the `docs` directory, or 
+you can start reading the [docs](docs/DOCUMENTATION.md)
 
 ## Footnotes
 

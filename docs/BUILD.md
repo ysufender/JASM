@@ -8,15 +8,15 @@ You'll have to deal with cmake directly.
 
 ### build.sh
 
-build.sh <-r|--refresh> <-g|--generate> <-w|--windows>
+`build.sh <-r|--refresh> <-g|--generate> <-w|--windows>`
 
--r|--refresh : Clean the build directory for a fresh start.
--g|--generate: Only generate build files. Do not build the project.
--w|--windows: If this flag is set, the script will invoke cmake with windows presets.
+`-r|--refresh` : Clean the build directory for a fresh start.
+`-g|--generate`: Only generate build files. Do not build the project.
+`-w|--windows`: If this flag is set, the script will invoke cmake with windows presets.
 
 ### build.ps1
 
-build.ps1 <-refresh> <-generate>
+`build.ps1 <-refresh> <-generate>`
 
 The flags work the same as the shell script.
 

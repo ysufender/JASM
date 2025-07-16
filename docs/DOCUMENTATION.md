@@ -1,4 +1,3 @@
-
 # JASM Documentation
 
 ## Introduction
@@ -743,7 +742,7 @@ Linker will check the symbols and resolve the issues.
 
 JASM (this repo) is the assembler and linker part of the CSLB. So IL is nothing but a bunch of symbols
 to be converted to bytecode format at this point. The execution and how it works part is handled
-by (CSR)[https://github.com/ysufender/CSR] (link can be down due to me not making the repo public) so
+by [CSR](https://github.com/ysufender/CSR) (link can be down due to me not making the repo public) so
 the execution part will be explained in CSR's documentation.
 
 But if your question is "why" rather than "how", the answer is "I too don't know" 95% of the time. For
