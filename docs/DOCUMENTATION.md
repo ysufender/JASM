@@ -363,8 +363,9 @@ dl;     ubyte;      general purpose. might be used for temporal bytes and bools.
 
 pc;     u32;     Program Counter. 
 sp;     u32;     Stack Poiner. 
+bp;     u32;     Base Pointer.
 
-flg;    ubyte;      Program Flags
+flg;    ubyte;      Program Flags.
 ```
 
 Technically every single register is modifiable, and the programmer potentially can use this to
