@@ -19,7 +19,7 @@
 namespace ByteLinker
 {
     ByteAssembler::AssemblyInfo::SymbolMap definedSymbols { };
-    ByteAssembler::AssemblyInfo::SymbolMap unknownSymbols { };
+    ByteAssembler::AssemblyInfo::UnknownSymbolCollection unknownSymbols { };
     std::vector<std::string_view> runtimeAssemblies { };
 
     namespace AsmFlag = ByteAssembler::AssemblyFlags;
@@ -109,15 +109,9 @@ namespace ByteLinker
                 final.definedSymbols.push_back(symbol);
                 final.symbolMap[symbol] = definedSymbols.at(symbol);
                 OStreamPos(outFile, pos);
-                LOGD(
-                    std::to_string(symbol), 
-                    "\n\tat lib pos ", std::to_string(lib.symbolMap.at(symbol)),
-                    "\n\tat output stream pos ", std::to_string(pos),
-                    "\n\tis at ", std::to_string(definedSymbols.at(symbol))
-                );
             }
             for (const auto& unknown : lib.unknownSymbols)
-                unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos;
+                unknownSymbols.emplace_back(unknown.SymbolHash, unknown.Address + currentPos);
 
             currentPos += bytecodeEnd;
             inFile.seekg(0, std::ios::beg);
@@ -153,15 +147,9 @@ namespace ByteLinker
             final.symbolMap[symbol] = definedSymbols.at(symbol);
 
             OStreamPos(outFile, pos);
-            LOGD(
-                std::to_string(symbol), 
-                "\n\tat object pos ", std::to_string(info.symbolMap.at(symbol)),
-                "\n\tat output stream pos ", std::to_string(pos),
-                "\n\tis at ", std::to_string(definedSymbols.at(symbol))
-            );
         }
         for (const auto& unknown : info.unknownSymbols)
-            unknownSymbols[unknown.SymbolHash] = unknown.Address + currentPos;
+            unknownSymbols.emplace_back(unknown.SymbolHash, unknown.Address + currentPos);
 
         std::ifstream inFile { System::OpenInFile(info.path) };
         inFile.seekg(0, std::ios::end);
@@ -191,11 +179,6 @@ namespace ByteLinker
 
 
             OStreamPos(outFile, pos);
-            LOGD(
-                std::to_string(symbol), 
-                "\n\tat pos ", std::to_string(address),
-                "\n\tis at ", std::to_string(final.symbolMap.at(symbol))
-            );
  
             outFile.seekp(address, std::ios::beg);
             Extensions::Serialization::SerializeInteger(final.symbolMap.at(symbol), outFile);
@@ -309,7 +292,7 @@ namespace ByteLinker
                 final.symbolMap[symbol] = definedSymbols.at(symbol);
             }
             for (const auto& unknown : objects[0].unknownSymbols)
-                unknownSymbols[unknown.SymbolHash] = unknown.Address + ((&unknown != &objects[0].unknownSymbols[0]) ? currentPos - 12 : 0);
+                unknownSymbols.emplace_back(unknown.SymbolHash, unknown.Address + ((&unknown != &objects[0].unknownSymbols[0]) ? currentPos - 12 : 0));
 
             inFile.seekg(0, std::ios::end);
             IStreamPos(inFile, endPos);
