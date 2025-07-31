@@ -28,7 +28,7 @@ namespace Extensions::String
             return false;
 
         bool fracted = false;
-        bool hex;
+        bool hex = false;
 
         for (size_t i = 0; i < token.size(); i++)
         {

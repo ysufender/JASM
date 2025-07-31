@@ -14,13 +14,24 @@
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
-                "CMAKE_CXX_STANDART": "20",
-                "CMAKE_CXX_STANDART_REQUIRED": true,
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_CXX_STANDARD_REQUIRED": true,
 
                 "CXX_COMPILER_NAME":"",
                 "TOOLCHAIN_MODE": "OFF",
                 "USE_PIPELINES_OPT": "OFF",
                 "OUTPUT_PATH": ""
+            }
+        },
+        {
+            "name": "Release",
+            "inherits": "default",
+            "cacheVariables": {
+                "CXX_COMPILER_NAME":"g++",
+                "CMAKE_BUILD_TYPE": "Release",
+                "OUTPUT_PATH": "Release",
+                "CMAKE_CXX_FLAGS": "-O3 -flto -DNDEBUG",
+                "CMAKE_EXE_LINKER_FLAGS": "-flto"
             }
         },
         {
@@ -50,6 +61,10 @@
         {
             "name": "Debug-MinGW",
             "configurePreset": "Debug-MinGW"
+        },
+        {
+            "name": "Release",
+            "configurePreset": "Release"
         }
     ]
 }
