@@ -205,3 +205,9 @@ TODO: Rewrite this without the memory modes.
 [x] subsi;  0x78;   sub two (u)ints from stack. DO NOT POP. push the result. 
 [x] subsf;  0x79;   sub two floats from stack. DO NOT POP. push the result. 
 [x] subsb;  0x7A;   sub two (u)bytes on top of the stack. DO NOT POP. push the result. 
+
+% Superinstructions
+[x] incl;   ----;
+[x] incli;  0x7B;   increases the given (u)integer at given index relative to &bp by given constant
+[x] inclf;  0x7C;   increases the given float at given index relative to &bp by given constant
+[x] inclb;  0x7D;   increases the given (u)byte at given index relative to &bp by given constant

@@ -1117,7 +1117,7 @@ namespace Instructions
 
     std::string Deallocate(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // del <size>
+        // del
         //
         // address is stored in &ebx
         // size is stored in &ecx
@@ -1125,4 +1125,106 @@ namespace Instructions
         Serialization::SerializeInteger(OpCodes::del, out);
         return Stream::Tokenize(in);
     }
+
+    std::string IncrementLocal(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // incl <mode> <index> <value>
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) }; 
+        _BoringModeSwitch(mode, out, {OpCodes::incli, OpCodes::inclf, OpCodes::inclb}, {
+            [&in, &out](){
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+            },
+            [&in, &out](){
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+                Serialization::SerializeFloat(std::stof(Stream::Tokenize(in)), out);
+            },
+            [&in, &out](){
+                Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+                Serialization::SerializeInteger(_TokenToInt<uchar_t>(Stream::Tokenize(in)), out);
+            }
+        });
+        return Stream::Tokenize(in);
+    }
+
+    std::string ReadLocal(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // ldl <mode> <constant>
+        const std::string modeStr { Stream::Tokenize(in) };
+        //const uchar_t fromReg { ModeFlags::GetModeFlag(next) };
+        const uchar_t mode { ModeFlags::GetModeFlag(modeStr, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
+        _BoringModeSwitch(mode, out, {OpCodes::rdlt, OpCodes::rdlt, OpCodes::rdle});
+        Serialization::SerializeInteger(_TokenToInt<systembit_t>(Stream::Tokenize(in)), out);
+        return Stream::Tokenize(in);
+    }
+
+    std::string ConditionalJump(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // cnj <mode> <compare_mode> <address>
+        // cnj <mode> <compare_mode> <symbol>
+        // cnj <mode> <compare_mode> <register>
+        //
+        // Serialize the <mode> and <compare_mode> to one byte
+        // first 3 bits are <mode>, last 5 bits are <compare_mode>
+
+        Serialization::SerializeInteger(OpCodes::cnj, out);
+
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
+        const uchar_t cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Comp::les), Enumc(Comp::neq), true) };
+        const uchar_t firstThree { static_cast<const uchar_t>(mode << 5) };    
+        const uchar_t compressedModes { static_cast<const uchar_t>(firstThree|cmpMode) };
+
+        Serialization::SerializeInteger(compressedModes, out);
+
+        const std::string symbolOrAddr { Stream::Tokenize(in) };
+
+        // cnj <compare_mode> <address>
+        if (String::TokenIsNumber(symbolOrAddr))
+        {
+            if (symbolOrAddr.find_first_of('.') != std::string::npos)
+                LOGE(System::LogLevel::High, "Can't use floating point numbers for memory addresses.");
+
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(symbolOrAddr), out);
+
+            return Stream::Tokenize(in);
+        }
+        
+        // cnj <compare_mode> <symbol>
+        const size_t symbolHash { String::Hash(symbolOrAddr) };
+        if (info.symbolMap.contains(symbolHash))
+            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+        else
+        {
+            OStreamPos(out, pos); 
+            info.AddUnknownSymbol(symbolHash, pos);
+            Serialization::SerializeInteger<systembit_t>(0, out);
+        }
+
+        return Stream::Tokenize(in);
+    }
+
+    std::string CompareLocal(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // cml <mode> <compare_mode> <idx1> <idx2>
+        //
+        // Serialize the <mode> and <compare_mode> to one byte
+        // first 3 bits are <mode>, last 5 bits are <compare_mode>
+
+        const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
+        const uchar_t cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Comp::les), Enumc(Comp::neq), true) };
+        const uchar_t firstThree { static_cast<const uchar_t>(mode << 5) };    
+        const uchar_t compressedModes { static_cast<const uchar_t>(firstThree|cmpMode) };
+
+
+        // cml <mode> <compare_mode> <idx1> <idx2>
+        const systembit_t index1 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg)) };
+        const systembit_t index2 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg), true) };
+        Serialization::SerializeInteger(OpCodes::cml, out);
+        Serialization::SerializeInteger(compressedModes, out);
+        Serialization::SerializeInteger(index1, out);
+        Serialization::SerializeInteger(index2, out);
+
+        return Stream::Tokenize(in);
+    }
+
 }

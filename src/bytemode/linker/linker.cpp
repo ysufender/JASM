@@ -89,7 +89,7 @@ namespace ByteLinker
             };
             std::ifstream inFile { System::OpenInFile(libPath) };
             inFile.seekg(-sizeof(uint64_t), std::ios::end);
-            uint64_t size;
+            uint64_t size { };
             Extensions::Serialization::DeserializeInteger(size, inFile);
             inFile.seekg(-(sizeof(uint64_t)+size), std::ios::end);
             IStreamPos(inFile, bytecodeEnd);
@@ -188,18 +188,19 @@ namespace ByteLinker
             if (!definedSymbols.contains(symbol) || System::Context.IsLib())
                 final.unknownSymbols.emplace_back(symbol, address);
         
-        if (final.flags & ByteAssembler::AssemblyFlags::SymbolInfo)
-        {
-            outFile.seekp(0, std::ios::end);
-            OStreamPos(outFile, asmInfoStart);
-            final.Serialize(outFile);
-            OStreamPos(outFile, asmInfoEnd);
-            Extensions::Serialization::SerializeInteger<uint64_t>(
-                asmInfoEnd-asmInfoStart,
-                outFile
-            );
-
-        }
+        //if (final.flags & ByteAssembler::AssemblyFlags::SymbolInfo)
+        //{
+        //
+        // Every target must include at least basic information about the Assembly.
+        outFile.seekp(0, std::ios::end);
+        OStreamPos(outFile, asmInfoStart);
+        final.Serialize(outFile);
+        OStreamPos(outFile, asmInfoEnd);
+        Extensions::Serialization::SerializeInteger<uint64_t>(
+            asmInfoEnd-asmInfoStart,
+            outFile
+        );
+        //}
         outFile.close();
 
         final.PrintAssemblyInfo();

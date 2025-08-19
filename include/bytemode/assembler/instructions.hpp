@@ -6,12 +6,13 @@
 
 #include <cmath>
 
+#include "JASMConfig.hpp"
 #include "extensions/serialization.hpp"
 #include "bytemode/assembler/assembler.hpp"
 
 namespace Instructions
 {
-    enum class OpCodes : char
+    enum class OpCodes : uchar_t 
     {
         nop, 
         stt, ste, 
@@ -45,7 +46,11 @@ namespace Instructions
         divi, divf, divb, divri, divrf, divrb, divsi, divsf, divsb, 
         ret,
         del,
-        subi, subf, subb, subri, subrf, subrb, subsi, subsf, subsb
+        subi, subf, subb, subri, subrf, subrb, subsi, subsf, subsb,
+        incli, inclf, inclb,
+        rdlt, rdle,
+        cnj,
+        cml,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -89,4 +94,8 @@ namespace Instructions
     std::string Deallocate(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string Sub(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string SubSafe(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string IncrementLocal(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string ReadLocal(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string ConditionalJump(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string CompareLocal(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

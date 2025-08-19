@@ -19,6 +19,8 @@ class AssemblyContext
         bool _singleAssembly;
         bool _isLib;
         bool _pipelines;
+        bool _symbolInfo;
+        bool _storeName;
         std::string _outFile;
         std::filesystem::path _workingDir;
         LibTypeEnum _libType;
@@ -37,7 +39,9 @@ class AssemblyContext
             const std::string& libT, 
             const std::filesystem::path& workingDir,
             const std::vector<std::string>& in,
-            const std::vector<std::string>& libs
+            const std::vector<std::string>& libs,
+            bool storeSymbols,
+            bool storeName
         );
 
         AssemblyContext() = delete;
@@ -49,6 +53,8 @@ class AssemblyContext
         bool IsSingle() const;
         bool IsUsingPipelines() const;
         bool IsLib() const;
+        bool StoreSymbols() const;
+        bool StoreName() const;
         std::string_view OutFile() const;
         LibTypeEnum LibType() const;
         const std::filesystem::path& WorkingDir() const;
@@ -66,5 +72,7 @@ static AssemblyContext DefaultContext {
     /*.workingDir =*/ "",
     /*.libType =*/ "", 
     /*.inputFiles =*/ { "none.jasm" }, 
-    /*.libraries =*/ { }
+    /*.libraries =*/ { },
+    /*.symbolInfo =*/ false,
+    /*.storeName =*/ false
 };

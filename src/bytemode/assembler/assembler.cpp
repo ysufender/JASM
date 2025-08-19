@@ -68,6 +68,10 @@ namespace ByteAssembler
         {"del", &Instructions::Deallocate},
         {"sub", &Instructions::Sub},
         {"subs", &Instructions::SubSafe},
+        {"incl", &Instructions::IncrementLocal},
+        {"rdl", &Instructions::ReadLocal},
+        {"cnj", &Instructions::ConditionalJump},
+        {"cml", &Instructions::CompareLocal},
     };
 
     //
@@ -164,7 +168,12 @@ namespace ByteAssembler
         // Setup
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        uchar_t outFlags { AssemblyFlags::Executable /*| AssemblyFlags::SymbolInfo*/ };
+        uchar_t outFlags { AssemblyFlags::Executable };
+
+        if (System::Context.StoreSymbols())
+            outFlags |= AssemblyFlags::SymbolInfo;
+        if (System::Context.StoreName())
+            outFlags |= AssemblyFlags::StoreName;
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);

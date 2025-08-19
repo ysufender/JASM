@@ -32,7 +32,9 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
         flags.GetFlag<FT::String>("lib-type"),
         flags.GetFlag<FT::String>("working-dir"),
         flags.GetFlag<FT::StringList>("in"),
-        flags.GetFlag<FT::StringList>("libs")
+        flags.GetFlag<FT::StringList>("libs"),
+        flags.GetFlag<FT::Bool>("store-symbols"),
+        flags.GetFlag<FT::Bool>("store-name"),
     };
     std::filesystem::current_path(Context.WorkingDir());
     std::cout.rdbuf(cout.rdbuf());

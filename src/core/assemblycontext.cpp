@@ -18,8 +18,10 @@ AssemblyContext::AssemblyContext(
         const std::string& libT, 
         const std::filesystem::path& workingDir,
         const std::vector<std::string>& in,
-        const std::vector<std::string>& libs
-    ) : _pipelines(pipelines), _silentMode(silent), _singleAssembly(single), _contextString("")
+        const std::vector<std::string>& libs,
+        bool storeSymbols,
+        bool storeName
+    ) : _pipelines(pipelines), _silentMode(silent), _singleAssembly(single), _contextString(""), _symbolInfo(storeSymbols), _storeName(storeName)
 {
     if (in.size() == 0)
     {
@@ -64,6 +66,8 @@ bool AssemblyContext::IsSilent() const { return _silentMode; }
 bool AssemblyContext::IsSingle() const { return _singleAssembly; }
 bool AssemblyContext::IsUsingPipelines() const { return _pipelines; }
 bool AssemblyContext::IsLib() const { return _isLib; }
+bool AssemblyContext::StoreSymbols() const { return _symbolInfo; }
+bool AssemblyContext::StoreName() const { return _storeName; }
 std::string_view AssemblyContext::OutFile() const { return _outFile; }
 LibTypeEnum AssemblyContext::LibType() const { return _libType; }
 const std::filesystem::path& AssemblyContext::WorkingDir() const { return _workingDir; }
