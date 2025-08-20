@@ -16,4 +16,7 @@
 namespace Extensions::Stream
 {
     std::string Tokenize(std::istream& inputStream);
+    void ClearMacros();
+    void AddMacro(std::string_view name, std::string_view expansion);
+    void ProcessMacroFile(const std::string_view file);
 }

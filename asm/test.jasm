@@ -1,101 +1,16 @@
-This file has been generated automatically by rlox-jasm.
-rlox, Rust implementation of lox from Crafting Interpreters by Emirhan TALA.
-rlox-jasm, JASM IL and Bytecode generation for rlox by Yusuf Ender Osmanoğlu.
-
 .prep
-    org __jasm_IL_entry_main__
+    org main
     sts 1032
     sth 1024
+
+    inc "asm/macro.jmf"
+
+    mac msg "Hello World"
+    mac len 11
 .body
-    __jasm_IL_entry_main__:
-        cal main
-        jmp __jasm_IL_end__
-
-	#function definition#
-	#test(0) -> #
-	test:
-		#return eval#
-		#str literal#
-		raw 11 "Hello World" ;
-		mov 15 &ecx
-		alc
-		mov &ecx &eax
-		sub %i &sp &eax
-		mcp %s %h
-		dcr %i &sp 15
-		rda &ebx
-		#return#
-		mov 4 &bl
-		ret
-	#function definition#
-	#main(0) -> void#
-	main:
-		#variable a#
-		#num literal#
-		stc %f 10
-		#while loop#
-		_while_start_0:
-			#var ref a#
-			mov &bp &ebx
-			rda %i
-			#num literal#
-			stc %f 150000
-			cmp %f %les
-			pop %i
-			pop %i
-			rda &bl
-			mov &bl
-			pop %b
-			cnd _while_body_1
-			jmp _while_end_2
-			_while_body_1:
-			#block#
-			#fn ref test#
-			#function call#
-			#call#
-			mov 0 &bl
-			cal test
-			#Print#
-			mov &ebx
-			mov &ebx &eax
-			rda %i
-			mov &ecx
-			pop %i
-			mov &sp &ebx
-			inc %i &ecx 4
-			mcp %h %s
-			add %i &ecx &sp
-			mov 1 &dl
-			or &dl &flg
-			mov &ecx &bl
-			cal 0x0
-			dcr %b &flg 1
-			sub %i &sp &ecx
-			mov &ecx &sp
-			mov &ebx
-			pop %i
-			rda %i
-			mov &ecx
-			pop %i
-			inc %i &ecx 4
-			del
-			#assignment 0#
-			#var ref a#
-			mov &bp &ebx
-			rda %i
-			#num literal#
-			stc %f 5
-			add %f
-			#assignment#
-			mov &bp &ebx
-			ldc %i
-			pop %i
-			dcr %i &sp 0
-			jmp _while_start_0
-		_while_end_2:
-		mov 0 &bl
-		ret
-__jasm_IL_end__:
+    main:
+        inc %b &flg 1
+        raw len msg 0 ;
+        mov 4 &bl
+        cal sys_println
 .end
-
-End of generated IL.

@@ -90,12 +90,14 @@ namespace ByteAssembler
         {
             outputVector.push_back(AssembleExecutable(inFiles[0]));
             i = 1;
+            Stream::ClearMacros();
         }
 
         for (; i < inFiles.size(); i++)
         {
             const std::string& inputFile { inFiles[i] };
             outputVector.push_back(AssembleLibrary(inputFile));
+            Stream::ClearMacros();
         }
 
         return outputVector;
@@ -113,6 +115,7 @@ namespace ByteAssembler
             if (token == "imp")
             {
                 // Letting the VM know that we need the particular shd file.
+                // imp "path/to/shd"
                 token = Stream::Tokenize(sourceFile);
 
                 if (!token.starts_with('"') && !token.ends_with('"'))
@@ -121,6 +124,29 @@ namespace ByteAssembler
                 token.pop_back();
                 token.erase(0, 1);
                 assemblyInfo.runtimeImports.push_back(token);
+            }
+            else if (token == "inc")
+            {
+                // include a file containing macros
+                // inc "path/to/file"
+                token = Stream::Tokenize(sourceFile);
+
+                if (!token.starts_with('"') && !token.ends_with('"'))
+                    LOGE(System::LogLevel::High, "Unrecognized token '", token, "' at include directive.");
+
+                token.pop_back();
+                token.erase(0, 1);
+                Stream::ProcessMacroFile(token);
+            }
+            else if (token == "mac")
+            {
+                std::string name { Stream::Tokenize(sourceFile) };
+                if (name == JASM_ENDL || name == JASM_EOF)
+                    LOGE(System::LogLevel::High, "Unexpected token ", name, " in macro definition.");
+                token = { Stream::Tokenize(sourceFile) };
+                if (token == JASM_ENDL || token == JASM_EOF)
+                    LOGE(System::LogLevel::High, "Unexpected token ", name, " in macro definition.");
+                Stream::AddMacro(name, token);
             }
             else
                 LOGE(

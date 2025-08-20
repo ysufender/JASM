@@ -1,5 +1,4 @@
 #include <cctype>
-#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -7,13 +6,13 @@
 
 namespace Extensions::String
 {
-    std::vector<std::string> Split(const std::string& str, char delimiter, bool removeTrailing)
+    std::vector<std::string> Split(const std::string_view& str, char delimiter, bool removeTrailing)
     {
         std::stringstream ss;
         std::vector<std::string> vec;
 
         if (str.find_first_of(delimiter) == std::string::npos)
-            return { str };
+            return { str.data() };
   
         for (size_t i = 0; i < str.size(); i++)
         {
@@ -36,10 +35,10 @@ namespace Extensions::String
         return vec;
     }
 
-    std::string Concat(const std::vector<std::string>& strings)
+    std::string Concat(const std::vector<std::string_view>& strings)
     {
         if (strings.size() == 1)
-            return strings[0];
+            return strings[0].data();
         if (strings.size() == 0)
             return "";
 
@@ -49,10 +48,10 @@ namespace Extensions::String
         return ss.str();
     }
 
-    std::string Join(const std::vector<std::string>& strings, char delimiter)
+    std::string Join(const std::vector<std::string_view>& strings, char delimiter)
     {
         if (strings.size() == 1)
-            return strings[0];
+            return strings[0].data();
         if (strings.size() == 0)
             return "";
 

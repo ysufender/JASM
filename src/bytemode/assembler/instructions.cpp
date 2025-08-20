@@ -265,7 +265,7 @@ namespace Instructions
     {
         std::stringstream ss;
         systembit_t size { 0 };
-        while (token != "__JASM__ENDL__")
+        while (token != JASM_ENDL)
         {
             if (token.starts_with('"'))
             {
@@ -280,7 +280,7 @@ namespace Instructions
             }
 
             if (!String::TokenIsNumber(token))
-                LOGE(System::LogLevel::High, "Expected a numeric constant. {", token, "}");
+                LOGE(System::LogLevel::High, "Expected a numeric constant, got ", token);
 
             if (token.find_first_of('.') != std::string::npos)
             {

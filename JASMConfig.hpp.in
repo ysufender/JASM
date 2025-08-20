@@ -13,3 +13,6 @@
 
 using systembit_t = uint32_t;
 using uchar_t = uint8_t;
+
+#define JASM_ENDL "__JASM__ENDL__"
+#define JASM_EOF "__JASM__EOF__"
