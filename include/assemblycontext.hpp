@@ -5,6 +5,8 @@
 #include <string_view>
 #include <vector>
 
+#include "JASMConfig.hpp"
+
 enum class LibTypeEnum 
 {
     Static,
@@ -45,9 +47,10 @@ class AssemblyContext
         );
 
         AssemblyContext() = delete;
+#ifndef TOOLCHAIN_MODE
         //AssemblyContext(AssemblyContext&&) = delete;
         AssemblyContext(AssemblyContext&) = delete;
-
+#endif
 
         bool IsSilent() const;
         bool IsSingle() const;

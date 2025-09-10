@@ -8,11 +8,11 @@ You'll have to deal with cmake directly.
 
 ### build.sh
 
-`build.sh <-r|--refresh> <-g|--generate> <-w|--windows>`
+`build.sh <-r|--refresh> <-g|--generate> <-R|--release>`
 
 `-r|--refresh` : Clean the build directory for a fresh start.
 `-g|--generate`: Only generate build files. Do not build the project.
-`-w|--windows`: If this flag is set, the script will invoke cmake with windows presets.
+`-R|--release` : Build in release mode, with all optimizations.
 
 ### build.ps1
 
@@ -53,13 +53,23 @@ The default presets are given below:
         "cacheVariables": {
             "CMAKE_CXX_COMPILER": "g++",
             "CMAKE_EXPORT_COMPILE_COMMANDS": true,
-            "CMAKE_CXX_STANDART": "20",
-            "CMAKE_CXX_STANDART_REQUIRED": true,
+            "CMAKE_CXX_STANDARD": "20",
+            "CMAKE_CXX_STANDARD_REQUIRED": true,
 
             "CXX_COMPILER_NAME":"",
             "TOOLCHAIN_MODE": "OFF",
             "USE_PIPELINES_OPT": "OFF",
             "OUTPUT_PATH": ""
+        }
+    },
+    {
+        "name": "Release",
+        "inherits": "default",
+        "cacheVariables": {
+            "CXX_COMPILER_NAME":"g++",
+            "CMAKE_BUILD_TYPE": "Release",
+            "OUTPUT_PATH": "Release",
+            "CMAKE_CXX_FLAGS": "-O3 -flto -DNDEBUG",
         }
     },
     {
@@ -69,15 +79,7 @@ The default presets are given below:
             "CXX_COMPILER_NAME":"g++",
             "CMAKE_BUILD_TYPE": "Debug",
             "OUTPUT_PATH": "Debug"
-        }
-    },
-    {
-        "name": "Debug-MinGW",
-        "inherits": "default",
-        "cacheVariables": {
-            "CXX_COMPILER_NAME":"x86_64-w64-mingw32-g++",
-            "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-g++",
-            "OUTPUT_PATH": "Debug-MinGW"
+            "CMAKE_CXX_FLAGS": "-O0 -g"
         }
     }
 ],
@@ -87,8 +89,8 @@ The default presets are given below:
         "configurePreset": "Debug"
     },
     {
-        "name": "Debug-MinGW",
-        "configurePreset": "Debug-MinGW"
+        "name": "Release",
+        "configurePreset": "Release"
     }
 ]
 ```
@@ -107,10 +109,12 @@ default:
     USE_PIPELINES_OPT (OFF): Enables the pipelines option. It's still optional if you enable it but will be present. NOTE: This is not yet ready.
 
 Debug:
-    CXX_COMPILER_NAME (g++): To differ from Debug-MinGW 
+    CMAKE_BUILD_TYPE: Debug
+    CMAKE_CXX_FLAGS: -O0 -g
     OUTPUT_PATH (Debug): Place resulting bins to build/Debug/
 
-Debug-MinGW:
-    CXX_COMPILER_NAME (x86_64-w64-mingw32-g++): I hate building for Windows. For some reason I wasn't able to build for windows on Linux.
-    OUTPUT_PATH (Debug-MinGW):
+Release:
+    CMAKE_BUILD_TYPE: Release
+    CMAKE_CXX_FLAGS: -O3 -flto -DNDEBUG
+    OUTPUT_PATH: Release
 ```

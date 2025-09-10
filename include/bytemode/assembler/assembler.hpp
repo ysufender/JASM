@@ -1,13 +1,16 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 #include "JASMConfig.hpp"
+
+#ifdef TOOLCHAIN_MODE
+#include "assemblycontext.hpp"
+#endif
 
 namespace ByteAssembler
 {
@@ -57,11 +60,20 @@ namespace ByteAssembler
             SymbolMap symbolMap;
 
         private:
+#ifdef TOOLCHAIN_MODE
+            const AssemblyContext& context;
+#endif
             mutable std::string _infStr = "";
 
         public:
             AssemblyInfo() = delete;
-            AssemblyInfo(const std::string& path, uchar_t flags);
+            AssemblyInfo(
+                const std::string& path,
+                uchar_t flags
+#ifdef TOOLCHAIN_MODE
+                , const AssemblyContext& ctx
+#endif
+            );
             void Serialize(std::ostream& outFile) const;
             void Deserialize(std::istream& inFile);
             void PrintAssemblyInfo() const;
@@ -75,10 +87,19 @@ namespace ByteAssembler
     class ByteAssembler
     {
         public:
+#ifndef TOOLCHAIN_MODE
             ByteAssembler() = default; 
+#else
+            ByteAssembler(const AssemblyContext&& context);
+#endif
+
             AssemblyInfoCollection Assemble();
 
         private:
+#ifdef TOOLCHAIN_MODE
+            const AssemblyContext context;
+#endif
+
             AssemblyInfo AssembleLibrary(const std::filesystem::path& file);
             AssemblyInfo AssembleExecutable(const std::filesystem::path& file);
             AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile);

@@ -1,3 +1,7 @@
+#include "JASMConfig.hpp"
+#include "bytemode/disassembler/disassembler.hpp"
+
+#ifndef TOOLCHAIN_MODE
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -9,7 +13,6 @@
 #include "jasm.hpp"
 #include "bytemode/linker/linker.hpp"
 #include "system.hpp"
-#include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
 
 int jasmmain(int argc, char** args)
@@ -27,14 +30,24 @@ int jasmmain(int argc, char** args)
             //SetStdout(flags);
             System::Setup(flags, std::cout, std::cerr);
 
-            using BAsm = typename ByteAssembler::ByteAssembler;
-            using BLink = typename ByteLinker::ByteLinker;
+            if (flags.GetFlag<CLIParser::FlagType::Bool>("disassemble"))
+            {
+                using BDasm = typename ByteAssembler::ByteDisassembler;
 
-            BAsm assembler;
-            ByteAssembler::AssemblyInfoCollection collection { assembler.Assemble() };
+                BDasm disassembler;
+                disassembler.Disassemble();
+            }
+            else
+            {
+                using BAsm = typename ByteAssembler::ByteAssembler;
+                using BLink = typename ByteLinker::ByteLinker;
 
-            BLink linker;
-            linker.Link(collection);
+                BAsm assembler;
+                ByteAssembler::AssemblyInfoCollection collection { assembler.Assemble() };
+
+                BLink linker;
+                linker.Link(collection);
+            }
         }
     }
     catch (const JASMException& exc)
@@ -119,6 +132,8 @@ CLIParser::Flags SetUpCLI(char** args, int argc)
     parser.AddFlag<FlagType::Bool>("help", "Print this help text.");
     parser.AddFlag<FlagType::Bool>("version", "Print version.");
     parser.Separator();
+    parser.AddFlag<FlagType::Bool>("disassemble", "Disassemble the given file and print the result to stdout. (only the first entry of --in will be used)");
+    parser.Separator();
     parser.AddFlag<FlagType::Bool>("silent", "Disables SOME outputs. So it's less painful to look at the screen.", false);
     parser.AddFlag<FlagType::Bool>("single", "Assemble each file provided by '--in' flag but do NOT link.", false);
     parser.AddFlag<FlagType::String>("out", "Place the output file to specified path if flag '--single' is not set.");
@@ -144,6 +159,9 @@ CLIParser::Flags SetUpCLI(char** args, int argc)
     parser.BindFlag("p", "pipelines");
     parser.BindFlag("w", "working-dir");
     parser.BindFlag("r", "redirect-stdout");
+    parser.BindFlag("d", "disassemble");
 
     return parser.Parse();
 }
+#else
+#endif

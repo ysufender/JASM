@@ -15,6 +15,12 @@
 #include "bytemode/assembler/assembler.hpp"
 #include "bytemode/assembler/instructions.hpp"
 
+#ifdef TOOLCHAIN_MODE
+#define CONTEXT this->context
+#else
+#define CONTEXT System::Context
+#endif
+
 namespace ByteAssembler
 {
     //
@@ -77,16 +83,23 @@ namespace ByteAssembler
     //
     // Assembler Implementation
     //
+#ifdef TOOLCHAIN_MODE
+    ByteAssembler::ByteAssembler(const AssemblyContext&& context) :
+        context(context)
+    {
+    }
+#endif
+
     std::vector<AssemblyInfo> ByteAssembler::Assemble()
     {
-        System::Context.PrintContext();
+        CONTEXT.PrintContext();
 
         std::vector<AssemblyInfo> outputVector { };
 
-        const std::vector<std::string>& inFiles { System::Context.InputFiles() };
+        const std::vector<std::string>& inFiles { CONTEXT.InputFiles() };
         size_t i { 0 };
 
-        if (!System::Context.IsLib() && !System::Context.IsSingle())
+        if (!CONTEXT.IsLib() && !CONTEXT.IsSingle())
         {
             outputVector.push_back(AssembleExecutable(inFiles[0]));
             i = 1;
@@ -196,9 +209,9 @@ namespace ByteAssembler
         outPath.concat(".jo");
         uchar_t outFlags { AssemblyFlags::Executable };
 
-        if (System::Context.StoreSymbols())
+        if (CONTEXT.StoreSymbols())
             outFlags |= AssemblyFlags::SymbolInfo;
-        if (System::Context.StoreName())
+        if (CONTEXT.StoreName())
             outFlags |= AssemblyFlags::StoreName;
 
         if (std::filesystem::exists(outPath))
@@ -206,7 +219,10 @@ namespace ByteAssembler
 
         AssemblyInfo assemblyInfo {
             outPath.generic_string(),
-            outFlags
+            outFlags,
+#ifdef TOOLCHAIN_MODE
+            this->context
+#endif
         };
 
         std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
@@ -277,7 +293,10 @@ namespace ByteAssembler
 
         AssemblyInfo assemblyInfo {
             outPath.generic_string(),
-            outFlags
+            outFlags,
+#ifdef TOOLCHAIN_MODE
+            this->context
+#endif
         };
 
         // Process
@@ -296,7 +315,19 @@ namespace ByteAssembler
     //
     // AssemblyInfo Implementation 
     //
-    AssemblyInfo::AssemblyInfo(const std::string& path, uchar_t flags) : symbolMap(), path(path), flags(flags)
+    AssemblyInfo::AssemblyInfo(
+        const std::string& path,
+        uchar_t flags
+#ifdef TOOLCHAIN_MODE
+        , const AssemblyContext& ctx
+#endif
+    ) :
+        symbolMap(),
+        path(path),
+        flags(flags)
+#ifdef TOOLCHAIN_MODE
+        , context(ctx)
+#endif
     {
     }
 
@@ -439,7 +470,7 @@ namespace ByteAssembler
 
     void AssemblyInfo::PrintAssemblyInfo() const
     {
-        if (System::Context.IsSilent())
+        if (CONTEXT.IsSilent())
             return;
 
         if (_infStr.empty())

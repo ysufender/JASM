@@ -18,6 +18,7 @@
 // 
 // System Implementation
 //
+#ifndef TOOLCHAIN_MODE
 AssemblyContext& System::Context { DefaultContext };
 
 void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostream& cerr)
@@ -40,6 +41,7 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
     std::cout.rdbuf(cout.rdbuf());
     std::cerr.rdbuf(cerr.rdbuf());
 }
+#endif
 
 void System::Log(std::string_view message)
 {

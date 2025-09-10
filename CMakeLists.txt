@@ -10,10 +10,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDART_REQUIRED TRUE)
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    #add_compile_options("-O0")
-endif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-
 message(STATUS "Checking CXX compiler.")
 if("${CXX_COMPILER_NAME}" STREQUAL "x86_64-w64-mingw32-g++")
     message(STATUS "Using ${CXX_COMPILER_NAME}, linking libstdc++ statically.")
@@ -42,10 +38,16 @@ configure_file(
 #    file(COPY ${JASM_FILE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${OUTPUT_PATH}/${OUT_JASM}")
 #endforeach(JASM_FILE ${JASM_FILES})
 
-
-add_executable(jasm 
-    src/main.cpp
-)
+if (NOT TOOLCHAIN_MODE)
+    add_executable(jasm 
+        src/main.cpp
+    )
+else ()
+    message(STATUS "Building in toolchain mode.")
+    add_library(jasm
+        src/main.cpp
+    )
+endif (NOT TOOLCHAIN_MODE)
 
 set_target_properties(jasm
     PROPERTIES
@@ -55,8 +57,8 @@ set_target_properties(jasm
 )
 
 include_directories(
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_BINARY_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include
 )
 
 # After the include call so everything includes those above
