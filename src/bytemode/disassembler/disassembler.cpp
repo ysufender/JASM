@@ -1,15 +1,12 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
-#include <functional>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 #include "system.hpp"
 #include "JASMConfig.hpp"
 #include "assemblycontext.hpp"
-#include "extensions/stringextensions.hpp"
 #include "extensions/serialization.hpp"
 #include "extensions/streamextensions.hpp"
 #include "bytemode/assembler/assembler.hpp"
@@ -41,6 +38,10 @@ namespace ByteAssembler
 
     void ByteDisassembler::Disassemble()
     {
+        using instructionFn = void(*)(std::istream& in);
+        constexpr static  instructionFn instructions[] {
+        };
+
         CONTEXT.PrintContext();
 
         const std::string& inFile { CONTEXT.InputFiles()[0] };

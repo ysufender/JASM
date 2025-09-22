@@ -1,9 +1,6 @@
 #pragma once
 
-#include <filesystem>
-
 #include "JASMConfig.hpp"
-#include "bytemode/assembler/assembler.hpp"
 
 #ifdef TOOLCHAIN_MODE
 #include "assemblycontext.hpp"

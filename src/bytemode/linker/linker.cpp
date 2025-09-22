@@ -177,7 +177,6 @@ namespace ByteLinker
             if (!definedSymbols.contains(symbol))
                 LOGE(System::LogLevel::High, "Runtime assemblies are currently not supported. Please statically link your assemblies.");
 
-
             OStreamPos(outFile, pos);
  
             outFile.seekp(address, std::ios::beg);

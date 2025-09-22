@@ -360,14 +360,9 @@ namespace Instructions
         _BoringModeSwitch(mode, out, {OpCodes::stts, OpCodes::stts, OpCodes::stes});
 
         size_t symbolHash { String::Hash(symOrVal) };
-        if (!info.symbolMap.contains(symbolHash)) 
-        {
-            OStreamPos(out, pos);
-            info.AddUnknownSymbol(symbolHash, pos);
-            Serialization::SerializeInteger<systembit_t>(0, out);
-        }
-        else 
-            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
+        OStreamPos(out, pos);
+        info.AddUnknownSymbol(symbolHash, pos);
+        Serialization::SerializeInteger<systembit_t>(0, out);
 
         return Stream::Tokenize(in);
     }
@@ -654,14 +649,9 @@ namespace Instructions
 
             Serialization::SerializeInteger(OpCodes::raws, out);
 
-            if (info.symbolMap.contains(symbolHash))
-                Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
-            else
-            {
-                OStreamPos(out, pos)
-                info.AddUnknownSymbol(symbolHash, pos);
-                Serialization::SerializeInteger<systembit_t>(0, out);
-            }
+            OStreamPos(out, pos)
+            info.AddUnknownSymbol(symbolHash, pos);
+            Serialization::SerializeInteger<systembit_t>(0, out);
 
             const std::string sizeToken { Stream::Tokenize(in) };
             Serialization::SerializeInteger(_TokenToInt<systembit_t>(sizeToken), out);
@@ -790,14 +780,9 @@ namespace Instructions
         
         // jmp <symbol>
         const size_t symbolHash { String::Hash(symbolOrAddr) };
-        if (info.symbolMap.contains(symbolHash))
-            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
-        else
-        {
-            OStreamPos(out, pos); 
-            info.AddUnknownSymbol(symbolHash, pos);
-            Serialization::SerializeInteger<systembit_t>(0, out);
-        }
+        OStreamPos(out, pos); 
+        info.AddUnknownSymbol(symbolHash, pos);
+        Serialization::SerializeInteger<systembit_t>(0, out);
 
         return Stream::Tokenize(in);
     }
@@ -1005,14 +990,9 @@ namespace Instructions
         
         // cnd <symbol>
         const size_t symbolHash { String::Hash(symbolOrAddr) };
-        if (info.symbolMap.contains(symbolHash))
-            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
-        else
-        {
-            OStreamPos(out, pos); 
-            info.AddUnknownSymbol(symbolHash, pos);
-            Serialization::SerializeInteger<systembit_t>(0, out);
-        }
+        OStreamPos(out, pos); 
+        info.AddUnknownSymbol(symbolHash, pos);
+        Serialization::SerializeInteger<systembit_t>(0, out);
 
         return Stream::Tokenize(in);
     }
@@ -1048,14 +1028,9 @@ namespace Instructions
             // cal <symbol>
             Serialization::SerializeInteger(OpCodes::cal, out);
             const size_t symbolHash { String::Hash(symbolOrAddr) };
-            if (info.symbolMap.contains(symbolHash))
-                Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
-            else
-            {
-                OStreamPos(out, pos); 
-                info.AddUnknownSymbol(symbolHash, pos);
-                Serialization::SerializeInteger<systembit_t>(0, out);
-            }
+            OStreamPos(out, pos); 
+            info.AddUnknownSymbol(symbolHash, pos);
+            Serialization::SerializeInteger<systembit_t>(0, out);
         }
 
         return Stream::Tokenize(in);
@@ -1191,14 +1166,9 @@ namespace Instructions
         
         // cnj <compare_mode> <symbol>
         const size_t symbolHash { String::Hash(symbolOrAddr) };
-        if (info.symbolMap.contains(symbolHash))
-            Serialization::SerializeInteger(info.symbolMap.at(symbolHash), out);
-        else
-        {
-            OStreamPos(out, pos); 
-            info.AddUnknownSymbol(symbolHash, pos);
-            Serialization::SerializeInteger<systembit_t>(0, out);
-        }
+        OStreamPos(out, pos); 
+        info.AddUnknownSymbol(symbolHash, pos);
+        Serialization::SerializeInteger<systembit_t>(0, out);
 
         return Stream::Tokenize(in);
     }
