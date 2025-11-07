@@ -9,9 +9,9 @@
 
 enum class LibTypeEnum 
 {
-    Static,
-    Shared,
-    Executable
+    Static = 0,
+    Shared = 1,
+    Executable = 2
 };
 
 class AssemblyContext 
@@ -38,7 +38,11 @@ class AssemblyContext
             bool single, 
             bool pipelines,
             const std::string& out, 
+#ifndef TOOLCHAIN_MODE
             const std::string& libT, 
+#else
+            LibTypeEnum libT,
+#endif
             const std::filesystem::path& workingDir,
             const std::vector<std::string>& in,
             const std::vector<std::string>& libs,
@@ -72,8 +76,12 @@ static AssemblyContext DefaultContext {
     /*.singleAssembly =*/ false, 
     /*.pipelines =*/ false,
     /*.outFile =*/ "", 
-    /*.workingDir =*/ "",
+#ifndef TOOLCHAIN_MODE
     /*.libType =*/ "", 
+#else
+    /*.libType =*/ LibTypeEnum::Executable,
+#endif
+    /*.workingDir =*/ "",
     /*.inputFiles =*/ { "none.jasm" }, 
     /*.libraries =*/ { },
     /*.symbolInfo =*/ false,

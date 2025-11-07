@@ -8,12 +8,13 @@
 #include "bytemode/assembler/modeflags.hpp"
 
 
-namespace Instructions
+namespace DisassemblerInstructions
 {
     using Reg = ModeFlags::RegisterModeFlags;
     using Numo = ModeFlags::NumericModeFlags;
     using Memo = ModeFlags::MemoryModeFlags;
     using Comp = ModeFlags::CompareModeFlags;
+    using std::cout;
 
     //
     // Implementation
@@ -21,20 +22,20 @@ namespace Instructions
     //
     void Nop(std::istream& in)
     {
-
+        cout << "\nnop";
     }
 
     void Store32(std::istream& in)
     {
-
+        // TODO: Continue from here
+        // everyone prints the newline at the start themselves.
     }
+
     void Store8(std::istream& in)
     {
-
-    }
-    void StoreFloat(std::istream& in)
-    {
-
+        char val;
+        in.read(&val, 1);
+        cout << "stc %b/%ub " << static_cast<uchar_t>(val);
     }
 
     void Load32(std::istream& in)

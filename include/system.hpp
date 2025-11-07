@@ -26,6 +26,8 @@ struct System
 {
 #ifndef TOOLCHAIN_MODE
     static AssemblyContext& Context; 
+#else
+    static AssemblyContext* Context;
 #endif
 
     enum class LogLevel

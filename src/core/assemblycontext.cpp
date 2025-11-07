@@ -15,7 +15,11 @@ AssemblyContext::AssemblyContext(
         bool single, 
         bool pipelines,
         const std::string& out, 
+#ifndef TOOLCHAIN_MODE
         const std::string& libT, 
+#else
+        LibTypeEnum libT,
+#endif
         const std::filesystem::path& workingDir,
         const std::vector<std::string>& in,
         const std::vector<std::string>& libs,
@@ -30,8 +34,14 @@ AssemblyContext::AssemblyContext(
     }
 
     _inputFiles = in;
+#ifndef TOOLCHAIN_MODE
     _isLib = !libT.empty();
     _libType = (_isLib ? (libT == "shd" ? LibTypeEnum::Shared : (libT == "stc" ? LibTypeEnum::Static : LibTypeEnum::Executable)) : LibTypeEnum::Executable);
+#else
+    _isLib = (libT != LibTypeEnum::Executable);
+    _libType = libT;
+#endif
+
     _libraries = libs;
 
     if (_libType == LibTypeEnum::Executable && _isLib)
@@ -56,7 +66,17 @@ AssemblyContext::AssemblyContext(
     else
         ss << out;
 
+#ifndef TOOLCHAIN_MODE
     std::string extension { _isLib ? '.'+libT : ".jef" };
+#else
+    std::string extension;
+    if (libT == LibTypeEnum::Static)
+        extension = ".stc";
+    else if (libT == LibTypeEnum::Shared)
+        extension = ".shd";
+    else
+        extension = ".jef";
+#endif
     if (std::filesystem::path(ss.str()).extension() != extension)
         ss << extension;
     _outFile = ss.str();

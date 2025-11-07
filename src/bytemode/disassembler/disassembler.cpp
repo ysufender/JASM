@@ -38,8 +38,11 @@ namespace ByteAssembler
 
     void ByteDisassembler::Disassemble()
     {
+        using namespace DisassemblerInstructions;
         using instructionFn = void(*)(std::istream& in);
-        constexpr static  instructionFn instructions[] {
+        constexpr static instructionFn instructions[] {
+            Nop,
+            Store32, Store8,
         };
 
         CONTEXT.PrintContext();
@@ -59,22 +62,24 @@ namespace ByteAssembler
         info.PrintAssemblyInfo();
 
         source.seekg(0, std::ios::beg);
+        std::cout << ".prep\n";
         if (info.flags & AssemblyFlags::Executable)
         {
             uint32_t dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\norg " << dat;
+            std::cout << "\torg " << dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\nsts " << dat;
+            std::cout << "\t\nsts " << dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\nsth " << dat;
+            std::cout << "\t\nsth " << dat;
         }
 
         while (source.tellg() < bytecodeEnd)
         {
             char dat { };
             source.read(&dat, 1);
-            std::cout << static_cast<uint32_t>(dat) << (source.tellg() % 9 == 8 ? '\n': ' ');
+            instructions[static_cast<uchar_t>(dat)](source);
+            //std::cout << static_cast<uint32_t>(dat) << (source.tellg() % 9 == 8 ? '\n': ' ');
         }
         std::cout << '\n';
     }

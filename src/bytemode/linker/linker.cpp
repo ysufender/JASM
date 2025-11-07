@@ -16,19 +16,37 @@
 
 #define log_ret(...) { LOGW(__VA_ARGS__); return; }
 
+#ifdef TOOLCHAIN_MODE
+#define CONTEXT (*currentContext)
+#else
+#define CONTEXT System::Context
+#endif
+
 namespace ByteLinker
 {
     ByteAssembler::AssemblyInfo::SymbolMap definedSymbols { };
     ByteAssembler::AssemblyInfo::UnknownSymbolCollection unknownSymbols { };
     std::vector<std::string_view> runtimeAssemblies { };
 
+    const AssemblyContext* currentContext { nullptr };
+
     namespace AsmFlag = ByteAssembler::AssemblyFlags;
 
-    void ByteLinker::Link(const ByteAssembler::AssemblyInfoCollection& objects)
+    void ByteLinker::Link(
+        const ByteAssembler::AssemblyInfoCollection& objects
+#ifdef TOOLCHAIN_MODE
+        , const AssemblyContext& context
+#endif
+    )
     {
-        if (System::Context.IsLib())
+        runtimeAssemblies.clear();
+        definedSymbols.clear();
+        unknownSymbols.clear();
+        currentContext = &context;
+
+        if (CONTEXT.IsLib())
             this->LinkLib(objects);
-        else if (System::Context.IsSingle())
+        else if (CONTEXT.IsSingle())
             this->LinkSingle(objects);
         else
             this->LinkExe(objects);
@@ -81,11 +99,14 @@ namespace ByteLinker
 
     static void LinkStatics(ByteAssembler::AssemblyInfo& final, size_t& currentPos, std::ostream& outFile)
     {
-        for (const std::string& libPath : System::Context.Libraries())
+        for (const std::string& libPath : CONTEXT.Libraries())
         {
             ByteAssembler::AssemblyInfo lib {
                 libPath,
-                ByteAssembler::AssemblyFlags::Static | ByteAssembler::AssemblyFlags::SymbolInfo | ByteAssembler::AssemblyFlags::StoreName
+                ByteAssembler::AssemblyFlags::Static | ByteAssembler::AssemblyFlags::SymbolInfo | ByteAssembler::AssemblyFlags::StoreName,
+#ifdef TOOLCHAIN_MODE
+                CONTEXT
+#endif
             };
             std::ifstream inFile { System::OpenInFile(libPath) };
             inFile.seekg(-sizeof(uint64_t), std::ios::end);
@@ -184,7 +205,7 @@ namespace ByteLinker
         } 
 
         for (const auto& [symbol, address] : unknownSymbols)
-            if (!definedSymbols.contains(symbol) || System::Context.IsLib())
+            if (!definedSymbols.contains(symbol) || CONTEXT.IsLib())
                 final.unknownSymbols.emplace_back(symbol, address);
         
         //if (final.flags & ByteAssembler::AssemblyFlags::SymbolInfo)
@@ -216,15 +237,18 @@ namespace ByteLinker
     void ByteLinker::LinkLib(const ByteAssembler::AssemblyInfoCollection& objects)
     {
         ByteAssembler::AssemblyInfo final {
-            System::Context.OutFile().data(),
+            CONTEXT.OutFile().data(),
             static_cast<uchar_t>(
-                (System::Context.LibType() == LibTypeEnum::Static ? ByteAssembler::AssemblyFlags::Static : ByteAssembler::AssemblyFlags::Shared) 
+                (CONTEXT.LibType() == LibTypeEnum::Static ? ByteAssembler::AssemblyFlags::Static : ByteAssembler::AssemblyFlags::Shared) 
                 |   ByteAssembler::AssemblyFlags::SymbolInfo
                 |   ByteAssembler::AssemblyFlags::StoreName
             ),
+#ifdef TOOLCHAIN_MODE
+            CONTEXT
+#endif
         };
 
-        std::ofstream outFile { System::OpenOutFile(System::Context.OutFile()) };
+        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
         std::size_t currentPos { 0 };
         
         // Link all object files
@@ -245,11 +269,14 @@ namespace ByteLinker
     void ByteLinker::LinkExe(const ByteAssembler::AssemblyInfoCollection& objects)
     {
         ByteAssembler::AssemblyInfo final {
-            System::Context.OutFile().data(),
-            objects[0].flags
+            CONTEXT.OutFile().data(),
+            objects[0].flags,
+#ifdef TOOLCHAIN_MODE
+            CONTEXT
+#endif
         };
 
-        std::ofstream outFile { System::OpenOutFile(System::Context.OutFile()) };
+        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
         std::size_t currentPos { 12 };
         outFile.seekp(12, std::ios::beg);
         

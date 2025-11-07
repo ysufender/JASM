@@ -1,5 +1,4 @@
 #include "JASMConfig.hpp"
-#include "bytemode/disassembler/disassembler.hpp"
 
 #ifndef TOOLCHAIN_MODE
 #include <cstdlib>
@@ -10,10 +9,11 @@
 
 #include "CLIParser.hpp"
 
-#include "jasm.hpp"
+#include "bytemode/disassembler/disassembler.hpp"
+#include "bytemode/assembler/assembler.hpp"
 #include "bytemode/linker/linker.hpp"
 #include "system.hpp"
-#include "bytemode/assembler/assembler.hpp"
+#include "jasm.hpp"
 
 int jasmmain(int argc, char** args)
 {

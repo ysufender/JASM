@@ -1,4 +1,7 @@
-add_subdirectory(disassembler)
+if(NOT TOOLCHAIN_MODE)
+    add_subdirectory(disassembler)
+endif(NOT TOOLCHAIN_MODE)
+
 add_subdirectory(assembler)
 add_subdirectory(linker)
 
@@ -8,5 +11,11 @@ target_link_libraries(bytemode
     INTERFACE
         byteassembler
         bytelinker
-        bytedisassembler
 )
+
+if(NOT TOOLCHAIN_MODE)
+    target_link_libraries(bytemode
+        INTERFACE
+            bytedisassembler
+    )
+endif(NOT TOOLCHAIN_MODE)

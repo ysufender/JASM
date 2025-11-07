@@ -88,6 +88,12 @@ namespace ByteAssembler
         context(context)
     {
     }
+
+    ByteAssembler::ByteAssembler(const AssemblyContext& context) :
+        context(context)
+    {
+
+    }
 #endif
 
     std::vector<AssemblyInfo> ByteAssembler::Assemble()

@@ -18,14 +18,16 @@
 // 
 // System Implementation
 //
+
 #ifndef TOOLCHAIN_MODE
+#define CONTEXT System::Context
 AssemblyContext& System::Context { DefaultContext };
 
 void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostream& cerr)
 {
     using FT = CLIParser::FlagType;
 
-    Context = AssemblyContext {
+    CONTEXT = AssemblyContext {
         flags.GetFlag<FT::Bool>("silent"),
         flags.GetFlag<FT::Bool>("single"),
         flags.GetFlag<FT::Bool>("pipelines"),
@@ -37,15 +39,18 @@ void System::Setup(const CLIParser::Flags& flags, std::ostream& cout, std::ostre
         flags.GetFlag<FT::Bool>("store-symbols"),
         flags.GetFlag<FT::Bool>("store-name"),
     };
-    std::filesystem::current_path(Context.WorkingDir());
+    std::filesystem::current_path(CONTEXT.WorkingDir());
     std::cout.rdbuf(cout.rdbuf());
     std::cerr.rdbuf(cerr.rdbuf());
 }
+#else
+#define CONTEXT (*System::Context)
+AssemblyContext* System::Context { &DefaultContext };
 #endif
 
 void System::Log(std::string_view message)
 {
-    if (Context.IsSilent())
+    if (CONTEXT.IsSilent())
         return;
 
     std::cout << message << '\n';
@@ -53,7 +58,7 @@ void System::Log(std::string_view message)
 
 void System::LogInternal(std::string_view message, std::string_view file, int line)
 {
-    if (Context.IsSilent())
+    if (CONTEXT.IsSilent())
         return;
 
     size_t idx { file.find_first_of("JASM") };
@@ -62,7 +67,7 @@ void System::LogInternal(std::string_view message, std::string_view file, int li
 
 void System::LogWarning(std::string_view message, std::string_view file, int line)
 {
-    if (Context.IsSilent())
+    if (CONTEXT.IsSilent())
         return;
 
     size_t idx { file.find_first_of("JASM") };
@@ -77,13 +82,13 @@ void System::LogError(std::string_view message, LogLevel level, std::string_view
     {
         case System::LogLevel::Normal:
             {
-                if (Context.IsSilent())
+                if (CONTEXT.IsSilent())
                     return;
             }
             break;
         case System::LogLevel::Low:
             {
-                if (Context.IsSilent())
+                if (CONTEXT.IsSilent())
                     return;
 
                 std::cout << "ERROR ";

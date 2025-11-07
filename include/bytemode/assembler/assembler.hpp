@@ -91,6 +91,7 @@ namespace ByteAssembler
             ByteAssembler() = default; 
 #else
             ByteAssembler(const AssemblyContext&& context);
+            ByteAssembler(const AssemblyContext& context);
 #endif
 
             AssemblyInfoCollection Assemble();
