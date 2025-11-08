@@ -14,7 +14,7 @@ namespace ByteAssembler
 #ifndef TOOLCHAIN_MODE
             ByteDisassembler() = default; 
 #else
-            ByteAssembler(const AssemblyContext&& context);
+            ByteDisassembler(const AssemblyContext&& context);
 #endif
 
             void Disassemble();

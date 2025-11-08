@@ -1,4 +1,4 @@
-add_library(extensions 
+add_library(extensions
     STATIC
         stringextensions.cpp
         streamextensions.cpp

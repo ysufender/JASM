@@ -4,9 +4,17 @@ add_subdirectory(core)
 
 add_library(src INTERFACE)
 
-target_link_libraries(src 
-    INTERFACE 
-        bytemode
-        extensions
-        core
+if(TOOLCHAIN_MODE)
+    target_sources(src
+        INTERFACE
+            $<TARGET_OBJECTS:core>
+            $<TARGET_OBJECTS:extensions>
+    )
+endif(TOOLCHAIN_MODE)
+
+target_link_libraries(src
+    INTERFACE
+    core
+    bytemode
+    extensions
 )

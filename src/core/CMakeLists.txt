@@ -1,13 +1,21 @@
-add_library(core 
-    STATIC
-        system.cpp
-        assemblycontext.cpp
-        jasm.cpp
-)
+if(TOOLCHAIN_MODE)
+    add_library(core
+        STATIC
+            system.cpp
+            assemblycontext.cpp
+            jasm.cpp
+    )
+else()
+    add_library(core
+        OBJECT
+            system.cpp
+            assemblycontext.cpp
+            jasm.cpp
+    )
+endif(TOOLCHAIN_MODE)
 
 target_link_libraries(core 
-    PRIVATE 
+    PRIVATE
         libs
         extensions
-        bytemode
 )

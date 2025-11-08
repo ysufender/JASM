@@ -50,7 +50,13 @@ namespace ByteAssembler
         const std::string& inFile { CONTEXT.InputFiles()[0] };
         std::ifstream source { System::OpenInFile(inFile) };
 
-        AssemblyInfo info { "", 0 }; 
+        AssemblyInfo info {
+            "",
+            0,
+#ifdef TOOLCHAIN_MODE
+            CONTEXT
+#endif
+        };
 
         source.seekg(-sizeof(uint64_t), std::ios::end);
         uint64_t size { };
