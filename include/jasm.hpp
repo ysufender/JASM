@@ -49,7 +49,7 @@ extern "C"
         typedef struct { void* ptr; } JASMByteLinker;
         typedef struct { void* ptr; } JASMAssemblyInfoCollection;
 
-        // Create AssemblyContext
+        // AssemblyContext
         JASMAssemblyContext CreateAssemblyContext(
             int silent,
             int single, 
@@ -62,13 +62,16 @@ extern "C"
             int storeSymbols,
             int storeName
         );
+        void DeleteAssemblyContext(JASMAssemblyContext context);
 
-        // Create ByteAssembler
+        // ByteAssembler
         JASMByteAssembler CreateByteAssembler(JASMAssemblyContext context);
+        void DeleteByteAssembler(JASMByteAssembler assembler);
         JASMAssemblyInfoCollection ByteAssemble(JASMByteAssembler assembler);
 
-        // Create ByteLinker
+        // ByteLinker
         JASMByteLinker CreateByteLinker();
+        void DeleteByteLinker(JASMByteLinker linker);
         void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context);
     }
 }

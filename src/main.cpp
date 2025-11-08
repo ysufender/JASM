@@ -6,19 +6,19 @@
 #include "jasm.hpp"
 
 #ifndef TOOLCHAIN_MODE
-
 int main(int argc, char** args)
 {
     return jasmmain(argc, args);
 }
 #else
+
 #include "bytemode/assembler/assembler.hpp"
 #include "assemblycontext.hpp"
-#include "system.hpp"
 
-namespace JASM
+namespace JASM {
+extern "C"
 {
-    extern "C" JASMAssemblyContext CreateAssemblyContext(
+    JASMAssemblyContext CreateAssemblyContext(
         int silent,
         int single, 
         int pipelines,
@@ -50,25 +50,40 @@ namespace JASM
         return { context };
     }
 
-    extern "C" JASMByteAssembler CreateByteAssembler(JASMAssemblyContext context)
+    void DeleteAssemblyContext(JASMAssemblyContext context)
+    {
+        delete static_cast<AssemblyContext*>(context.ptr);
+    }
+
+    JASMByteAssembler CreateByteAssembler(JASMAssemblyContext context)
     {
         ByteAssembler::ByteAssembler* basm = new ByteAssembler::ByteAssembler { *static_cast<AssemblyContext*>(context.ptr) };
         return { basm };
     }
 
-    extern "C" JASMAssemblyInfoCollection ByteAssemble(JASMByteAssembler assembler)
+    void DeleteByteAssembler(JASMByteAssembler assembler)
+    {
+        delete static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr);
+    }
+
+    JASMAssemblyInfoCollection ByteAssemble(JASMByteAssembler assembler)
     {
         ByteAssembler::ByteAssembler basm { *static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr) };
         ByteAssembler::AssemblyInfoCollection* asminfs = new ByteAssembler::AssemblyInfoCollection { basm.Assemble() };
         return JASMAssemblyInfoCollection { asminfs };
     }
 
-    extern "C" JASMByteLinker CreateByteLinker()
+    JASMByteLinker CreateByteLinker()
     {
         return { new ByteLinker::ByteLinker { } };
     }
 
-    extern "C" void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context)
+    void DeleteByteLinker(JASMByteLinker linker)
+    {
+        delete static_cast<ByteLinker::ByteLinker*>(linker.ptr);
+    }
+
+    void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context)
     {
         ByteLinker::ByteLinker blink { *static_cast<ByteLinker::ByteLinker*>(linker.ptr) };
         blink.Link(
@@ -76,5 +91,5 @@ namespace JASM
             *static_cast<AssemblyContext*>(context.ptr)
         );
     }
-}
+}}
 #endif
