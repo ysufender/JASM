@@ -42,7 +42,9 @@ namespace ByteLinker
         runtimeAssemblies.clear();
         definedSymbols.clear();
         unknownSymbols.clear();
+#ifdef TOOLCHAIN_MODE
         currentContext = &context;
+#endif
 
         if (CONTEXT.IsLib())
             this->LinkLib(objects);

@@ -6,9 +6,14 @@
 //
 // NOTE: C API is only available when the project
 // is built in TOOLCHAIN_MODE
+//
+// you can remove JASMConfig.hpp and just #define TOOLCHAIN_MODE
 
+#ifndef JASM_EMBED
 #include "JASMConfig.hpp"
-#include "assemblycontext.hpp"
+#else
+#define TOOLCHAIN_MODE
+#endif
 
 #ifndef TOOLCHAIN_MODE
 #include "CLIParser.hpp"
@@ -25,18 +30,17 @@ CLIParser::Flags SetUpCLI(char** args, int argc);
 //
 // C API Here
 //
+#ifdef __cplusplus
 extern "C"
 {
     namespace JASM
     {
-        namespace LibTypeEnum
-        {
-            typedef enum : int {
-                Static = 0,
-                Shared = 1,
-                Executable = 2
-            } LibTypes;
-        }
+#endif
+        typedef enum {
+            Static = 0,
+            Shared = 1,
+            Executable = 2
+        } LibTypes;
 
         typedef const char* Str;
         typedef struct {
@@ -55,7 +59,7 @@ extern "C"
             int single, 
             int pipelines,
             const Str out, 
-            LibTypeEnum::LibTypes libT, 
+            LibTypes libT, 
             const Str workingDir,
             StrVector in,
             StrVector libs,
@@ -73,6 +77,8 @@ extern "C"
         JASMByteLinker CreateByteLinker();
         void DeleteByteLinker(JASMByteLinker linker);
         void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context);
+#ifdef __cplusplus
     }
 }
+#endif
 #endif

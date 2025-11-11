@@ -4,6 +4,7 @@
 #include "JASMConfig.hpp"
 #include "bytemode/linker/linker.hpp"
 #include "jasm.hpp"
+#include <cstdio>
 
 #ifndef TOOLCHAIN_MODE
 int main(int argc, char** args)
@@ -23,7 +24,7 @@ extern "C"
         int single, 
         int pipelines,
         const JASM::Str out, 
-        JASM::LibTypeEnum::LibTypes libT, 
+        JASM::LibTypes libT, 
         const JASM::Str workingDir,
         JASM::StrVector const in,
         JASM::StrVector const libs,
@@ -68,7 +69,7 @@ extern "C"
 
     JASMAssemblyInfoCollection ByteAssemble(JASMByteAssembler assembler)
     {
-        ByteAssembler::ByteAssembler basm { *static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr) };
+        ByteAssembler::ByteAssembler& basm { *static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr) };
         ByteAssembler::AssemblyInfoCollection* asminfs = new ByteAssembler::AssemblyInfoCollection { basm.Assemble() };
         return JASMAssemblyInfoCollection { asminfs };
     }
@@ -85,11 +86,11 @@ extern "C"
 
     void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context)
     {
-        ByteLinker::ByteLinker blink { *static_cast<ByteLinker::ByteLinker*>(linker.ptr) };
-        blink.Link(
-            *static_cast<ByteAssembler::AssemblyInfoCollection*>(objects.ptr),
-            *static_cast<AssemblyContext*>(context.ptr)
-        );
+        ByteLinker::ByteLinker& blink { *static_cast<ByteLinker::ByteLinker*>(linker.ptr) };
+        ByteAssembler::AssemblyInfoCollection& col { *static_cast<ByteAssembler::AssemblyInfoCollection*>(objects.ptr) };
+        AssemblyContext& ctx { *static_cast<AssemblyContext*>(context.ptr) };
+
+        blink.Link(col, ctx);
     }
 }}
 #endif

@@ -14,7 +14,7 @@ endif(TOOLCHAIN_MODE)
 
 target_link_libraries(src
     INTERFACE
-    core
-    bytemode
-    extensions
+        core
+        bytemode
+        extensions
 )
