@@ -189,4 +189,6 @@ namespace DisassemblerInstructions
     void ConditionalJump(std::istream& in);
 
     void CompareLocal(std::istream& in);
+
+    void StoreAddress(std::istream& in);
 }

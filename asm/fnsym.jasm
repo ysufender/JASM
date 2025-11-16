@@ -1,0 +1,31 @@
+.prep
+    org main
+    sts 64
+    sth 64
+
+    inc "macro.jmf"
+.body
+    addTwoUI:
+        add %ui
+        mov 4 &bl
+        ret
+
+    calAdd:
+        dcr %ub &bl 4
+        rdl %ui 0
+        mov &eax
+        pop %ui
+        cal &eax
+        ret
+
+    main:
+        sad addTwoUI
+        stc %ui 4
+        stc %ui 9
+        mov 12 &bl
+        cal calAdd
+        mov 4 &bl
+        inc %b &flg 1
+        cal sys_uitostr
+        cal sys_println
+.end

@@ -31,13 +31,15 @@ Here is the helper text from the current version of JASM:
 
 Just an Assembler (JASM)
         Description: Assembler and linker for JASM
-        Version: 0.1.1
+        Version: 0.1.2
         Use Pipelines: Unavailable
         Build Mode: CLI
 
 Available Flags:
         --help , -h : Print this help text.
         --version , -v : Print version.
+
+        --disassemble , -d : Disassemble the given file and print the result to stdout. (only the first entry of --in will be used)
 
         --silent , -s : Disables SOME outputs. So it's less painful to look at the screen.
         --single , -S : Assemble each file provided by '--in' flag but do NOT link.
@@ -50,6 +52,9 @@ Available Flags:
         --pipelines , -p : Use pipeline-streams instead of intermediate files.
         --working-dir <value>, -w : Set the working directory of the assembler.
         --redirect-stdout <..params..>, -r : Redirect stdout and stderr to given files. If only one is provided, both get redirected to it.
+
+        --symbol-info  : Only affects the executable builds. Stores the symbol information inside the resulting file.
+        --store-name  : Store assembly name in resulting file. It might come in handy.
 
 
         WARNING: In single mode, each file will be assembled as a static library by default. You can specify it with `--libType` flag.

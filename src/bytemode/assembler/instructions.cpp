@@ -1124,7 +1124,7 @@ namespace Instructions
 
     std::string ReadLocal(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        // ldl <mode> <constant>
+        // rdl <mode> <stack_index>
         const std::string modeStr { Stream::Tokenize(in) };
         //const uchar_t fromReg { ModeFlags::GetModeFlag(next) };
         const uchar_t mode { ModeFlags::GetModeFlag(modeStr, Enumc(Numo::Int), Enumc(Numo::UByte), true) };
@@ -1197,4 +1197,21 @@ namespace Instructions
         return Stream::Tokenize(in);
     }
 
+    std::string SymbolAddress(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // sad <symbol>
+        //
+        // actually turns into stc %ui <symbol_address> so it's not a
+        // new instruction that the runtime must handle.
+
+        Serialization::SerializeInteger(OpCodes::stt, out);
+
+        const std::string symbol { Stream::Tokenize(in) };
+        size_t symbolHash { String::Hash(symbol) };
+        OStreamPos(out, pos);
+        info.AddUnknownSymbol(symbolHash, pos);
+        Serialization::SerializeInteger(0, out);
+
+        return Stream::Tokenize(in);
+    }
 }

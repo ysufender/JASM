@@ -78,6 +78,7 @@ namespace ByteAssembler
         {"rdl", &Instructions::ReadLocal},
         {"cnj", &Instructions::ConditionalJump},
         {"cml", &Instructions::CompareLocal},
+        {"sad", &Instructions::SymbolAddress},
     };
 
     //
@@ -194,9 +195,9 @@ namespace ByteAssembler
             }
             else if (instructionMap.contains(token))
                 token = instructionMap.at(token)(assemblyInfo, sourceFile, outFile);
-            else if (token == "__JASM__ENDL__")
+            else if (token == JASM_ENDL)
                 token = Stream::Tokenize(sourceFile);
-            else if (token == "__JASM__EOF__")
+            else if (token == JASM_EOF)
                 LOGE(System::LogLevel::High, "Expected '.end' at the end of the file.");
             else
                 LOGE(System::LogLevel::High, "Couldn't find '", token, "' on instruction map.");
@@ -240,12 +241,15 @@ namespace ByteAssembler
             LOGE(System::LogLevel::High, "An Error Occured While Reading the Source File");
         }
 
-        while (Stream::Tokenize(sourceFile) != ".prep") {}
+        std::string token { Stream::Tokenize(sourceFile) };
+        for (; token != ".prep"; token = Stream::Tokenize(sourceFile))
+            if (token == JASM_EOF)
+                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", file.c_str(), "'.");
 
         // 
         // Set the origin point
         //
-        std::string token { Stream::Tokenize(sourceFile) };
+        token = Stream::Tokenize(sourceFile);
         if (token != "org")
             LOGE(System::LogLevel::High, "Expected org after .prep");
         else
@@ -309,7 +313,10 @@ namespace ByteAssembler
         std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
         std::ofstream outFile { System::OpenOutFile(outPath) };
 
-        while (Stream::Tokenize(sourceFile) != ".prep") { }
+        std::string token { Stream::Tokenize(sourceFile) };
+        for (; token != ".prep"; token = Stream::Tokenize(sourceFile))
+            if (token == JASM_EOF)
+                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", file.c_str(), "'.");
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
 

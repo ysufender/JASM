@@ -51,6 +51,7 @@ namespace Instructions
         rdlt, rdle,
         cnj,
         cml,
+        sad
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -98,4 +99,5 @@ namespace Instructions
     std::string ReadLocal(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string ConditionalJump(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string CompareLocal(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string SymbolAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

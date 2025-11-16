@@ -20,8 +20,7 @@ namespace DisassemblerInstructions
     // Implementation
     //
     //
-    void Nop(std::istream& in)
-    {
+    void Nop(std::istream& in) {
         cout << "\nnop";
     }
 
@@ -35,7 +34,7 @@ namespace DisassemblerInstructions
     {
         char val;
         in.read(&val, 1);
-        cout << "stc %b/%ub " << static_cast<uchar_t>(val);
+        cout << "\nstc %b/%ub " << static_cast<uchar_t>(val);
     }
 
     void Load32(std::istream& in)
@@ -595,6 +594,11 @@ namespace DisassemblerInstructions
     }
 
     void CompareLocal(std::istream& in)
+    {
+
+    }
+
+    void StoreAddress(std::istream& in)
     {
 
     }

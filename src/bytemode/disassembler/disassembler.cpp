@@ -68,17 +68,18 @@ namespace ByteAssembler
         info.PrintAssemblyInfo();
 
         source.seekg(0, std::ios::beg);
-        std::cout << ".prep\n";
+        std::cout << "\n.prep";
         if (info.flags & AssemblyFlags::Executable)
         {
             uint32_t dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\torg " << dat;
+            std::cout << "\n\torg " << dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\t\nsts " << dat;
+            std::cout << "\n\tsts " << dat;
             Serialization::DeserializeInteger(dat, source);
-            std::cout << "\t\nsth " << dat;
+            std::cout << "\n\tsth " << dat;
         }
+        std::cout << "\n.body";
 
         while (source.tellg() < bytecodeEnd)
         {

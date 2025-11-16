@@ -64,7 +64,7 @@ namespace Extensions::Stream
         }
 
         if (ss.view() == ";")
-            return "__JASM__ENDL__";
+            return JASM_ENDL;
 
         std::string s { std::move(ss.str()) };
         if (macros.contains(s))
@@ -83,7 +83,7 @@ namespace Extensions::Stream
 
     void ProcessMacroFile(const std::string_view file)
     {
-        LOG("Processing macro file: ", file);
+        LOGD("Processing macro file: ", file);
         std::ifstream in { System::OpenInFile(file) };
 
         std::string name { Tokenize(in) };
