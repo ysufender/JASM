@@ -714,7 +714,7 @@ namespace Instructions
 
         const uchar_t mode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Numo::Int), Enumc(Numo::UByte), true) };
         const uchar_t cmpMode { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Comp::les), Enumc(Comp::neq), true) };
-        const uchar_t firstThree { static_cast<const uchar_t>(mode << 5) };    
+        const uchar_t firstThree { static_cast<const uchar_t>(mode << 5) };
         const uchar_t compressedModes { static_cast<const uchar_t>(firstThree|cmpMode) };
 
         std::string possibleReg { Stream::Tokenize(in) }; 
@@ -1211,6 +1211,40 @@ namespace Instructions
         OStreamPos(out, pos);
         info.AddUnknownSymbol(symbolHash, pos);
         Serialization::SerializeInteger(0, out);
+
+        return Stream::Tokenize(in);
+    }
+
+    std::string PushStackFrame(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // psf
+        Serialization::SerializeInteger(OpCodes::psf, out);
+        return Stream::Tokenize(in);
+    }
+
+    std::string SetFlag(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        // stf <flag> <on/off>
+        // possible flags: syscall
+        // on/off and flag are compressed. First 4 flag last 4 on/off
+
+        const std::string flag { Stream::Tokenize(in) };
+        const std::string onoff { Stream::Tokenize(in) };
+        uchar_t flg;
+        uchar_t mode;
+        Serialization::SerializeInteger(OpCodes::stf, out);
+
+        if (flag == "syscall")
+            flg = 0;
+        else
+            LOGE(System::LogLevel::High, "Unsupported flag '", flag, "'. In instruction 'acf'");
+
+        mode = (onoff == "on") ? 1 : (onoff == "off") ? 0 : 8;
+        if (mode == 8)
+            LOGE(System::LogLevel::High, "Unexpected token '", onoff, "'. Expected 'on' of 'off'");
+
+        const uchar_t compressed { static_cast<uchar_t>((flg << 4) | mode) };
+        Serialization::SerializeInteger(compressed, out);
 
         return Stream::Tokenize(in);
     }

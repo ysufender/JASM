@@ -1,7 +1,5 @@
 .prep
-    org main
-    sts 0
-    sth 0
 .body
     main:
+        stf syscall on
 .end

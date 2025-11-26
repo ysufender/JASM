@@ -9,3 +9,5 @@ build/
 *.shd
 *.jo
 *.project.gf
+
+*gring.out*
