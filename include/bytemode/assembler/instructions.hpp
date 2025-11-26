@@ -51,8 +51,7 @@ namespace Instructions
         rdlt, rdle,
         cnj,
         cml,
-        sad,
-        psf,
+        // psf,
         stf
     };
 

@@ -79,7 +79,7 @@ namespace ByteAssembler
         {"cnj", &Instructions::ConditionalJump},
         {"cml", &Instructions::CompareLocal},
         {"sad", &Instructions::SymbolAddress},
-        {"psf", &Instructions::PushStackFrame},
+        // {"psf", &Instructions::PushStackFrame},
         {"stf", &Instructions::SetFlag},
     };
 

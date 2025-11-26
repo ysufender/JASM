@@ -1187,8 +1187,8 @@ namespace Instructions
 
 
         // cml <mode> <compare_mode> <idx1> <idx2>
-        const systembit_t index1 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg)) };
-        const systembit_t index2 { ModeFlags::GetModeFlag(Stream::Tokenize(in), Enumc(Reg::eax), Enumc(Reg::flg), true) };
+        const systembit_t index1 { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
+        const systembit_t index2 { _TokenToInt<systembit_t>(Stream::Tokenize(in)) };
         Serialization::SerializeInteger(OpCodes::cml, out);
         Serialization::SerializeInteger(compressedModes, out);
         Serialization::SerializeInteger(index1, out);
@@ -1215,12 +1215,12 @@ namespace Instructions
         return Stream::Tokenize(in);
     }
 
-    std::string PushStackFrame(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    /*std::string PushStackFrame(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // psf
-        Serialization::SerializeInteger(OpCodes::psf, out);
+        // Serialization::SerializeInteger(OpCodes::psf, out);
         return Stream::Tokenize(in);
-    }
+    }*/
 
     std::string SetFlag(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
