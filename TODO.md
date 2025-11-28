@@ -2,8 +2,9 @@
 
 ## Assembler
 
-Create a prep section instruction with form `ffi "return_t fnname(type params)"` and then
-add those C function signature list to AssemblyInfo in the form of (name, signature) pairs.
+~Create a prep section instruction with form `ffi "return_t fnname(type params)"` and then
+add those C function signature list to AssemblyInfo in the form of (name, signature) pairs.~
+Just use libffi in CSR. Please.
 
 ### Instructions
 

@@ -14,6 +14,7 @@
 #include "JASMConfig.hpp"
 #else
 #define TOOLCHAIN_MODE
+#include "stdlib.h"
 #endif
 
 #ifndef TOOLCHAIN_MODE
@@ -35,22 +36,43 @@ CLIParser::Flags SetUpCLI(char** args, int argc);
 extern "C"
 {
 #endif
-    typedef enum {
+    typedef enum LibTypes {
         Static = 0,
         Shared = 1,
         Executable = 2
     } LibTypes;
 
     typedef const char* Str;
-    typedef struct {
-        const Str* elements;
-        int size;
+    typedef struct StrVector {
+        Str* elements;
+        size_t top;
+        size_t size;
     } StrVector;
 
-    typedef struct { void* ptr; } JASMAssemblyContext;
-    typedef struct { void* ptr; } JASMByteAssembler;
-    typedef struct { void* ptr; } JASMByteLinker;
-    typedef struct { void* ptr; } JASMAssemblyInfoCollection;
+    typedef struct JASMAssemblyContext { void* ptr; } JASMAssemblyContext;
+    typedef struct JASMByteAssembler { void* ptr; } JASMByteAssembler;
+    typedef struct JASMByteLinker { void* ptr; } JASMByteLinker;
+    typedef struct JASMAssemblyInfoCollection { void* ptr; } JASMAssemblyInfoCollection;
+
+    // Helper Functions
+    inline StrVector StrVectorCreate(size_t size)
+    {
+        Str* data = (Str*)malloc(size);
+        return StrVector(data, 0, size);
+    }
+
+    inline void StrVectorDelete(StrVector vector)
+    { free((void*)vector.elements); }
+
+    inline int StrVectorPush(StrVector vector, Str str)
+    {
+        if (vector.top >= vector.size)
+            return 0;
+        vector.elements[vector.top++] = str;
+        return 1;
+    }
+
+    size_t HashString(Str str);
 
     // AssemblyContext
     JASMAssemblyContext CreateAssemblyContext(
