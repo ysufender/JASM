@@ -58,7 +58,7 @@ extern "C"
     inline StrVector StrVectorCreate(size_t size)
     {
         Str* data = (Str*)malloc(size);
-        return StrVector(data, 0, size);
+        return {data, 0, size};
     }
 
     inline void StrVectorDelete(StrVector vector)
