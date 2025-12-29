@@ -52,7 +52,9 @@ namespace Instructions
         cnj,
         cml,
         // psf,
-        stf
+        stf,
+        sys,
+        xorst, xorse, xorr,
     };
 
     std::string Nop(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
@@ -103,4 +105,6 @@ namespace Instructions
     std::string SymbolAddress(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string PushStackFrame(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
     std::string SetFlag(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string SysCall(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
+    std::string Xor(ByteAssembler::AssemblyInfo& info, std::istream& in, std::ostream& out);
 }

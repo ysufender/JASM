@@ -4,6 +4,7 @@
 #include "JASMConfig.hpp"
 #include "bytemode/linker/linker.hpp"
 #include "jasm.hpp"
+#include "system.hpp"
 #include <cstdio>
 
 #ifndef TOOLCHAIN_MODE
@@ -23,11 +24,11 @@ extern "C"
         int silent,
         int single, 
         int pipelines,
-        const JASM::Str out, 
-        JASM::LibTypes libT, 
-        const JASM::Str workingDir,
-        JASM::StrVector const in,
-        JASM::StrVector const libs,
+        const Str out, 
+        LibTypes libT, 
+        const Str workingDir,
+        StrVector const in,
+        StrVector const libs,
         int storeSymbols,
         int storeName
     )
@@ -51,6 +52,27 @@ extern "C"
         return { context };
     }
 
+    JASMInfo JASMGetBuildInfo()
+    {
+        return {
+            JASM_VERSION,
+            JASM_DESCRIPTION,
+            JASM_VERSION_MAJOR,
+            JASM_VERSION_MINOR,
+            JASM_VERSION_PATCH,
+#ifdef USE_PIPELINES_OPT
+            true
+#else
+            false
+#endif
+        };
+    }
+
+    size_t HashString(Str str)
+    {
+        return Extensions::String::Hash(str);
+    }
+
     void DeleteAssemblyContext(JASMAssemblyContext context)
     {
         delete static_cast<AssemblyContext*>(context.ptr);
@@ -69,9 +91,18 @@ extern "C"
 
     JASMAssemblyInfoCollection ByteAssemble(JASMByteAssembler assembler)
     {
-        ByteAssembler::ByteAssembler& basm { *static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr) };
-        ByteAssembler::AssemblyInfoCollection* asminfs = new ByteAssembler::AssemblyInfoCollection { basm.Assemble() };
-        return JASMAssemblyInfoCollection { asminfs };
+        try
+        {
+            ByteAssembler::ByteAssembler& basm { *static_cast<ByteAssembler::ByteAssembler*>(assembler.ptr) };
+            ByteAssembler::AssemblyInfoCollection* asminfs = new ByteAssembler::AssemblyInfoCollection { basm.Assemble() };
+            return JASMAssemblyInfoCollection { asminfs };
+        }
+        catch (const JASMException& exc)
+        {
+            static ByteAssembler::AssemblyInfoCollection empty { };
+            LOGE(System::LogLevel::Medium, exc.Stringify());
+            return JASMAssemblyInfoCollection { &empty };
+        }
     }
 
     JASMByteLinker CreateByteLinker()
@@ -84,13 +115,25 @@ extern "C"
         delete static_cast<ByteLinker::ByteLinker*>(linker.ptr);
     }
 
-    void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context)
+    ErrorTypes ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context)
     {
-        ByteLinker::ByteLinker& blink { *static_cast<ByteLinker::ByteLinker*>(linker.ptr) };
-        ByteAssembler::AssemblyInfoCollection& col { *static_cast<ByteAssembler::AssemblyInfoCollection*>(objects.ptr) };
-        AssemblyContext& ctx { *static_cast<AssemblyContext*>(context.ptr) };
+        if (static_cast<ByteAssembler::AssemblyInfoCollection*>(objects.ptr)->empty())
+            return AssemblerError;
 
-        blink.Link(col, ctx);
+        try
+        {
+            ByteLinker::ByteLinker& blink { *static_cast<ByteLinker::ByteLinker*>(linker.ptr) };
+            ByteAssembler::AssemblyInfoCollection& col { *static_cast<ByteAssembler::AssemblyInfoCollection*>(objects.ptr) };
+            AssemblyContext& ctx { *static_cast<AssemblyContext*>(context.ptr) };
+
+            blink.Link(col, ctx);
+            return Ok;
+        }
+        catch (const JASMException& exc)
+        {
+            LOGE(System::LogLevel::Medium, exc.Stringify());
+            return LinkerError;
+        }
     }
 }}
 #endif

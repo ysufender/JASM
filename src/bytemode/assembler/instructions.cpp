@@ -1248,4 +1248,25 @@ namespace Instructions
 
         return Stream::Tokenize(in);
     }
+
+    std::string SysCall(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        std::string signature { Stream::Tokenize(in) };
+        
+        if (!signature.starts_with('\"') || !signature.ends_with('\"'))
+            LOGE(System::LogLevel::High, "Signature name must start/end with quotes, got ", signature, " instead.");
+        signature.pop_back();
+        signature.erase(0, 1);
+
+        Serialization::SerializeInteger(OpCodes::sys, out);
+        Serialization::SerializeInteger<systembit_t>(signature.size(), out);
+        out.write(signature.data(), signature.size());
+
+        return Stream::Tokenize(in);
+    }
+
+    std::string Xor(AssemblyInfo& info, std::istream& in, std::ostream& out)
+    {
+        return _BoringLogicHandle(in, out, {OpCodes::xorst, OpCodes::xorse, OpCodes::xorr});
+    }
 }

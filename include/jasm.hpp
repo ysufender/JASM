@@ -28,6 +28,8 @@ void SetStdout(const CLIParser::Flags& flags);
 
 CLIParser::Flags SetUpCLI(char** args, int argc);
 #else
+#include <stddef.h>
+#include <stdlib.h>
 
 //
 // C API Here
@@ -36,11 +38,26 @@ CLIParser::Flags SetUpCLI(char** args, int argc);
 extern "C"
 {
 #endif
+    typedef struct JASMInfo {
+        const char* const versionString;
+        const char* const description;
+        int versionMajor;
+        int versionMinor;
+        int versionPatch;
+        int pipelinesAvailable;
+    } JASMInfo;
+
     typedef enum LibTypes {
         Static = 0,
         Shared = 1,
         Executable = 2
     } LibTypes;
+
+    typedef enum ErrorTypes {
+        Ok = 0,
+        AssemblerError = 1,
+        LinkerError = 2
+    } ErrorTypes;
 
     typedef const char* Str;
     typedef struct StrVector {
@@ -54,17 +71,20 @@ extern "C"
     typedef struct JASMByteLinker { void* ptr; } JASMByteLinker;
     typedef struct JASMAssemblyInfoCollection { void* ptr; } JASMAssemblyInfoCollection;
 
+    // API Funcs
+    JASMInfo JASMGetBuildInfo();
+
     // Helper Functions
-    inline StrVector StrVectorCreate(size_t size)
+    static StrVector StrVectorCreate(size_t size)
     {
         Str* data = (Str*)malloc(size);
-        return {data, 0, size};
+        return (StrVector){data, 0, size};
     }
 
-    inline void StrVectorDelete(StrVector vector)
+    static void StrVectorDelete(StrVector vector)
     { free((void*)vector.elements); }
 
-    inline int StrVectorPush(StrVector vector, Str str)
+    static int StrVectorPush(StrVector vector, Str str)
     {
         if (vector.top >= vector.size)
             return 0;
@@ -97,7 +117,7 @@ extern "C"
     // ByteLinker
     JASMByteLinker CreateByteLinker();
     void DeleteByteLinker(JASMByteLinker linker);
-    void ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context);
+    ErrorTypes ByteLink(JASMByteLinker linker, JASMAssemblyInfoCollection objects, JASMAssemblyContext context);
 #ifdef __cplusplus
 }
 #endif

@@ -81,6 +81,8 @@ namespace ByteAssembler
         {"sad", &Instructions::SymbolAddress},
         // {"psf", &Instructions::PushStackFrame},
         {"stf", &Instructions::SetFlag},
+        {"sys", &Instructions::SysCall},
+        {"xor", &Instructions::Xor}
     };
 
     //
