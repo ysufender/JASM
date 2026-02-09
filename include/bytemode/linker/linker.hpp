@@ -20,9 +20,10 @@ namespace ByteLinker
 #endif
             );
 
-#ifdef TOOLCHAIN_MODE
+#ifndef TOOLCHAIN_MODE
         private:
 #endif
+            // TODO: Read from the AssemblyInfo::istream instead of opening file
             void LinkSingle(const ByteAssembler::AssemblyInfoCollection& objects);
             void LinkLib(const ByteAssembler::AssemblyInfoCollection& objects);
             void LinkExe(const ByteAssembler::AssemblyInfoCollection& objects);

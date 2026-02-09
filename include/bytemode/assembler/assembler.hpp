@@ -44,6 +44,8 @@ namespace ByteAssembler
 
     struct AssemblyInfo
     {
+        // TODO: Add std::istream creation to AssemblyInfo from the provided std::ostream
+        // for the linker to read from
         public:
             //using SymbolCollection = std::vector<SymbolInfo>;
             using ImportCollection = std::vector<std::string>;
