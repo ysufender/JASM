@@ -98,11 +98,15 @@ namespace ByteAssembler
 
         private:
 #ifdef TOOLCHAIN_MODE
+        private:
             const AssemblyContext context;
+#else
+        public:
 #endif
-
             AssemblyInfo AssembleLibrary(const std::filesystem::path& file);
+            AssemblyInfo AssembleLibrary(const std::string& path, std::istream& sourceFile, std::ostream& outFile);
             AssemblyInfo AssembleExecutable(const std::filesystem::path& file);
+            AssemblyInfo AssembleExecutable(const std::string& path, std::istream& sourceFile, std::ostream& outFile);
             AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile);
     };
 }

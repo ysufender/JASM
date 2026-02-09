@@ -1,4 +1,4 @@
-sys_println 0x0
+sys_println "CSR_Println"
 sys_print   0x1
 sys_sleep   0x2
 sys_sleep_s 0x3

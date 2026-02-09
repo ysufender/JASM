@@ -218,23 +218,9 @@ namespace ByteAssembler
         // Setup
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        uchar_t outFlags { AssemblyFlags::Executable };
-
-        if (CONTEXT.StoreSymbols())
-            outFlags |= AssemblyFlags::SymbolInfo;
-        if (CONTEXT.StoreName())
-            outFlags |= AssemblyFlags::StoreName;
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
-
-        AssemblyInfo assemblyInfo {
-            outPath.generic_string(),
-            outFlags,
-#ifdef TOOLCHAIN_MODE
-            this->context
-#endif
-        };
 
         std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
         std::ofstream outFile { System::OpenOutFile(outPath) };
@@ -245,10 +231,35 @@ namespace ByteAssembler
             LOGE(System::LogLevel::High, "An Error Occured While Reading the Source File");
         }
 
+        AssemblyInfo result { AssembleExecutable(outPath, sourceFile, outFile) };
+
+        sourceFile.close();
+        outFile.close();
+
+        return std::move(result);
+    }
+
+    AssemblyInfo ByteAssembler::AssembleExecutable(const std::string& path, std::istream& sourceFile, std::ostream& outFile)
+    {
+        uchar_t outFlags { AssemblyFlags::Executable };
+
+        if (CONTEXT.StoreSymbols())
+            outFlags |= AssemblyFlags::SymbolInfo;
+        if (CONTEXT.StoreName())
+            outFlags |= AssemblyFlags::StoreName;
+
+        AssemblyInfo assemblyInfo {
+            path,
+            outFlags,
+#ifdef TOOLCHAIN_MODE
+            this->context
+#endif
+        };
+
         std::string token { Stream::Tokenize(sourceFile) };
         for (; token != ".prep"; token = Stream::Tokenize(sourceFile))
             if (token == JASM_EOF)
-                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", file.c_str(), "'.");
+                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", path, "'.");
 
         // 
         // Set the origin point
@@ -291,8 +302,6 @@ namespace ByteAssembler
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
         
-        sourceFile.close();
-        outFile.close();
         return assemblyInfo;
     }
 
@@ -300,13 +309,26 @@ namespace ByteAssembler
     {
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
-        uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo | AssemblyFlags::StoreName };
 
         if (std::filesystem::exists(outPath))
             std::filesystem::remove(outPath);
 
+        std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
+        std::ofstream outFile { System::OpenOutFile(outPath) };
+
+        AssemblyInfo result { AssembleLibrary(outPath, sourceFile, outFile) };
+        sourceFile.close();
+        outFile.close();
+        return std::move(result);
+    }
+
+    AssemblyInfo ByteAssembler::AssembleLibrary(const std::string& path, std::istream& sourceFile, std::ostream& outFile)
+    {
+
+        uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo | AssemblyFlags::StoreName };
+
         AssemblyInfo assemblyInfo {
-            outPath.generic_string(),
+            path,
             outFlags,
 #ifdef TOOLCHAIN_MODE
             this->context
@@ -314,18 +336,13 @@ namespace ByteAssembler
         };
 
         // Process
-        std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
-        std::ofstream outFile { System::OpenOutFile(outPath) };
-
         std::string token { Stream::Tokenize(sourceFile) };
         for (; token != ".prep"; token = Stream::Tokenize(sourceFile))
             if (token == JASM_EOF)
-                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", file.c_str(), "'.");
+                LOGE(System::LogLevel::High, "Missing '.prep' section in file '", path, "'.");
 
         AssembleCommon(assemblyInfo, sourceFile, outFile);
 
-        sourceFile.close();
-        outFile.close();
         return assemblyInfo;
     }
 

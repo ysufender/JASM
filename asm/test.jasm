@@ -1,5 +1,11 @@
 .prep
+    org main
+    sts 32
+    sth 0
+
+    inc "macro.jmf"
 .body
     main:
-        stf syscall on
+        raw 11 "Hello World" 0 ;
+        sys sys_println
 .end
