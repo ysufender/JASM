@@ -37,7 +37,6 @@ Note: words inside paranthesis "()" are optional
 [x] addsf;  0x14;   add two floats from stack. DO NOT POP. push the result. 
 [x] addsb;  0x15;   add two (u)bytes on top of the stack. DO NOT POP. push the result. 
 
-TODO: Rewrite this without the memory modes.
 [x] mcp;    0x16;   copy the heap/stack starting at &eax to heap/stack starting at &ebx with the size of &ecx
 
 % The increments are not by one but by a given constant. Must be known at compile time.

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 
 project(JASM 
-    VERSION 0.1.3
+    VERSION 0.1.4
     DESCRIPTION "Assembler and linker for JASM IL"
     LANGUAGES CXX
 )

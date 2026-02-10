@@ -215,31 +215,35 @@ namespace ByteAssembler
 
     AssemblyInfo ByteAssembler::AssembleExecutable(const std::filesystem::path& file)
     {
-        // Setup
+        std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile; 
+        std::ifstream sourceFile { System::OpenInFile(file) };
+
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
 
-        if (std::filesystem::exists(outPath))
-            std::filesystem::remove(outPath);
-
-        std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
-        std::ofstream outFile { System::OpenOutFile(outPath) };
-
-        if (sourceFile.bad())
+#ifdef USE_PIPELINES_OPT
+        if (CONTEXT.IsUsingPipelines())
+            outFile = std::make_unique<Extensions::Stream::MemoryStream>();
+        else
         {
-            sourceFile.close();
-            LOGE(System::LogLevel::High, "An Error Occured While Reading the Source File");
-        }
+#endif
+            if (std::filesystem::exists(outPath))
+                std::filesystem::remove(outPath);
 
-        AssemblyInfo result { AssembleExecutable(outPath, sourceFile, outFile) };
+            outFile = std::make_unique<Extensions::Stream::FileStream>(outPath);
+#ifdef USE_PIPELINES_OPT
+        }
+#endif
+
+        AssemblyInfo result { AssembleExecutable(outPath, sourceFile, std::move(outFile)) };
 
         sourceFile.close();
-        outFile.close();
+        result.GetStream().InputStream().seekg(0, std::ios::beg);
 
-        return std::move(result);
+        return result;
     }
 
-    AssemblyInfo ByteAssembler::AssembleExecutable(const std::string& path, std::istream& sourceFile, std::ostream& outFile)
+    AssemblyInfo ByteAssembler::AssembleExecutable(const std::string& path, std::istream& sourceFile, std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile)
     {
         uchar_t outFlags { AssemblyFlags::Executable };
 
@@ -248,9 +252,12 @@ namespace ByteAssembler
         if (CONTEXT.StoreName())
             outFlags |= AssemblyFlags::StoreName;
 
+        std::ostream& outStream { outFile->OutputStream() };
+
         AssemblyInfo assemblyInfo {
             path,
             outFlags,
+            std::move(outFile),
 #ifdef TOOLCHAIN_MODE
             this->context
 #endif
@@ -270,7 +277,7 @@ namespace ByteAssembler
         else
         { 
             std::string entryName { Stream::Tokenize(sourceFile) };
-            Serialization::SerializeInteger<systembit_t>(0, outFile);
+            Serialization::SerializeInteger<systembit_t>(0, outStream);
             assemblyInfo.AddUnknownSymbol(String::Hash(entryName), 0);
         }
 
@@ -284,7 +291,7 @@ namespace ByteAssembler
         {
             std::string sizeStr { Stream::Tokenize(sourceFile) };
             systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-            Serialization::SerializeInteger(size, outFile);
+            Serialization::SerializeInteger(size, outStream);
         }
 
         //
@@ -297,39 +304,54 @@ namespace ByteAssembler
         {
             std::string sizeStr { Stream::Tokenize(sourceFile) };
             systembit_t size { static_cast<systembit_t>(std::stoul(sizeStr)) };
-            Serialization::SerializeInteger(size, outFile);
+            Serialization::SerializeInteger(size, outStream);
         }
 
-        AssembleCommon(assemblyInfo, sourceFile, outFile);
+        AssembleCommon(assemblyInfo, sourceFile, outStream);
         
-        return assemblyInfo;
+        return std::move(assemblyInfo);
     }
 
     AssemblyInfo ByteAssembler::AssembleLibrary(const std::filesystem::path& file)
     {
+        std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile; 
+        std::ifstream sourceFile { System::OpenInFile(file) };
+
         std::filesystem::path outPath { file };
         outPath.concat(".jo");
 
-        if (std::filesystem::exists(outPath))
-            std::filesystem::remove(outPath);
+#ifdef USE_PIPELINES_OPT
+        if (CONTEXT.IsUsingPipelines())
+            outFile = std::make_unique<Extensions::Stream::MemoryStream>();
+        else
+        {
+#endif
+            if (std::filesystem::exists(outPath))
+                std::filesystem::remove(outPath);
 
-        std::ifstream sourceFile { System::OpenInFile(file, std::ios::in) };
-        std::ofstream outFile { System::OpenOutFile(outPath) };
+            outFile = std::make_unique<Extensions::Stream::FileStream>(outPath);
+#ifdef USE_PIPELINES_OPT
+        }
+#endif
 
-        AssemblyInfo result { AssembleLibrary(outPath, sourceFile, outFile) };
+        AssemblyInfo result { AssembleLibrary(outPath, sourceFile, std::move(outFile)) };
+
         sourceFile.close();
-        outFile.close();
-        return std::move(result);
+        result.GetStream().InputStream().seekg(0, std::ios::beg);
+
+        return result;
     }
 
-    AssemblyInfo ByteAssembler::AssembleLibrary(const std::string& path, std::istream& sourceFile, std::ostream& outFile)
+    AssemblyInfo ByteAssembler::AssembleLibrary(const std::string& path, std::istream& sourceFile, std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile)
     {
-
         uchar_t outFlags { AssemblyFlags::Static | AssemblyFlags::SymbolInfo | AssemblyFlags::StoreName };
+
+        std::ostream& outStream { outFile->OutputStream() };
 
         AssemblyInfo assemblyInfo {
             path,
             outFlags,
+            std::move(outFile),
 #ifdef TOOLCHAIN_MODE
             this->context
 #endif
@@ -341,7 +363,7 @@ namespace ByteAssembler
             if (token == JASM_EOF)
                 LOGE(System::LogLevel::High, "Missing '.prep' section in file '", path, "'.");
 
-        AssembleCommon(assemblyInfo, sourceFile, outFile);
+        AssembleCommon(assemblyInfo, sourceFile, outStream);
 
         return assemblyInfo;
     }
@@ -351,14 +373,16 @@ namespace ByteAssembler
     //
     AssemblyInfo::AssemblyInfo(
         const std::string& path,
-        uchar_t flags
+        uchar_t flags,
+        std::unique_ptr<Extensions::Stream::LinkCompatibleStream> stream
 #ifdef TOOLCHAIN_MODE
         , const AssemblyContext& ctx
 #endif
     ) :
         symbolMap(),
         path(path),
-        flags(flags)
+        flags(flags),
+        _stream(std::move(stream))
 #ifdef TOOLCHAIN_MODE
         , context(ctx)
 #endif

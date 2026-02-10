@@ -33,7 +33,7 @@ namespace ByteLinker
     namespace AsmFlag = ByteAssembler::AssemblyFlags;
 
     void ByteLinker::Link(
-        const ByteAssembler::AssemblyInfoCollection& objects
+        ByteAssembler::AssemblyInfoCollection& objects
 #ifdef TOOLCHAIN_MODE
         , const AssemblyContext& context
 #endif
@@ -53,11 +53,59 @@ namespace ByteLinker
         else
             this->LinkExe(objects);
     }
-    
 
-    void ByteLinker::LinkSingle(const ByteAssembler::AssemblyInfoCollection& objects)
+#ifdef TOOLCHAIN_MODE
+    void ByteLinker::Link(
+        ByteAssembler::AssemblyInfoCollection& objects,
+        const AssemblyContext& context,
+        std::ostream& outFile
+    )
     {
-        for (const ByteAssembler::AssemblyInfo& info : objects)
+        runtimeAssemblies.clear();
+        definedSymbols.clear();
+        unknownSymbols.clear();
+#ifdef TOOLCHAIN_MODE
+        currentContext = &context;
+#endif
+
+        if (CONTEXT.IsLib())
+            this->LinkLib(objects, outFile);
+        else if (CONTEXT.IsSingle())
+            this->LinkSingle(objects, outFile);
+        else
+            this->LinkExe(objects, outFile);
+    }
+#endif
+
+    void ByteLinker::LinkSingle(ByteAssembler::AssemblyInfo& info, std::ostream& outFile)
+    {
+        std::istream& inFile { info.GetStream().InputStream() };
+
+        inFile.seekg(0, std::ios::beg);
+        while (!inFile.eof())
+        {
+            char ch;
+            Extensions::Serialization::DeserializeInteger(ch, inFile);
+            if (inFile.eof())
+                break;
+            Extensions::Serialization::SerializeInteger(ch, outFile);
+        }
+
+        outFile.seekp(0, std::ios::end);
+        OStreamPos(outFile, asmInfoStart);
+        info.Serialize(outFile);
+        OStreamPos(outFile, asmInfoEnd);
+        Extensions::Serialization::SerializeInteger(
+            static_cast<uint64_t>(asmInfoEnd-asmInfoStart),
+            outFile
+        );
+
+        info.PrintAssemblyInfo();
+    }
+
+    void ByteLinker::LinkSingle(ByteAssembler::AssemblyInfoCollection& objects)
+    {
+        for (ByteAssembler::AssemblyInfo& info : objects)
         {
             if (info.unknownSymbols.size() != 0)
             {
@@ -69,33 +117,14 @@ namespace ByteLinker
                 continue;
             }
 
-            ByteAssembler::AssemblyInfo newInfo { info };
-            newInfo.path.replace(newInfo.path.size()-8, 8, ".stc");
+            // ByteAssembler::AssemblyInfo newInfo { info };
+            info.path.replace(info.path.size()-8, 8, ".stc");
 
-            std::ifstream inFile { System::OpenInFile(info.path) };
-            std::ofstream outFile { System::OpenOutFile(newInfo.path) };
+            std::ofstream outFile { System::OpenOutFile(info.path) };
 
-            inFile.seekg(0, std::ios::beg);
-            while (!inFile.eof())
-            {
-                char ch;
-                Extensions::Serialization::DeserializeInteger(ch, inFile);
-                if (inFile.eof())
-                    break;
-                Extensions::Serialization::SerializeInteger(ch, outFile);
-            }
-
-            outFile.seekp(0, std::ios::end);
-            OStreamPos(outFile, asmInfoStart);
-            newInfo.Serialize(outFile);
-            OStreamPos(outFile, asmInfoEnd);
-            Extensions::Serialization::SerializeInteger(
-                static_cast<uint64_t>(asmInfoEnd-asmInfoStart),
-                outFile
-            );
+            LinkSingle(info, outFile);
 
             outFile.close();
-            newInfo.PrintAssemblyInfo();
         }
     }
 
@@ -106,10 +135,12 @@ namespace ByteLinker
             ByteAssembler::AssemblyInfo lib {
                 libPath,
                 ByteAssembler::AssemblyFlags::Static | ByteAssembler::AssemblyFlags::SymbolInfo | ByteAssembler::AssemblyFlags::StoreName,
+                nullptr,
 #ifdef TOOLCHAIN_MODE
                 CONTEXT
 #endif
             };
+
             std::ifstream inFile { System::OpenInFile(libPath) };
             inFile.seekg(-sizeof(uint64_t), std::ios::end);
             uint64_t size { };
@@ -150,7 +181,7 @@ namespace ByteLinker
         }
     }
 
-    static void LinkObjects(const ByteAssembler::AssemblyInfo& info, ByteAssembler::AssemblyInfo& final, size_t& currentPos, std::ostream& outFile)
+    static void LinkObjects(ByteAssembler::AssemblyInfo& info, ByteAssembler::AssemblyInfo& final, size_t& currentPos, std::ostream& outFile)
     {
         for (const std::string& import : info.runtimeImports)
         {
@@ -174,7 +205,7 @@ namespace ByteLinker
         for (const auto& unknown : info.unknownSymbols)
             unknownSymbols.emplace_back(unknown.SymbolHash, unknown.Address + currentPos);
 
-        std::ifstream inFile { System::OpenInFile(info.path) };
+        std::istream& inFile { info.GetStream().InputStream() };
         inFile.seekg(0, std::ios::end);
         IStreamPos(inFile, endPos);
         currentPos += endPos;
@@ -187,11 +218,9 @@ namespace ByteLinker
                 break;
             Extensions::Serialization::SerializeInteger(ch, outFile);
         }
-
-        inFile.close();
     }
 
-    static void HandleSymbols(ByteAssembler::AssemblyInfo& final, std::ofstream& outFile)
+    static void HandleSymbols(ByteAssembler::AssemblyInfo& final, std::ostream& outFile)
     {
         for (const auto& [symbol, address] : unknownSymbols)
         {
@@ -223,7 +252,6 @@ namespace ByteLinker
             outFile
         );
         //}
-        outFile.close();
 
         final.PrintAssemblyInfo();
 
@@ -236,7 +264,16 @@ namespace ByteLinker
         LOGW("TODO: Symbol check with runtime assemblies.");
     }
 
-    void ByteLinker::LinkLib(const ByteAssembler::AssemblyInfoCollection& objects)
+    void ByteLinker::LinkLib(ByteAssembler::AssemblyInfoCollection& objects)
+    {
+        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
+        
+        LinkLib(objects, outFile);
+
+        outFile.close();
+    }
+
+    void ByteLinker::LinkLib(ByteAssembler::AssemblyInfoCollection& objects, std::ostream& outFile)
     {
         ByteAssembler::AssemblyInfo final {
             CONTEXT.OutFile().data(),
@@ -245,16 +282,16 @@ namespace ByteLinker
                 |   ByteAssembler::AssemblyFlags::SymbolInfo
                 |   ByteAssembler::AssemblyFlags::StoreName
             ),
+            nullptr,
 #ifdef TOOLCHAIN_MODE
             CONTEXT
 #endif
         };
 
-        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
         std::size_t currentPos { 0 };
         
         // Link all object files
-        for (const auto& info : objects)
+        for (auto& info : objects)
         {
             if ((info.flags & ByteAssembler::AssemblyFlags::Executable))
                 LOGE(System::LogLevel::High, "Executable assemblies in library target, aborting. (", info.path, ")");
@@ -268,22 +305,31 @@ namespace ByteLinker
         HandleSymbols(final, outFile);
     }
 
-    void ByteLinker::LinkExe(const ByteAssembler::AssemblyInfoCollection& objects)
+    void ByteLinker::LinkExe(ByteAssembler::AssemblyInfoCollection& objects)
+    {
+        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
+
+        LinkExe(objects, outFile);
+
+        outFile.close();
+    }
+
+    void ByteLinker::LinkExe(ByteAssembler::AssemblyInfoCollection& objects, std::ostream& outFile)
     {
         ByteAssembler::AssemblyInfo final {
             CONTEXT.OutFile().data(),
             objects[0].flags,
+            nullptr,
 #ifdef TOOLCHAIN_MODE
             CONTEXT
 #endif
         };
 
-        std::ofstream outFile { System::OpenOutFile(CONTEXT.OutFile()) };
         std::size_t currentPos { 12 };
         outFile.seekp(12, std::ios::beg);
         
         // Link all object files
-        for (const auto& info : objects)
+        for (auto& info : objects)
         {
             if (&info == &objects[0])
                 continue;
@@ -298,7 +344,7 @@ namespace ByteLinker
         // Link the first file lastly, to keep the entry point at the bottom, and ensure the program exits.
         {
             outFile.seekp(0, std::ios::beg);
-            std::ifstream inFile { System::OpenInFile(objects[0].path) };
+            std::istream& inFile { objects[0].GetStream().InputStream() };
             inFile.seekg(0, std::ios::beg);
             systembit_t data;
             // org
@@ -336,8 +382,6 @@ namespace ByteLinker
                     break;
                 Extensions::Serialization::SerializeInteger(ch, outFile);
             }
-
-            inFile.close();
         }
 
         // Handle symbols

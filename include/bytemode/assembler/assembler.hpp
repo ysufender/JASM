@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "JASMConfig.hpp"
+#include "extensions/streamextensions.hpp"
 
 #ifdef TOOLCHAIN_MODE
 #include "assemblycontext.hpp"
@@ -42,10 +43,8 @@ namespace ByteAssembler
         systembit_t Address;
     };
 
-    struct AssemblyInfo
+    class AssemblyInfo
     {
-        // TODO: Add std::istream creation to AssemblyInfo from the provided std::ostream
-        // for the linker to read from
         public:
             //using SymbolCollection = std::vector<SymbolInfo>;
             using ImportCollection = std::vector<std::string>;
@@ -66,16 +65,21 @@ namespace ByteAssembler
             const AssemblyContext& context;
 #endif
             mutable std::string _infStr = "";
+            std::unique_ptr<Extensions::Stream::LinkCompatibleStream> _stream;
 
         public:
             AssemblyInfo() = delete;
             AssemblyInfo(
                 const std::string& path,
-                uchar_t flags
+                uchar_t flags,
+                std::unique_ptr<Extensions::Stream::LinkCompatibleStream> stream
 #ifdef TOOLCHAIN_MODE
                 , const AssemblyContext& ctx
 #endif
             );
+
+            Extensions::Stream::LinkCompatibleStream& GetStream() { return *_stream; }
+
             void Serialize(std::ostream& outFile) const;
             void Deserialize(std::istream& inFile);
             void PrintAssemblyInfo() const;
@@ -106,9 +110,9 @@ namespace ByteAssembler
         public:
 #endif
             AssemblyInfo AssembleLibrary(const std::filesystem::path& file);
-            AssemblyInfo AssembleLibrary(const std::string& path, std::istream& sourceFile, std::ostream& outFile);
+            AssemblyInfo AssembleLibrary(const std::string& path, std::istream& sourceFile, std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile);
             AssemblyInfo AssembleExecutable(const std::filesystem::path& file);
-            AssemblyInfo AssembleExecutable(const std::string& path, std::istream& sourceFile, std::ostream& outFile);
+            AssemblyInfo AssembleExecutable(const std::string& path, std::istream& sourceFile, std::unique_ptr<Extensions::Stream::LinkCompatibleStream> outFile);
             AssemblyInfo& AssembleCommon(AssemblyInfo& assemblyInfo, std::istream& sourceFile, std::ostream& outFile);
     };
 }

@@ -53,6 +53,7 @@ namespace ByteAssembler
         AssemblyInfo info {
             "",
             0,
+            nullptr,
 #ifdef TOOLCHAIN_MODE
             CONTEXT
 #endif

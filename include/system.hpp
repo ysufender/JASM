@@ -51,6 +51,7 @@ struct System
     
     static std::ifstream OpenInFile(const std::filesystem::path& path, const std::ios::openmode mode = std::ios::binary);
     static std::ofstream OpenOutFile(const std::filesystem::path& path, const std::ios::openmode mode = std::ios::binary);
+    static std::fstream OpenIOFile(const std::filesystem::path& path, const std::ios::openmode mode = std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc );
 };
 
 class JASMException : std::runtime_error

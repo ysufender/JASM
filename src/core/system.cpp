@@ -132,6 +132,20 @@ std::ofstream System::OpenOutFile(const std::filesystem::path& path, const std::
     return file;
 }
 
+std::fstream System::OpenIOFile(const std::filesystem::path& path, const std::ios::openmode mode)
+{
+    if (std::filesystem::exists(path))
+        LOGW("A file at path '", path.generic_string(), "' already exists. Overwriting...");
+
+    std::fstream file;
+    file.open(path, mode);
+
+    if (file.fail() || file.bad() || !file.is_open())
+        LOGE(LogLevel::High, "An error occured while opening the file '", path.generic_string(), "'.");
+
+    return file;
+}
+
 //
 // System::JASMException Implementation
 //

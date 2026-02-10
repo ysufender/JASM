@@ -19,7 +19,7 @@
 
                 "CXX_COMPILER_NAME":"g++",
                 "TOOLCHAIN_MODE": "OFF",
-                "USE_PIPELINES_OPT": "OFF",
+                "USE_PIPELINES_OPT": "ON",
                 "OUTPUT_PATH": ""
             }
         },

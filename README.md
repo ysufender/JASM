@@ -31,7 +31,7 @@ Here is the helper text from the current version of JASM:
 
 Just an Assembler (JASM)
         Description: Assembler and linker for JASM
-        Version: 0.1.3
+        Version: 0.1.4
         Use Pipelines: Unavailable
         Build Mode: CLI
 

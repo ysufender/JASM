@@ -2,10 +2,8 @@
     org main
     sts 32
     sth 0
-
-    inc "macro.jmf"
 .body
     main:
-        raw 11 "Hello World" 0 ;
-        sys sys_println
+        mov 0 &bl
+        cal func
 .end

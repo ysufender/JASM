@@ -2,6 +2,7 @@
 
 #include "JASMConfig.hpp"
 #include "bytemode/assembler/assembler.hpp"
+#include "extensions/streamextensions.hpp"
 
 
 namespace ByteLinker
@@ -12,20 +13,33 @@ namespace ByteLinker
     class ByteLinker
     {
         public:
+
             ByteLinker() = default;
             void Link(
-                const ByteAssembler::AssemblyInfoCollection& objects
+                ByteAssembler::AssemblyInfoCollection& objects
 #ifdef TOOLCHAIN_MODE
                 , const AssemblyContext& context
 #endif
             );
 
+#ifdef TOOLCHAIN_MODE
+            std::ostream& Link(
+                ByteAssembler::AssemblyInfoCollection& objects,
+                const AssemblyContext& context,
+                std::ostream& outFile
+            )
+#endif
+
 #ifndef TOOLCHAIN_MODE
         private:
 #endif
-            // TODO: Read from the AssemblyInfo::istream instead of opening file
-            void LinkSingle(const ByteAssembler::AssemblyInfoCollection& objects);
-            void LinkLib(const ByteAssembler::AssemblyInfoCollection& objects);
-            void LinkExe(const ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkSingle(ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkSingle(ByteAssembler::AssemblyInfo& info, std::ostream& outFile);
+
+            void LinkLib(ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkLib(ByteAssembler::AssemblyInfoCollection& objects, std::ostream& outFile);
+
+            void LinkExe(ByteAssembler::AssemblyInfoCollection& objects);
+            void LinkExe(ByteAssembler::AssemblyInfoCollection& objects, std::ostream& outFile);
     };
 }
