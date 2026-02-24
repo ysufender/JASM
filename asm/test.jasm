@@ -1,9 +1,9 @@
 .prep
     org main
-    sts 32
+    sts 128
     sth 0
 .body
     main:
-        mov 0 &bl
-        cal func
+        raw 0 "Hello World" 0 ;
+        sys "CSR_Println"
 .end

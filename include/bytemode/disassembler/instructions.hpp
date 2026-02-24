@@ -4,191 +4,198 @@
 
 namespace DisassemblerInstructions
 {
-    void Nop(std::istream& in);
+    void Nop(std::istream& in, std::ostream& out);
 
-    void Store32(std::istream& in);
-    void Store8(std::istream& in);
-    void StoreFloat(std::istream& in);
+    void Store32(std::istream& in, std::ostream& out);
+    void Store8(std::istream& in, std::ostream& out);
 
-    void Load32(std::istream& in);
-    void Load8(std::istream& in);
-    void LoadFloat(std::istream& in);
+    void Store32Symbol(std::istream& in, std::ostream& out);
+    void Store8Symbol(std::istream& in, std::ostream& out);
 
-    void ReadRegister(std::istream& in);
-    void ReadAddress(std::istream& in);
+    void Load32(std::istream& in, std::ostream& out);
+    void Load8(std::istream& in, std::ostream& out);
 
-    void MoveStackToReg(std::istream& in);
-    void MoveRegToReg(std::istream& in);
-    void MoveConstToReg(std::istream& in);
+    void Read32Address(std::istream& in, std::ostream& out);
+    void Read8Address(std::istream& in, std::ostream& out);
+    void ReadRegister(std::istream& in, std::ostream& out);
 
-    void Add32(std::istream& in);
-    void Add8(std::istream& in);
-    void AddFloat(std::istream& in);
+    void MoveStackToReg(std::istream& in, std::ostream& out);
+    void MoveRegToReg(std::istream& in, std::ostream& out);
+    void MoveConstToReg(std::istream& in, std::ostream& out);
 
-    void AddReg32(std::istream& in);
-    void AddReg8(std::istream& in);
-    void AddRegFloat(std::istream& in);
+    void Add32(std::istream& in, std::ostream& out);
+    void Add8(std::istream& in, std::ostream& out);
+    void AddFloat(std::istream& in, std::ostream& out);
 
-    void AddSafe32(std::istream& in);
-    void AddSafe8(std::istream& in);
-    void AddSafeFloat(std::istream& in);
+    void AddReg32(std::istream& in, std::ostream& out);
+    void AddReg8(std::istream& in, std::ostream& out);
+    void AddRegFloat(std::istream& in, std::ostream& out);
 
-    void Sub32(std::istream& in);
-    void Sub8(std::istream& in);
-    void SubFloat(std::istream& in);
+    void AddSafe32(std::istream& in, std::ostream& out);
+    void AddSafe8(std::istream& in, std::ostream& out);
+    void AddSafeFloat(std::istream& in, std::ostream& out);
 
-    void SubReg32(std::istream& in);
-    void SubReg8(std::istream& in);
-    void SubRegFloat(std::istream& in);
+    void Sub32(std::istream& in, std::ostream& out);
+    void Sub8(std::istream& in, std::ostream& out);
+    void SubFloat(std::istream& in, std::ostream& out);
 
-    void SubSafe32(std::istream& in);
-    void SubSafe8(std::istream& in);
-    void SubSafeFloat(std::istream& in);
+    void SubReg32(std::istream& in, std::ostream& out);
+    void SubReg8(std::istream& in, std::ostream& out);
+    void SubRegFloat(std::istream& in, std::ostream& out);
 
-    void MemCopy(std::istream& in);
+    void SubSafe32(std::istream& in, std::ostream& out);
+    void SubSafe8(std::istream& in, std::ostream& out);
+    void SubSafeFloat(std::istream& in, std::ostream& out);
 
-    void Increment32(std::istream& in);
-    void Increment8(std::istream& in);
-    void IncrementFloat(std::istream& in);
+    void MemCopy(std::istream& in, std::ostream& out);
 
-    void IncrementReg32(std::istream& in);
-    void IncrementReg8(std::istream& in);
-    void IncrementRegFloat(std::istream& in);
+    void Increment32(std::istream& in, std::ostream& out);
+    void Increment8(std::istream& in, std::ostream& out);
+    void IncrementFloat(std::istream& in, std::ostream& out);
 
-    void IncrementSafe32(std::istream& in);
-    void IncrementSafe8(std::istream& in);
-    void IncrementSafeFloat(std::istream& in);
+    void IncrementReg32(std::istream& in, std::ostream& out);
+    void IncrementReg8(std::istream& in, std::ostream& out);
+    void IncrementRegFloat(std::istream& in, std::ostream& out);
 
-    void Decrement32(std::istream& in);
-    void Decrement8(std::istream& in);
-    void DecrementFloat(std::istream& in);
+    void IncrementSafe32(std::istream& in, std::ostream& out);
+    void IncrementSafe8(std::istream& in, std::ostream& out);
+    void IncrementSafeFloat(std::istream& in, std::ostream& out);
 
-    void DecrementReg32(std::istream& in);
-    void DecrementReg8(std::istream& in);
-    void DecrementRegFloat(std::istream& in);
+    void Decrement32(std::istream& in, std::ostream& out);
+    void Decrement8(std::istream& in, std::ostream& out);
+    void DecrementFloat(std::istream& in, std::ostream& out);
 
-    void DecrementSafe32(std::istream& in);
-    void DecrementSafe8(std::istream& in);
-    void DecrementSafeFloat(std::istream& in);
+    void DecrementReg32(std::istream& in, std::ostream& out);
+    void DecrementReg8(std::istream& in, std::ostream& out);
+    void DecrementRegFloat(std::istream& in, std::ostream& out);
 
-    void And32(std::istream& in);
-    void And8(std::istream& in);
-    void AndReg(std::istream& in);
+    void DecrementSafe32(std::istream& in, std::ostream& out);
+    void DecrementSafe8(std::istream& in, std::ostream& out);
+    void DecrementSafeFloat(std::istream& in, std::ostream& out);
 
-    void Or32(std::istream& in);
-    void Or8(std::istream& in);
-    void OrReg(std::istream& in);
+    void And32(std::istream& in, std::ostream& out);
+    void And8(std::istream& in, std::ostream& out);
+    void AndReg(std::istream& in, std::ostream& out);
 
-    void Nor32(std::istream& in);
-    void Nor8(std::istream& in);
-    void NorReg(std::istream& in);
+    void Or32(std::istream& in, std::ostream& out);
+    void Or8(std::istream& in, std::ostream& out);
+    void OrReg(std::istream& in, std::ostream& out);
 
-    void Swap32(std::istream& in);
-    void Swap8(std::istream& in);
-    void SwapReg(std::istream& in);
+    void Nor32(std::istream& in, std::ostream& out);
+    void Nor8(std::istream& in, std::ostream& out);
+    void NorReg(std::istream& in, std::ostream& out);
 
-    void Duplicate32(std::istream& in);
-    void Duplicate8(std::istream& in);
+    void Swap32(std::istream& in, std::ostream& out);
+    void Swap8(std::istream& in, std::ostream& out);
+    void SwapReg(std::istream& in, std::ostream& out);
 
-    void RawData(std::istream& in);
-    void RawSymbol(std::istream& in);
+    void Duplicate32(std::istream& in, std::ostream& out);
+    void Duplicate8(std::istream& in, std::ostream& out);
+
+    void RawData(std::istream& in, std::ostream& out);
+    void RawSymbol(std::istream& in, std::ostream& out);
 
 //  This instruction can't be detected since it leaves no trace
-//  void RomData(std::istream& in);
+//  void RomData(std::istream& in, std::ostream& out);
 
-    void Invert32(std::istream& in);
-    void Invert8(std::istream& in);
-    void InvertReg(std::istream& in);
+    void Invert32(std::istream& in, std::ostream& out);
+    void Invert8(std::istream& in, std::ostream& out);
+    void InvertReg(std::istream& in, std::ostream& out);
 
-    void InvertSafe32(std::istream& in);
-    void InvertSafe8(std::istream& in);
+    void InvertSafe32(std::istream& in, std::ostream& out);
+    void InvertSafe8(std::istream& in, std::ostream& out);
     
-    void CompareStack(std::istream& in);
-    void CompareReg(std::istream& in);
+    void CompareStack(std::istream& in, std::ostream& out);
+    void CompareReg(std::istream& in, std::ostream& out);
 
-    void Pop32(std::istream& in);
-    void Pop8(std::istream& in);
+    void Pop32(std::istream& in, std::ostream& out);
+    void Pop8(std::istream& in, std::ostream& out);
 
-    void JumpImm(std::istream& in);
-    void JumpReg(std::istream& in);
+    void JumpImm(std::istream& in, std::ostream& out);
+    void JumpReg(std::istream& in, std::ostream& out);
 
-    void SwapRange(std::istream& in);
+    void SwapRange(std::istream& in, std::ostream& out);
 
-    void DuplicateRange(std::istream& in);
+    void DuplicateRange(std::istream& in, std::ostream& out);
 
-    void Repeat(std::istream& in);
+    void Repeat(std::istream& in, std::ostream& out);
 
-    void Allocate(std::istream& in);
+    void Allocate(std::istream& in, std::ostream& out);
 
-    void PowerImm32(std::istream& in);
-    void PowerImm8(std::istream& in);
-    void PowerImmFloat(std::istream& in);
+    void PowerImm32(std::istream& in, std::ostream& out);
+    void PowerImm8(std::istream& in, std::ostream& out);
+    void PowerImmFloat(std::istream& in, std::ostream& out);
 
-    void PowerStack32(std::istream& in);
-    void PowerStack8(std::istream& in);
-    void PowerStackFloat(std::istream& in);
+    void PowerStack32(std::istream& in, std::ostream& out);
+    void PowerStack8(std::istream& in, std::ostream& out);
+    void PowerStackFloat(std::istream& in, std::ostream& out);
 
-    void PowerReg32(std::istream& in);
-    void PowerReg8(std::istream& in);
-    void PowerRegFloat(std::istream& in);
+    void PowerReg32(std::istream& in, std::ostream& out);
+    void PowerReg8(std::istream& in, std::ostream& out);
+    void PowerRegFloat(std::istream& in, std::ostream& out);
 
-    void SquareImm32(std::istream& in);
-    void SquareImm8(std::istream& in);
-    void SquareImmFloat(std::istream& in);
+    void SquareImm32(std::istream& in, std::ostream& out);
+    void SquareImm8(std::istream& in, std::ostream& out);
+    void SquareImmFloat(std::istream& in, std::ostream& out);
 
-    void SquareStack32(std::istream& in);
-    void SquareStack8(std::istream& in);
-    void SquareStackFloat(std::istream& in);
+    void SquareStack32(std::istream& in, std::ostream& out);
+    void SquareStack8(std::istream& in, std::ostream& out);
+    void SquareStackFloat(std::istream& in, std::ostream& out);
 
-    void SquareReg32(std::istream& in);
-    void SquareReg8(std::istream& in);
-    void SquareRegFloat(std::istream& in);
+    void SquareReg32(std::istream& in, std::ostream& out);
+    void SquareReg8(std::istream& in, std::ostream& out);
+    void SquareRegFloat(std::istream& in, std::ostream& out);
 
-    void ConditionalImm(std::istream& in);
-    void ConditionalReg(std::istream& in);
+    void ConditionalImm(std::istream& in, std::ostream& out);
+    void ConditionalReg(std::istream& in, std::ostream& out);
 
-    void CallImm(std::istream& in);
-    void CallReg(std::istream& in);
+    void CallImm(std::istream& in, std::ostream& out);
+    void CallReg(std::istream& in, std::ostream& out);
 
-    void Multiply32(std::istream& in);
-    void Multiply8(std::istream& in);
-    void MultiplyFloat(std::istream& in);
+    void Multiply32(std::istream& in, std::ostream& out);
+    void Multiply8(std::istream& in, std::ostream& out);
+    void MultiplyFloat(std::istream& in, std::ostream& out);
 
-    void MultiplyReg32(std::istream& in);
-    void MultiplyReg8(std::istream& in);
-    void MultiplyRegFloat(std::istream& in);
+    void MultiplyReg32(std::istream& in, std::ostream& out);
+    void MultiplyReg8(std::istream& in, std::ostream& out);
+    void MultiplyRegFloat(std::istream& in, std::ostream& out);
 
-    void MultiplySafe32(std::istream& in);
-    void MultiplySafe8(std::istream& in);
-    void MultiplySafeFloat(std::istream& in);
+    void MultiplySafe32(std::istream& in, std::ostream& out);
+    void MultiplySafe8(std::istream& in, std::ostream& out);
+    void MultiplySafeFloat(std::istream& in, std::ostream& out);
 
-    void Divide32(std::istream& in);
-    void Divide8(std::istream& in);
-    void DivideFloat(std::istream& in);
+    void Divide32(std::istream& in, std::ostream& out);
+    void Divide8(std::istream& in, std::ostream& out);
+    void DivideFloat(std::istream& in, std::ostream& out);
 
-    void DivideReg32(std::istream& in);
-    void DivideReg8(std::istream& in);
-    void DivideRegFloat(std::istream& in);
+    void DivideReg32(std::istream& in, std::ostream& out);
+    void DivideReg8(std::istream& in, std::ostream& out);
+    void DivideRegFloat(std::istream& in, std::ostream& out);
 
-    void DivideSafe32(std::istream& in);
-    void DivideSafe8(std::istream& in);
-    void DivideSafeFloat(std::istream& in);
+    void DivideSafe32(std::istream& in, std::ostream& out);
+    void DivideSafe8(std::istream& in, std::ostream& out);
+    void DivideSafeFloat(std::istream& in, std::ostream& out);
 
-    void Return(std::istream& in);
+    void Return(std::istream& in, std::ostream& out);
 
-    void Deallocate(std::istream& in);
+    void Deallocate(std::istream& in, std::ostream& out);
 
-    void IncrementLocal32(std::istream& in);
-    void IncrementLocal8(std::istream& in);
-    void IncrementLocalFloat(std::istream& in);
+    void IncrementLocal32(std::istream& in, std::ostream& out);
+    void IncrementLocal8(std::istream& in, std::ostream& out);
+    void IncrementLocalFloat(std::istream& in, std::ostream& out);
 
-    void ReadLocal32(std::istream& in);
-    void DividetLocal8(std::istream& in);
-    void DividetLocalFloat(std::istream& in);
+    void ReadLocal32(std::istream& in, std::ostream& out);
+    void ReadLocal8(std::istream& in, std::ostream& out);
 
-    void ConditionalJump(std::istream& in);
+    void CompareJump(std::istream& in, std::ostream& out);
 
-    void CompareLocal(std::istream& in);
+    void CompareLocal(std::istream& in, std::ostream& out);
 
-    void StoreAddress(std::istream& in);
+    void SetFlag(std::istream& in, std::ostream& out);
+
+    void SysCall(std::istream& in, std::ostream& out);
+
+    void Xor32(std::istream& in, std::ostream& out);
+    void Xor8(std::istream& in, std::ostream& out);
+    void XorReg(std::istream& in, std::ostream& out);
 }
