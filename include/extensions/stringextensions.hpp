@@ -52,4 +52,16 @@ namespace Extensions::String
 
         return true;
     }
+
+    constexpr size_t ConstHash(std::string_view str)
+    {
+        if (str == "syscall")
+            return 0;
+        else if (str == "on")
+            return 1;
+        else if (str == "off")
+            return 2;
+
+        __builtin_unreachable();
+    }
 }

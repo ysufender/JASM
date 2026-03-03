@@ -314,7 +314,7 @@ namespace Instructions
     std::string Nop(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
         // nop
-        Extensions::Serialization::SerializeInteger(OpCodes::nop, out);
+        Serialization::SerializeInteger(OpCodes::nop, out);
         return Stream::Tokenize(in);
     }
 
@@ -1228,20 +1228,37 @@ namespace Instructions
         // possible flags: syscall
         // on/off and flag are compressed. First 4 flag last 4 on/off
 
+        using Extensions::String::ConstHash;
+
         const std::string flag { Stream::Tokenize(in) };
         const std::string onoff { Stream::Tokenize(in) };
         uchar_t flg;
         uchar_t mode;
         Serialization::SerializeInteger(OpCodes::stf, out);
 
-        if (flag == "syscall")
-            flg = 0;
-        else
-            LOGE(System::LogLevel::High, "Unsupported flag '", flag, "'. In instruction 'acf'");
+        switch (ConstHash(flag))
+        {
+            case ConstHash("syscall"):
+                flg = 0;
+                break;
 
-        mode = (onoff == "on") ? 1 : (onoff == "off") ? 0 : 8;
-        if (mode == 8)
-            LOGE(System::LogLevel::High, "Unexpected token '", onoff, "'. Expected 'on' of 'off'");
+            default:
+                LOGE(System::LogLevel::High, "Unsupported flag '", flag, "'. In instruction 'acf'");
+        }
+
+        switch (ConstHash(onoff))
+        {
+            case ConstHash("on"):
+                mode = 1;
+                break;
+
+            case ConstHash("off"):
+                mode = 0;
+                break;
+
+            default:
+                LOGE(System::LogLevel::High, "Unexpected token '", onoff, "'. Expected 'on' of 'off'");
+        }
 
         const uchar_t compressed { static_cast<uchar_t>((flg << 4) | mode) };
         Serialization::SerializeInteger(compressed, out);
@@ -1251,17 +1268,23 @@ namespace Instructions
 
     std::string SysCall(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {
-        std::string signature { Stream::Tokenize(in) };
-        
-        if (!signature.starts_with('\"') || !signature.ends_with('\"'))
-            LOGE(System::LogLevel::High, "Signature name must start/end with quotes, got ", signature, " instead.");
-        signature.pop_back();
-        signature.erase(0, 1);
+        // sys <symbol>
+        // sys <rom_address>
+        std::string next { Stream::Tokenize(in) };
 
         Serialization::SerializeInteger(OpCodes::sys, out);
-        Serialization::SerializeInteger<systembit_t>(signature.size(), out);
-        out.write(signature.data(), signature.size());
 
+        // sys <rom_address>
+        if (String::TokenIsNumber(next))
+            Serialization::SerializeInteger(_TokenToInt<systembit_t>(next), out);
+        else
+        {
+            size_t symbolHash { String::Hash(next) };
+            OStreamPos(out, pos);
+            info.AddUnknownSymbol(symbolHash, pos);
+            Serialization::SerializeInteger<systembit_t>(0, out);
+        }
+        
         return Stream::Tokenize(in);
     }
 
