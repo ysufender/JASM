@@ -10,4 +10,7 @@ build/
 *.jo
 *.project.gf
 
-*gring.out*
+*grind.out*
+
+.zig-cache/
+zig-out/

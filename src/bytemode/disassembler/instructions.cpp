@@ -125,7 +125,7 @@ namespace DisassemblerInstructions
         {
             uchar_t val;
             DeserializeInteger(val, in);
-            out << "\nmov " << static_cast<int>(val) << " " << modeStr.at(static_cast<uchar_t>(regMode));
+            out << "\nmov " << static_cast<int>(val << " " << modeStr.at(static_cast<uchar_t>(regMode));
         }
         else
         {

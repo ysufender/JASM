@@ -1,0 +1,13 @@
+.{
+    .name = .JASM,
+    .version = "0.1.5",
+    .fingerprint = 0x3d4eb308a1f118bc,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
