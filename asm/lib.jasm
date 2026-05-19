@@ -1,6 +1,0 @@
-.prep
-.body
-    const:
-        mov 15 &eax
-        ret
-.end

@@ -1137,7 +1137,6 @@ namespace Instructions
     {
         // cnj <mode> <compare_mode> <address>
         // cnj <mode> <compare_mode> <symbol>
-        // cnj <mode> <compare_mode> <register>
         //
         // Serialize the <mode> and <compare_mode> to one byte
         // first 3 bits are <mode>, last 5 bits are <compare_mode>
@@ -1214,13 +1213,6 @@ namespace Instructions
 
         return Stream::Tokenize(in);
     }
-
-    /*std::string PushStackFrame(AssemblyInfo& info, std::istream& in, std::ostream& out)
-    {
-        // psf
-        // Serialization::SerializeInteger(OpCodes::psf, out);
-        return Stream::Tokenize(in);
-    }*/
 
     std::string SetFlag(AssemblyInfo& info, std::istream& in, std::ostream& out)
     {

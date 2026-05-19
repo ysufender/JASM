@@ -1,9 +1,0 @@
-.prep
-.body
-    func:
-        mov &sp &eax
-        raw 11 "Hello World" ;
-        rda &eax
-        sys "CSR_Println"
-        ret
-.end

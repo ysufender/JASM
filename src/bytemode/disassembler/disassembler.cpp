@@ -121,12 +121,15 @@ namespace ByteAssembler
 
         info.PrintAssemblyInfo();
 
+        systembit_t entryPoint;
+
         in.seekg(0, std::ios::beg);
         out << "\n.prep";
         if (info.flags & AssemblyFlags::Executable)
         {
-            uint32_t dat;
+            systembit_t dat;
             Serialization::DeserializeInteger(dat, in);
+            entryPoint = dat;
             out << "\n\torg " << dat;
             Serialization::DeserializeInteger(dat, in);
             out << "\n\tsts " << dat;
@@ -134,6 +137,8 @@ namespace ByteAssembler
             out << "\n\tsth " << dat;
         }
         out << "\n.body";
+
+        in.seekg(entryPoint);
 
         for (std::streamoff pos { in.tellg() }; pos != -1 && pos < bytecodeEnd; pos = in.tellg())
         {
